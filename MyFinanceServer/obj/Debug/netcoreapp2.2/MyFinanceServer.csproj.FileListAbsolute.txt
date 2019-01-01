@@ -1,0 +1,14 @@
+C:\git\MyFinanceServer\MyFinanceServer\bin\Debug\netcoreapp2.2\MyFinanceServer.deps.json
+C:\git\MyFinanceServer\MyFinanceServer\bin\Debug\netcoreapp2.2\MyFinanceServer.runtimeconfig.json
+C:\git\MyFinanceServer\MyFinanceServer\bin\Debug\netcoreapp2.2\MyFinanceServer.runtimeconfig.dev.json
+C:\git\MyFinanceServer\MyFinanceServer\bin\Debug\netcoreapp2.2\MyFinanceServer.dll
+C:\git\MyFinanceServer\MyFinanceServer\bin\Debug\netcoreapp2.2\MyFinanceServer.pdb
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.csprojAssemblyReference.cache
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.csproj.CoreCompileInputs.cache
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.RazorAssemblyInfo.cache
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.RazorAssemblyInfo.cs
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.AssemblyInfoInputs.cache
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.AssemblyInfo.cs
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.RazorTargetAssemblyInfo.cache
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.dll
+C:\git\MyFinanceServer\MyFinanceServer\obj\Debug\netcoreapp2.2\MyFinanceServer.pdb
