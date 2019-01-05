@@ -1,3 +1,4 @@
 /.vs
 /MyFinanceServer/obj
 /MyFinanceServer/bin
+/MyFinanceServer/*.user

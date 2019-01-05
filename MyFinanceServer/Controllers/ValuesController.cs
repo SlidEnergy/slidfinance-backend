@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyFinanceServer.Data;
 
 namespace MyFinanceServer.Controllers
 {
@@ -12,10 +13,19 @@ namespace MyFinanceServer.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly ApplicationDbContext _context;
+
+        public ValuesController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
+            _context.User.Add(new Models.User() { Email = "dsfsdf", Login = " dsfsdf", Password = "dsfwer" });
+            _context.SaveChanges();
             return new string[] { "value1", "value2" };
         }
 
