@@ -29,22 +29,24 @@
         $('#submitLogin').click(function (e) {
             e.preventDefault();
             var loginData = {
-                grant_type: 'password',
-                username: $('#emailLogin').val(),
+                //grant_type: 'password',
+                email: $('#emailLogin').val(),
                 password: $('#passwordLogin').val()
             };
 
             $.ajax({
                 type: 'POST',
                 url: '/auth/v1/token',
-                data: loginData
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: JSON.stringify(loginData)
             }).success(function (data) {
                 $('.userName').text(data.username);
                 $('.userInfo').css('display', 'block');
                 $('.loginForm').css('display', 'none');
                 // сохраняем в хранилище sessionStorage токен доступа
-                sessionStorage.setItem(tokenKey, data.access_token);
-                console.log(data.access_token);
+                sessionStorage.setItem(tokenKey, data.token);
+                console.log(data.token);
             }).fail(function (data) {
                 console.log(data);
             });
