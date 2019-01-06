@@ -134,6 +134,7 @@ namespace MyFinanceServer
         private string GetConnectionString()
         {
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
             var databaseUri = new Uri(databaseUrl);
             var userInfo = databaseUri.UserInfo.Split(':');
 
@@ -143,7 +144,9 @@ namespace MyFinanceServer
                 Port = databaseUri.Port,
                 Username = userInfo[0],
                 Password = userInfo[1],
-                Database = databaseUri.LocalPath.TrimStart('/')
+                Database = databaseUri.LocalPath.TrimStart('/'),
+                //SslMode = SslMode.Require,
+                //TrustServerCertificate = true
             };
 
             return builder.ToString();
