@@ -145,8 +145,8 @@ namespace MyFinanceServer
                 Username = userInfo[0],
                 Password = userInfo[1],
                 Database = databaseUri.LocalPath.TrimStart('/'),
-                //SslMode = SslMode.Require,
-                //TrustServerCertificate = true
+                SslMode = databaseUri.Host == "localhost" ? SslMode.Disable : SslMode.Require,
+                TrustServerCertificate = true
             };
 
             return builder.ToString();
