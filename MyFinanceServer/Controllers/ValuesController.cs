@@ -24,8 +24,6 @@ namespace MyFinanceServer.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            _context.User.Add(new Models.User() { Email = "dsfsdf", Login = " dsfsdf", Password = "dsfwer" });
-            _context.SaveChanges();
             return new string[] { "value1", "value2" };
         }
 

@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Models;
 using MyFinanceServer.Data;
+using Npgsql;
 
 namespace MyFinanceServer
 {
@@ -32,6 +33,10 @@ namespace MyFinanceServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // configure AppSettings
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
             //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
 
             //services
@@ -55,8 +60,15 @@ namespace MyFinanceServer
             //        };
             //    });
 
+            var appSettings = appSettingsSection.Get<AppSettings>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                     .AddJwtBearer(options =>
                     {
                         options.RequireHttpsMetadata = false;
@@ -65,34 +77,32 @@ namespace MyFinanceServer
                             // укзывает, будет ли валидироваться издатель при валидации токена
                             ValidateIssuer = true,
                             // строка, представляющая издателя
-                            ValidIssuer = AuthOptions.ISSUER,
+                            //ValidIssuer = AuthOptions.ISSUER,
 
                             // будет ли валидироваться потребитель токена
                             ValidateAudience = true,
                             // установка потребителя токена
-                            ValidAudience = AuthOptions.AUDIENCE,
+                            //ValidAudience = AuthOptions.AUDIENCE,
                             // будет ли валидироваться время существования
                             ValidateLifetime = true,
 
                             // установка ключа безопасности
-                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                            IssuerSigningKey = new SymmetricSecurityKey(key),
                             // валидация ключа безопасности
                             ValidateIssuerSigningKey = true,
                         };
                     });
 
+            services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddEntityFrameworkNpgsql()
-                .AddDbContext<ApplicationDbContext>(options =>
-//#if DEBUG
-//                options.UseNpgsql(Configuration.GetConnectionString("PostgreSqlConnectionString")))
-//#else
-                options.UseNpgsql(Configuration.GetConnectionString("HerokuPostgreSqlConnectionString")))
-//#endif
+                .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
                 .BuildServiceProvider();
-            //services.AddDbContext<ApplicationDbContext>(options =>
-              //      options.UseSqlServer(Configuration.GetConnectionString("ApplicationDbContext")));
+
+            // DI
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -108,11 +118,35 @@ namespace MyFinanceServer
                 app.UseHsts();
             }
 
+            app.UseCors(x => x
+               .AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials());
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private string GetConnectionString()
+        {
+            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+            var databaseUri = new Uri(databaseUrl);
+            var userInfo = databaseUri.UserInfo.Split(':');
+
+            var builder = new NpgsqlConnectionStringBuilder
+            {
+                Host = databaseUri.Host,
+                Port = databaseUri.Port,
+                Username = userInfo[0],
+                Password = userInfo[1],
+                Database = databaseUri.LocalPath.TrimStart('/')
+            };
+
+            return builder.ToString();
         }
     }
 }
