@@ -85,11 +85,11 @@ namespace MyFinanceServer
 
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ApplicationDbContext>(options =>
-#if DEBUG
-                options.UseNpgsql(Configuration.GetConnectionString("PostgreSqlConnectionString")))
-#else
+//#if DEBUG
+//                options.UseNpgsql(Configuration.GetConnectionString("PostgreSqlConnectionString")))
+//#else
                 options.UseNpgsql(Configuration.GetConnectionString("HerokuPostgreSqlConnectionString")))
-#endif
+//#endif
                 .BuildServiceProvider();
             //services.AddDbContext<ApplicationDbContext>(options =>
               //      options.UseSqlServer(Configuration.GetConnectionString("ApplicationDbContext")));
