@@ -33,6 +33,28 @@ namespace MyFinanceServer.Api
         [HttpPost]
         public async Task<ActionResult<Transaction>> AddTransaction(TransactionBindingModel transaction)
         {
+            var t = await AddTransactionInternal(transaction);
+
+            return CreatedAtAction("GetTransaction", new { id = t.Id }, t);
+        }
+
+        // POST: api/transactions
+        [HttpPatch]
+        public async Task<ActionResult> AddTransactions(ICollection<TransactionBindingModel> transactions)
+        {
+            List<Models.Transaction> list = new List<Transaction>(transactions.Count);
+
+            foreach (var t in transactions)
+            {
+                var transaction = await AddTransactionInternal(t);
+                list.Add(transaction);
+            }
+
+            return StatusCode(201);
+        }
+
+        private async Task<Models.Transaction> AddTransactionInternal(TransactionBindingModel transaction)
+        {
             var t = new Models.Transaction()
             {
                 Amount = transaction.Amount,
@@ -43,7 +65,7 @@ namespace MyFinanceServer.Api
 
             var account = await _dbContext.Accounts
                 .Include(x => x.Transactions)
-                .SingleOrDefaultAsync(x=> x.Id == transaction.AccountId);
+                .SingleOrDefaultAsync(x => x.Id == transaction.AccountId);
 
             if (account == null)
                 NotFound();
@@ -52,7 +74,7 @@ namespace MyFinanceServer.Api
 
             await _dbContext.SaveChangesAsync();
 
-            return CreatedAtAction("GetTransaction", new { id = t.Id }, t);
+            return t;
         }
     }
 }

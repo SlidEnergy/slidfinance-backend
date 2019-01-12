@@ -26,8 +26,13 @@ namespace MyFinanceServer.Data
                 });
 
             modelBuilder.Entity<Models.Account>().HasData(
-                new { Id = 1, BankId = 1 }
-                );
+                new
+                {
+                    Id = 1,
+                    BankId = 1,
+                    Title = "Польза",
+                    Balance = 0f
+                });
         }
 
         public DbSet<Models.Transaction> Transactions { get; set; }
