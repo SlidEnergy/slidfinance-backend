@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace MyFinanceServer.Data
 {
@@ -15,10 +16,24 @@ namespace MyFinanceServer.Data
         {
             modelBuilder.Entity<Models.User>().HasData(
                 new Models.User { Id = 1, Email = "slidenergy@gmail.com", Password = "slider123" });
+
+            modelBuilder.Entity<Models.Bank>().HasData(
+                new 
+                {
+                    Id = 1,
+                    Title = "HomeCreditBank",
+                    UserId = 1
+                });
+
+            modelBuilder.Entity<Models.Account>().HasData(
+                new { Id = 1, BankId = 1 }
+                );
         }
 
         public DbSet<Models.Transaction> Transactions { get; set; }
 
         public DbSet<Models.Account> Accounts { get; set; }
+
+        public DbSet<Models.Bank> Banks { get; set; }
     }
 }

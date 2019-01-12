@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyFinanceServer.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,9 +10,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyFinanceServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190112132224_createinit")]
+    partial class createinit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,7 +26,7 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("BankId");
+                    b.Property<int?>("BankId");
 
                     b.HasKey("Id");
 
@@ -45,10 +47,9 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Title")
-                        .IsRequired();
+                    b.Property<string>("Title");
 
-                    b.Property<int>("UserId");
+                    b.Property<int?>("UserId");
 
                     b.HasKey("Id");
 
@@ -60,8 +61,7 @@ namespace MyFinanceServer.Migrations
                         new
                         {
                             Id = 1,
-                            Title = "HomeCreditBank",
-                            UserId = 1
+                            Title = "HomeCreditBank"
                         });
                 });
 
@@ -70,7 +70,7 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AccountId");
+                    b.Property<int?>("AccountId");
 
                     b.Property<float>("Amount");
 
@@ -78,8 +78,7 @@ namespace MyFinanceServer.Migrations
 
                     b.Property<DateTime>("DateTime");
 
-                    b.Property<string>("Description")
-                        .IsRequired();
+                    b.Property<string>("Description");
 
                     b.HasKey("Id");
 
@@ -93,11 +92,9 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Email")
-                        .IsRequired();
+                    b.Property<string>("Email");
 
-                    b.Property<string>("Password")
-                        .IsRequired();
+                    b.Property<string>("Password");
 
                     b.HasKey("Id");
 
@@ -116,24 +113,21 @@ namespace MyFinanceServer.Migrations
                 {
                     b.HasOne("MyFinanceServer.Models.Bank", "Bank")
                         .WithMany("Accounts")
-                        .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("BankId");
                 });
 
             modelBuilder.Entity("MyFinanceServer.Models.Bank", b =>
                 {
-                    b.HasOne("MyFinanceServer.Models.User", "User")
+                    b.HasOne("MyFinanceServer.Models.User")
                         .WithMany("Banks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("MyFinanceServer.Models.Transaction", b =>
                 {
                     b.HasOne("MyFinanceServer.Models.Account", "Account")
                         .WithMany("Transactions")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("AccountId");
                 });
 #pragma warning restore 612, 618
         }

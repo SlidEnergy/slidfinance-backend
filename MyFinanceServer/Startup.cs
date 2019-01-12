@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Models;
 using MyFinanceServer.Data;
 using Npgsql;
+using MyFinanceServer.Api;
 
 namespace MyFinanceServer
 {
@@ -102,7 +103,6 @@ namespace MyFinanceServer
 
             // DI
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

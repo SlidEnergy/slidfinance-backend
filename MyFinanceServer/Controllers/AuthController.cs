@@ -1,32 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Data;
 using MyFinanceServer.Models;
+using System.Linq;
 
 namespace MyFinanceServer.Api
 {
     [Route("auth/v1")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public sealed class AuthController : ControllerBase
     {
-        ITokenGenerator _tokenGenerator;
-        IUserRepository _userRepository;
+        private readonly ITokenGenerator _tokenGenerator;
+        private readonly ApplicationDbContext _dbContext;
 
-        public AuthController(ITokenGenerator tokenGenerator, IUserRepository userRepository)
+        public AuthController(ITokenGenerator tokenGenerator, ApplicationDbContext dbContext)
         {
-            _userRepository = userRepository;
+            _dbContext = dbContext;
             _tokenGenerator = tokenGenerator;
         }
 
         [HttpPost("token")]
-        public IActionResult Token([FromBody]User userData)
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        public ActionResult<TokenInfo> GetToken(UserBindingModel userData)
         {
-            var user = _userRepository.Get(userData.Email, userData.Password);
+            var user = _dbContext.Users.Where(x => x.Email == userData.Email && x.Password == userData.Password).SingleOrDefault();
+            
             if (user == null)
                 return Unauthorized();
 
             var token = _tokenGenerator.Get(userData.Email);
 
-            return Ok(new { token, userData.Email });
+            return new TokenInfo() { Token = token, Email = userData.Email };
         }
     }
 }
