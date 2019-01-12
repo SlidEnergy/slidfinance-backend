@@ -2,7 +2,7 @@
 using MyFinanceServer.Data;
 using MyFinanceServer.Models;
 
-namespace MyFinanceServer.Controllers
+namespace MyFinanceServer.Api
 {
     [Route("auth/v1")]
     [ApiController]

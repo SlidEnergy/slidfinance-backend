@@ -16,5 +16,9 @@ namespace MyFinanceServer.Data
             modelBuilder.Entity<Models.User>().HasData(
                 new Models.User { Id = 1, Email = "slidenergy@gmail.com", Password = "slider123" });
         }
+
+        public DbSet<Models.Transaction> Transactions { get; set; }
+
+        public DbSet<Models.Account> Accounts { get; set; }
     }
 }

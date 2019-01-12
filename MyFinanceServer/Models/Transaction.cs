@@ -13,12 +13,10 @@ namespace MyFinanceServer.Models
 
         public float Amount { get; set; }
 
+        public Category Category { get; set; }
+
         public string Description { get; set; }
 
-        public string Category { get; set; }
-
-        public string BankDescription { get; set; }
-
-        public string BankCategory { get; set; }
+        public Models.Account Account { get; set; }
     }
 }

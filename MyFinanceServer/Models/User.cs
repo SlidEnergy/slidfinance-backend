@@ -1,4 +1,6 @@
-﻿namespace MyFinanceServer.Models
+﻿using System.Collections.Generic;
+
+namespace MyFinanceServer.Models
 {
     public class User
     {
@@ -7,5 +9,7 @@
         public string Email { get; set; }
 
         public string Password { get; set; }
+
+        public IEnumerable<Models.Bank> Banks { get; set; }
     }
 }
