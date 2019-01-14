@@ -2,14 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
+using MyFinanceServer.Domain;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Moq;
 
 namespace MyFinanceServer.Tests
 {
-    public class TransactionsTests
+    public class AccountTests
     {
         [SetUp]
         public void Setup()
@@ -17,37 +19,7 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
-        public async Task AddTransaction_Created()
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("Add_Transaction_Created");
-            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var account = new Models.Account() { Transactions = new List<Models.Transaction>() };
-            await dbContext.Accounts.AddAsync(account);
-            await dbContext.Banks.AddAsync(new Models.Bank()
-            {
-                Title = "Bank #1",
-                Accounts = new List<Models.Account>(new[] { account })
-            });
-            await dbContext.SaveChangesAsync();
-
-            var transaction = new TransactionBindingModel()
-            {
-                AccountId = account.Id,
-                DateTime = DateTime.Now,
-                Amount = 10,
-                Category = "Category #1",
-                Description = "Description #1"
-            };
-
-            var controller = new TransactionsController(dbContext);
-            var result = await controller.AddTransaction(transaction);
-
-            Assert.IsInstanceOf<ActionResult<Models.Transaction>>(result);
-        }
-
-        [Test]
-        public async Task AddTransactions_NoContentResult()
+        public async Task PatchAccountDataInMemory_NoContentResult()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("Add_Transaction_Created");
@@ -63,7 +35,6 @@ namespace MyFinanceServer.Tests
 
             var transaction1 = new TransactionBindingModel()
             {
-                AccountId = account.Id,
                 DateTime = DateTime.Now,
                 Amount = 10,
                 Category = "Category #1",
@@ -72,18 +43,70 @@ namespace MyFinanceServer.Tests
 
             var transaction2 = new TransactionBindingModel()
             {
-                AccountId = account.Id,
                 DateTime = DateTime.Now,
                 Amount = 5,
                 Category = "Category #2",
                 Description = "Description #2"
             };
 
-            var controller = new TransactionsController(dbContext);
-            var result = await controller.AddTransactions(new[] { transaction1, transaction2 });
+            var accountDataSaver = new AccountDataSaver(dbContext);
+            var controller = new AccountController(dbContext, accountDataSaver);
+            var result = await controller.PatchAccountData(account.Id,
+                new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 
-            Assert.IsInstanceOf<StatusCodeResult>(result);
-            Assert.AreEqual(201, ((StatusCodeResult)result).StatusCode);
+            Assert.IsInstanceOf<NoContentResult>(result);
+
+            var newAccount = await dbContext.Accounts.Include(x => x.Transactions).SingleOrDefaultAsync(x => x.Id == account.Id);
+            Assert.AreEqual(500, newAccount.Balance);
+            Assert.AreEqual(2, newAccount.Transactions.Count);
+        }
+
+        [Test]
+        public async Task PatchAccountData_NoContentResult()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("Add_Transaction_Created");
+            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
+            var account = new Models.Account() { Transactions = new List<Models.Transaction>() };
+            await dbContext.Accounts.AddAsync(account);
+            await dbContext.Banks.AddAsync(new Models.Bank()
+            {
+                Title = "Bank #1",
+                Accounts = new List<Models.Account>(new[] { account })
+            });
+            await dbContext.SaveChangesAsync();
+
+            var transaction1 = new TransactionBindingModel()
+            {
+                DateTime = DateTime.Now,
+                Amount = 10,
+                Category = "Category #1",
+                Description = "Description #1"
+            };
+
+            var transaction2 = new TransactionBindingModel()
+            {
+                DateTime = DateTime.Now,
+                Amount = 5,
+                Category = "Category #2",
+                Description = "Description #2"
+            };
+
+            var accountDataSaverMock = new Mock<IAccountDataSaver>();
+            accountDataSaverMock
+                .Setup(x => 
+                    x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = new AccountController(dbContext, accountDataSaverMock.Object);
+            var result = await controller.PatchAccountData(account.Id,
+                new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
+
+            Assert.IsInstanceOf<NoContentResult>(result);
+
+            accountDataSaverMock.Verify(x=> 
+                x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()),
+                Times.Once);
         }
     }
 }
