@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyFinanceServer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190112132224_createinit")]
-    partial class createinit
+    [Migration("20190114124119_InitMigration")]
+    partial class InitMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,7 +26,12 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("BankId");
+                    b.Property<float>("Balance");
+
+                    b.Property<int>("BankId");
+
+                    b.Property<string>("Title")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -38,7 +43,30 @@ namespace MyFinanceServer.Migrations
                         new
                         {
                             Id = 1,
-                            BankId = 1
+                            Balance = 0f,
+                            BankId = 1,
+                            Title = "Карта Польза"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Balance = 0f,
+                            BankId = 2,
+                            Title = "Карта Отличная"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Balance = 0f,
+                            BankId = 3,
+                            Title = "Общий счет"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Balance = 0f,
+                            BankId = 4,
+                            Title = "Карта Тинькофф блэк"
                         });
                 });
 
@@ -47,9 +75,10 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .IsRequired();
 
-                    b.Property<int?>("UserId");
+                    b.Property<int>("UserId");
 
                     b.HasKey("Id");
 
@@ -61,7 +90,26 @@ namespace MyFinanceServer.Migrations
                         new
                         {
                             Id = 1,
-                            Title = "HomeCreditBank"
+                            Title = "HomeCreditBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "RgsBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Title = "VostBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Title = "TinkoffBank",
+                            UserId = 1
                         });
                 });
 
@@ -70,7 +118,7 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("AccountId");
+                    b.Property<int>("AccountId");
 
                     b.Property<float>("Amount");
 
@@ -78,7 +126,8 @@ namespace MyFinanceServer.Migrations
 
                     b.Property<DateTime>("DateTime");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -92,9 +141,11 @@ namespace MyFinanceServer.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .IsRequired();
 
-                    b.Property<string>("Password");
+                    b.Property<string>("Password")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -113,21 +164,24 @@ namespace MyFinanceServer.Migrations
                 {
                     b.HasOne("MyFinanceServer.Models.Bank", "Bank")
                         .WithMany("Accounts")
-                        .HasForeignKey("BankId");
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MyFinanceServer.Models.Bank", b =>
                 {
-                    b.HasOne("MyFinanceServer.Models.User")
+                    b.HasOne("MyFinanceServer.Models.User", "User")
                         .WithMany("Banks")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("MyFinanceServer.Models.Transaction", b =>
                 {
                     b.HasOne("MyFinanceServer.Models.Account", "Account")
                         .WithMany("Transactions")
-                        .HasForeignKey("AccountId");
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

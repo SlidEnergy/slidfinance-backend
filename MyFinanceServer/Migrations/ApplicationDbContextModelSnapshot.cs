@@ -43,7 +43,28 @@ namespace MyFinanceServer.Migrations
                             Id = 1,
                             Balance = 0f,
                             BankId = 1,
-                            Title = "Польза"
+                            Title = "Карта Польза"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Balance = 0f,
+                            BankId = 2,
+                            Title = "Карта Отличная"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Balance = 0f,
+                            BankId = 3,
+                            Title = "Общий счет"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Balance = 0f,
+                            BankId = 4,
+                            Title = "Карта Тинькофф блэк"
                         });
                 });
 
@@ -68,6 +89,24 @@ namespace MyFinanceServer.Migrations
                         {
                             Id = 1,
                             Title = "HomeCreditBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Title = "RgsBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Title = "VostBank",
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Title = "TinkoffBank",
                             UserId = 1
                         });
                 });

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace MyFinanceServer.Migrations
 {
-    public partial class createinit : Migration
+    public partial class InitMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,8 +14,8 @@ namespace MyFinanceServer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    Email = table.Column<string>(nullable: true),
-                    Password = table.Column<string>(nullable: true)
+                    Email = table.Column<string>(nullable: false),
+                    Password = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,8 +28,8 @@ namespace MyFinanceServer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    Title = table.Column<string>(nullable: true),
-                    UserId = table.Column<int>(nullable: true)
+                    Title = table.Column<string>(nullable: false),
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,7 +39,7 @@ namespace MyFinanceServer.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,7 +48,9 @@ namespace MyFinanceServer.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    BankId = table.Column<int>(nullable: true)
+                    Balance = table.Column<float>(nullable: false),
+                    Title = table.Column<string>(nullable: false),
+                    BankId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,7 +60,7 @@ namespace MyFinanceServer.Migrations
                         column: x => x.BankId,
                         principalTable: "Banks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -70,8 +72,8 @@ namespace MyFinanceServer.Migrations
                     DateTime = table.Column<DateTime>(nullable: false),
                     Amount = table.Column<float>(nullable: false),
                     Category = table.Column<int>(nullable: false),
-                    Description = table.Column<string>(nullable: true),
-                    AccountId = table.Column<int>(nullable: true)
+                    Description = table.Column<string>(nullable: false),
+                    AccountId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,13 +83,8 @@ namespace MyFinanceServer.Migrations
                         column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "Banks",
-                columns: new[] { "Id", "Title", "UserId" },
-                values: new object[] { 1, "HomeCreditBank", null });
 
             migrationBuilder.InsertData(
                 table: "Users",
@@ -95,9 +92,26 @@ namespace MyFinanceServer.Migrations
                 values: new object[] { 1, "slidenergy@gmail.com", "slider123" });
 
             migrationBuilder.InsertData(
+                table: "Banks",
+                columns: new[] { "Id", "Title", "UserId" },
+                values: new object[,]
+                {
+                    { 1, "HomeCreditBank", 1 },
+                    { 2, "RgsBank", 1 },
+                    { 3, "VostBank", 1 },
+                    { 4, "TinkoffBank", 1 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Accounts",
-                columns: new[] { "Id", "BankId" },
-                values: new object[] { 1, 1 });
+                columns: new[] { "Id", "Balance", "BankId", "Title" },
+                values: new object[,]
+                {
+                    { 1, 0f, 1, "Карта Польза" },
+                    { 2, 0f, 2, "Карта Отличная" },
+                    { 3, 0f, 3, "Общий счет" },
+                    { 4, 0f, 4, "Карта Тинькофф блэк" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Accounts_BankId",
