@@ -50,7 +50,7 @@ namespace MyFinanceServer.Tests
             };
 
             var accountDataSaver = new AccountDataSaver(dbContext);
-            var controller = new AccountController(dbContext, accountDataSaver);
+            var controller = new AccountsController(dbContext, accountDataSaver);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 
@@ -98,7 +98,7 @@ namespace MyFinanceServer.Tests
                     x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AccountController(dbContext, accountDataSaverMock.Object);
+            var controller = new AccountsController(dbContext, accountDataSaverMock.Object);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 

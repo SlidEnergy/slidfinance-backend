@@ -5,7 +5,7 @@ namespace MyFinanceServer.Api
 {
     public class PatchAccountDataBindingModel
     {
-        public float Balance { get; set; }
+        public float? Balance { get; set; }
 
         public ICollection<TransactionBindingModel> Transactions { get; set; }
     }

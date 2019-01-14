@@ -18,21 +18,17 @@ namespace MyFinanceServer.Data
                 new Models.User { Id = 1, Email = "slidenergy@gmail.com", Password = "slider123" });
 
             modelBuilder.Entity<Models.Bank>().HasData(
-                new 
-                {
-                    Id = 1,
-                    Title = "HomeCreditBank",
-                    UserId = 1
-                });
+                new { Id = 1, Title = "HomeCreditBank", UserId = 1 },
+                new { Id = 2, Title = "RgsBank", UserId = 1 },
+                new { Id = 3, Title = "VostBank", UserId = 1 },
+                new { Id = 4, Title = "TinkoffBank", UserId = 1 }
+            );
 
             modelBuilder.Entity<Models.Account>().HasData(
-                new
-                {
-                    Id = 1,
-                    BankId = 1,
-                    Title = "Польза",
-                    Balance = 0f
-                });
+                new { Id = 1, BankId = 1, Title = "Карта Польза", Balance = 0f },
+                new { Id = 2, BankId = 2, Title = "Карта Отличная", Balance = 0f },
+                new { Id = 3, BankId = 3, Title = "Общий счет", Balance = 0f },
+                new { Id = 4, BankId = 4, Title = "Карта Тинькофф блэк", Balance = 0f });
         }
 
         public DbSet<Models.Transaction> Transactions { get; set; }

@@ -14,12 +14,12 @@ namespace MyFinanceServer.Api
     [Route("api/v1/[controller]")]
     [Authorize]
     [ApiController]
-    public sealed class AccountController : ControllerBase
+    public sealed class AccountsController : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IAccountDataSaver _accountDataSaver;
 
-        public AccountController(ApplicationDbContext dbContext, IAccountDataSaver accountDataSaver)
+        public AccountsController(ApplicationDbContext dbContext, IAccountDataSaver accountDataSaver)
         {
             _dbContext = dbContext;
             _accountDataSaver = accountDataSaver;
