@@ -26,7 +26,7 @@ namespace MyFinanceServer.Domain
 
             foreach (var t in transactions)
             {
-                var existTransaction = account.Transactions.SingleOrDefault(x => 
+                var existTransaction = account.Transactions.FirstOrDefault(x => 
                     x.DateTime == t.DateTime && x.Amount == t.Amount && x.Description == t.Description);
 
                 if(existTransaction == null)

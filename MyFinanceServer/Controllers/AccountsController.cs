@@ -26,7 +26,7 @@ namespace MyFinanceServer.Api
         }
 
         // POST: api/account/id
-        [HttpPatch]
+        [HttpPatch("{id}")]
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
             var account = await _dbContext.Accounts
@@ -37,6 +37,7 @@ namespace MyFinanceServer.Api
                 NotFound();
 
             await _accountDataSaver.Save(account, accountData.Balance, accountData.Transactions.Select(x => new Transaction() {
+                Account = account,
                 Amount = x.Amount,
                 DateTime = x.DateTime,
                 Category = Category.None,
