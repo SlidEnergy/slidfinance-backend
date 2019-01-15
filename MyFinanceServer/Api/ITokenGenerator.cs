@@ -7,6 +7,6 @@ namespace MyFinanceServer
 {
     public interface ITokenGenerator
     {
-        string Get(string username);
+        string Get(Models.User user);
     }
 }

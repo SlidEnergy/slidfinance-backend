@@ -16,14 +16,14 @@ namespace MyFinanceServer.Api
             _appSettings = appSettings.Value;
         }
 
-        public string Get(string username)
+        public string Get(Models.User user)
         {
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = GetIdentity(username),
+                Subject = GetIdentity(user),
                 Expires = DateTime.UtcNow.AddMonths(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
@@ -34,11 +34,12 @@ namespace MyFinanceServer.Api
             return serializedToken;
         }
 
-        private ClaimsIdentity GetIdentity(string username)
+        private ClaimsIdentity GetIdentity(Models.User user)
         {
             return new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Email, username),
+                    //new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email)
                 });
         }
     }

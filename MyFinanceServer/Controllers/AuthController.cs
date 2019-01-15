@@ -23,12 +23,12 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(401)]
         public ActionResult<TokenInfo> GetToken(UserBindingModel userData)
         {
-            var user = _dbContext.Users.Where(x => x.Email == userData.Email && x.Password == userData.Password).SingleOrDefault();
+            var user = _dbContext.Users.SingleOrDefault(x => x.Email == userData.Email && x.Password == userData.Password);
             
             if (user == null)
                 return Unauthorized();
 
-            var token = _tokenGenerator.Get(userData.Email);
+            var token = _tokenGenerator.Get(user);
 
             return new TokenInfo() { Token = token, Email = userData.Email };
         }

@@ -6,6 +6,7 @@ using MyFinanceServer.Domain;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 
@@ -17,6 +18,28 @@ namespace MyFinanceServer.Tests
         public void Setup()
         {
         }
+
+        [Test]
+        public async Task GetAccounts_Ok()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("Get_Accounts");
+            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
+
+            await dbContext.Accounts.AddAsync(new Models.Account() { Title = "Account #1" });
+            await dbContext.Accounts.AddAsync(new Models.Account() { Title = "Account #2" });
+
+            await dbContext.SaveChangesAsync();
+
+            var accountDataSaver = new AccountDataSaver(dbContext);
+            var controller = new AccountsController(dbContext, accountDataSaver);
+            var result = await controller.GetAccounts();
+
+            Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Account>>>(result);
+
+            Assert.AreEqual(2, ((ActionResult<IEnumerable<Models.Account>>)result).Value.Count());
+        }
+
 
         [Test]
         public async Task PatchAccountDataInMemory_NoContentResult()

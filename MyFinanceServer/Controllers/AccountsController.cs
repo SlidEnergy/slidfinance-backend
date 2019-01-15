@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,21 @@ namespace MyFinanceServer.Api
     [ApiController]
     public sealed class AccountsController : ControllerBase
     {
-        private readonly ApplicationDbContext _dbContext;
+        private readonly ApplicationDbContext _context;
         private readonly IAccountDataSaver _accountDataSaver;
 
-        public AccountsController(ApplicationDbContext dbContext, IAccountDataSaver accountDataSaver)
+        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver)
         {
-            _dbContext = dbContext;
+            _context = context;
             _accountDataSaver = accountDataSaver;
+        }
+
+        // GET: api/Transactions
+        [HttpGet]
+        [ProducesResponseType(200)]
+        public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
+        {
+            return await _context.Accounts.ToListAsync();
         }
 
         // POST: api/account/id
@@ -32,7 +41,7 @@ namespace MyFinanceServer.Api
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
             Console.Write("accountId: {0}, balance: {1}", id, accountData.Balance);
-            var account = await _dbContext.Accounts
+            var account = await _context.Accounts
               .Include(x => x.Transactions)
               .SingleOrDefaultAsync(x => x.Id == id);
 
