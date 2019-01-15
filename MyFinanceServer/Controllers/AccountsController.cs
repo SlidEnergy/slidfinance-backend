@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
@@ -25,8 +26,12 @@ namespace MyFinanceServer.Api
 
         // POST: api/account/id
         [HttpPatch("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(401)]
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
+            Console.Write("accountId: {0}, balance: {1}", id, accountData.Balance);
             var account = await _dbContext.Accounts
               .Include(x => x.Transactions)
               .SingleOrDefaultAsync(x => x.Id == id);
