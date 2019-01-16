@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class AuthTests
+    public class AuthTests : TestBase
     {
         [SetUp]
         public void Setup()

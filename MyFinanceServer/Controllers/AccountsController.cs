@@ -30,7 +30,8 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {
-            return await _context.Accounts.ToListAsync();
+            var userId = Int32.Parse(User.GetUserId());
+            return await _context.Accounts.Include(x=>x.Bank.User).Where(x=>x.Bank.User.Id == userId).ToListAsync();
         }
 
         // POST: api/account/id
@@ -41,9 +42,12 @@ namespace MyFinanceServer.Api
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
             Console.Write("accountId: {0}, balance: {1}", id, accountData.Balance);
+
+            var userId = Int32.Parse(User.GetUserId());
+            
             var account = await _context.Accounts
-              .Include(x => x.Transactions)
-              .SingleOrDefaultAsync(x => x.Id == id);
+              .Include(x => x.Transactions).Include(x => x.Bank.User)
+              .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == id);
 
             if (account == null)
                 NotFound();

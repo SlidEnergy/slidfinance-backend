@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 using MyFinanceServer.Models;
 
@@ -28,7 +29,9 @@ namespace MyFinanceServer.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            return await _context.Transactions.ToListAsync();
+            var userId = Int32.Parse(User.GetUserId());
+            return await _context.Transactions.Include(x => x.Account.Bank.User)
+                .Where(x => x.Account.Bank.User.Id == userId).ToListAsync();
         }
     }
 }
