@@ -5,12 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
 using MyFinanceServer.Models;
 
-namespace MyFinanceServer.Controllers
+namespace MyFinanceServer.Api
 {
     [Authorize]
     [Route("api/v1/[controller]")]
@@ -29,8 +30,8 @@ namespace MyFinanceServer.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Bank>>> GetBanks()
         {
-            //var userId = Int32.Parse(User.FindFirst(JwtRegisteredClaimNames.NameId).Value);
-            return await _context.Banks.ToListAsync();//.Include(x=>x.User).Where(x=>x.Id == userId).ToListAsync();
+            var userId = Int32.Parse(User.GetUserId());
+            return await _context.Banks.Include(x => x.User).Where(x => x.User.Id == userId).ToListAsync();
         }
     }
 }

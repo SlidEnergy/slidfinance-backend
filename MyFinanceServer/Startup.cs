@@ -21,6 +21,8 @@ using Npgsql;
 using MyFinanceServer.Api;
 using MyFinanceServer.Domain;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MyFinanceServer
 {
@@ -99,9 +101,14 @@ namespace MyFinanceServer
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddEntityFrameworkNpgsql()
-                .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
-                .BuildServiceProvider();
+            if (System.Environment.MachineName == "KLUCHKO")
+                services.AddEntityFrameworkSqlServer()
+                    .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LocalDbConnectionString")))
+                    .BuildServiceProvider();
+            else
+                services.AddEntityFrameworkNpgsql()
+                    .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
+                    .BuildServiceProvider();
 
             // DI
             services.AddScoped<ITokenGenerator, TokenGenerator>();

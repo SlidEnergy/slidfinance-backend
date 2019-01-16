@@ -23,7 +23,7 @@ namespace MyFinanceServer.Api
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = GetIdentity(user),
+                Subject = CreateIdentity(user),
                 Expires = DateTime.UtcNow.AddMonths(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
@@ -34,12 +34,12 @@ namespace MyFinanceServer.Api
             return serializedToken;
         }
 
-        private ClaimsIdentity GetIdentity(Models.User user)
+        private ClaimsIdentity CreateIdentity(Models.User user)
         {
             return new ClaimsIdentity(new Claim[]
                 {
-                    //new Claim(JwtRegisteredClaimNames.NameId, user.Id.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.Email) // equal ClaimsIdentity.DefaultNameClaimType
                 });
         }
     }
