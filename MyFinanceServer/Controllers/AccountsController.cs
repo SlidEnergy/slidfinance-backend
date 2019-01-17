@@ -59,7 +59,6 @@ namespace MyFinanceServer.Api
                 Account = account,
                 Amount = x.Amount,
                 DateTime = x.DateTime,
-                Category = Category.None,
                 Description = x.Category + " : " + x.Description
             }).ToList());
 

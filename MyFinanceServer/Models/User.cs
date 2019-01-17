@@ -15,5 +15,8 @@ namespace MyFinanceServer.Models
 
         [Required]
         public IEnumerable<Models.Bank> Banks { get; set; }
+
+        [Required]
+        public IEnumerable<Models.Category> Categories { get; set; }
     }
 }

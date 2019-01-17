@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace MyFinanceServer.Models
+﻿namespace MyFinanceServer.Models
 {
-    public enum Category
+    public class Category
     {
-        None = 0,
-        Food,
-        InternetAndMobile,
-        Child,
-        Study
+        public int Id { get; set; }
+
+        public string Title { get; set; }
+
+        public User User { get; set; }
     }
 }

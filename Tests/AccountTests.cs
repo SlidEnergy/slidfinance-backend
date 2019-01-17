@@ -46,10 +46,10 @@ namespace MyFinanceServer.Tests
 
 
         [Test]
-        public async Task PatchAccountDataInMemory_NoContentResult()
+        public async Task PatchAccountData_NoContentResult()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("PatchAccountDataInMemory_NoContentResult");
+            optionsBuilder.UseInMemoryDatabase("PatchAccountData_NoContentResult");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
             await dbContext.Users.AddAsync(user);

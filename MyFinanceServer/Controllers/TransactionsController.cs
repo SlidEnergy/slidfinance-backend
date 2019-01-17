@@ -30,5 +30,30 @@ namespace MyFinanceServer.Api
             var userId = Int32.Parse(User.GetUserId());
             return await _context.Transactions.Where(x => x.Account.Bank.User.Id == userId).ToListAsync();
         }
+
+        // POST: api/account/id
+        [HttpPatch("{id}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> PatchTransaction(int id, PatchTransactionBindingModel transactionData)
+        {
+            var userId = Int32.Parse(User.GetUserId());
+
+            var transaction =
+                await _context.Transactions.SingleOrDefaultAsync(x => x.Id == id && x.Account.Bank.User.Id == userId);
+
+            if (transaction == null)
+                return NotFound();
+
+            var category = await _context.Category.FindAsync(transactionData.CategoryId);
+
+            if (category == null)
+                return NotFound();
+
+            transaction.Category = category;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }
