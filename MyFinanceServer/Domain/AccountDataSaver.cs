@@ -32,7 +32,7 @@ namespace MyFinanceServer.Domain
                 if(existTransaction == null)
                     account.Transactions.Add(t);
             }
-
+            Console.Write("before save transactions");
             await _dbContext.SaveChangesAsync();
         }
     }
