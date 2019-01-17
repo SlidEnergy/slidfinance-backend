@@ -154,8 +154,8 @@ namespace MyFinanceServer
             app.UseCors(x => x
                .AllowAnyOrigin()
                .AllowAnyMethod()
-               .AllowAnyHeader()
-               .AllowCredentials());
+               .AllowAnyHeader());
+               //.AllowCredentials());
 
             app.UseDefaultFiles();
             app.UseStaticFiles();

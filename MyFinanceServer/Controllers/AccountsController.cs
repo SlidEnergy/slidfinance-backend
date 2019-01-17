@@ -41,15 +41,19 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(401)]
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
-            Console.Write("accountId: {0}, balance: {1}", id, accountData.Balance);
+            Console.Write("accountId: {0}, balance: {1}, transactionsCount: {2}", id, accountData.Balance, accountData.Transactions.Count);
 
             var userId = Int32.Parse(User.GetUserId());
-            
+
+            Console.Write("userId: {0}", userId);
+
             var account = await _context.Accounts.Include(x => x.Transactions)
               .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == id);
 
             if (account == null)
                 NotFound();
+
+            Console.Write("Account found");
 
             await _accountDataSaver.Save(account, accountData.Balance, accountData.Transactions.Select(x => new Transaction() {
                 Account = account,
