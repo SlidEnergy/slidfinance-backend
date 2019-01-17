@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyFinanceServer.Data;
+using MyFinanceServer.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Api;
-using MyFinanceServer.Data;
-using MyFinanceServer.Models;
 
-namespace MyFinanceServer.Controllers
+namespace MyFinanceServer.Api
 {
     [Authorize]
     [Route("api/v1/[controller]")]
@@ -30,8 +28,7 @@ namespace MyFinanceServer.Controllers
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
             var userId = Int32.Parse(User.GetUserId());
-            return await _context.Transactions.Include(x => x.Account.Bank.User)
-                .Where(x => x.Account.Bank.User.Id == userId).ToListAsync();
+            return await _context.Transactions.Where(x => x.Account.Bank.User.Id == userId).ToListAsync();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace MyFinanceServer.Api
         public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
         {
             var userId = Int32.Parse(User.GetUserId());
-            return await _context.Accounts.Include(x=>x.Bank.User).Where(x=>x.Bank.User.Id == userId).ToListAsync();
+            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).ToListAsync();
         }
 
         // POST: api/account/id
@@ -45,8 +45,7 @@ namespace MyFinanceServer.Api
 
             var userId = Int32.Parse(User.GetUserId());
             
-            var account = await _context.Accounts
-              .Include(x => x.Transactions).Include(x => x.Bank.User)
+            var account = await _context.Accounts.Include(x => x.Transactions)
               .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == id);
 
             if (account == null)

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class AuthTests : TestBase
+    public class TokenTests : TestBase
     {
         [SetUp]
         public void Setup()
@@ -30,8 +30,8 @@ namespace MyFinanceServer.Tests
             var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));
             var userBindingModel = new UserBindingModel() { Email = user.Email, Password = user.Password };
 
-            var controller = new AuthController(tokenGenerator, dbContext);
-            var result = controller.GetToken(userBindingModel);
+            var controller = new TokensController(tokenGenerator, dbContext);
+            var result = controller.CreateToken(userBindingModel);
 
             Assert.IsInstanceOf<ActionResult<TokenInfo>>(result);
             var actionResult = (ActionResult<TokenInfo>)result;

@@ -2,15 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
-using MyFinanceServer.Domain;
+using MyFinanceServer.Models;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Moq;
-using MyFinanceServer.Controllers;
-using MyFinanceServer.Models;
 
 namespace MyFinanceServer.Tests
 {
@@ -22,10 +19,10 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
-        public async Task GetBanks_Ok()
+        public async Task GetTransactions_Ok()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("GetBanks_Ok");
+            optionsBuilder.UseInMemoryDatabase("GetTransactions_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
             await dbContext.Users.AddAsync(user);
