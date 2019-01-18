@@ -26,11 +26,11 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("GetAccounts_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             var bank = new Models.Bank() { Title = "Bank #1", User = user };
-            await dbContext.Banks.AddAsync(bank);
-            await dbContext.Accounts.AddAsync(new Models.Account() { Title = "Account #1", Bank = bank });
-            await dbContext.Accounts.AddAsync(new Models.Account() { Title = "Account #2", Bank = bank });
+            dbContext.Banks.Add(bank);
+            dbContext.Accounts.Add(new Models.Account() { Title = "Account #1", Bank = bank });
+            dbContext.Accounts.Add(new Models.Account() { Title = "Account #2", Bank = bank });
 
             await dbContext.SaveChangesAsync();
 
@@ -52,11 +52,11 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("PatchAccountData_NoContentResult");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             var bank = new Models.Bank() { Title = "Bank #1", User = user };
-            await dbContext.Banks.AddAsync(bank);
+            dbContext.Banks.Add(bank);
             var account = new Models.Account() { Transactions = new List<Models.Transaction>(), Bank = bank };
-            await dbContext.Accounts.AddAsync(account);
+            dbContext.Accounts.Add(account);
             await dbContext.SaveChangesAsync();
 
             var transaction1 = new TransactionBindingModel()
@@ -95,11 +95,11 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("PatchAccountData_SaveCalled");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             var bank = new Models.Bank() { Title = "Bank #1", User = user };
-            await dbContext.Banks.AddAsync(bank);
+            dbContext.Banks.Add(bank);
             var account = new Models.Account() { Transactions = new List<Models.Transaction>(), Bank = bank };
-            await dbContext.Accounts.AddAsync(account);
+            dbContext.Accounts.Add(account);
             await dbContext.SaveChangesAsync();
 
             var transaction1 = new TransactionBindingModel()

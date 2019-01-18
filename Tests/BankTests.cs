@@ -23,13 +23,13 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("Get_Banks");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
-            await dbContext.Banks.AddAsync(new Models.Bank()
+            dbContext.Users.Add(user);
+            dbContext.Banks.Add(new Models.Bank()
             {
                 Title = "Bank #1",
                 User = user
             });
-            await dbContext.Banks.AddAsync(new Models.Bank()
+            dbContext.Banks.Add(new Models.Bank()
             {
                 Title = "Bank #2",
                 User = user

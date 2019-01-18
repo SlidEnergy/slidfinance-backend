@@ -21,7 +21,7 @@ namespace MyFinanceServer.Domain
             if (account.Transactions == null)
                 throw new ArgumentException(nameof(account));
 
-            if(accountBalance != null && accountBalance.Value != 0)
+            if (accountBalance != null && accountBalance.Value != 0)
                 account.Balance = accountBalance.Value;
 
             foreach (var t in transactions)
@@ -32,7 +32,6 @@ namespace MyFinanceServer.Domain
                 if(existTransaction == null)
                     account.Transactions.Add(t);
             }
-            Console.Write("before save transactions");
             await _dbContext.SaveChangesAsync();
         }
     }

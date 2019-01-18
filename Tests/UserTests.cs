@@ -21,7 +21,7 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("GetCurrentUser_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
             var controller = new UsersController(dbContext);

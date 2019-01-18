@@ -23,13 +23,13 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("GetCategories_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
-            await dbContext.Users.AddAsync(user);
-            await dbContext.Category.AddAsync(new Models.Category()
+            dbContext.Users.Add(user);
+            dbContext.Category.Add(new Models.Category()
             {
                 Title = "Category #1",
                 User = user
             });
-            await dbContext.Category.AddAsync(new Models.Category()
+            dbContext.Category.Add(new Models.Category()
             {
                 Title = "Category #2",
                 User = user

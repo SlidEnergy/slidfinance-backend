@@ -24,7 +24,7 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("Add_Transaction_Created");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() { Email = "email@domain.com", Password = "Password #1" };
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
             var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));

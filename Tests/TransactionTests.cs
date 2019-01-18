@@ -26,19 +26,19 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("GetTransactions_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() {Id = 1, Password = "Password #1", Email = "Email #1"};
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             var bank = new Models.Bank() {Title = "Bank #1", User = user};
-            await dbContext.Banks.AddAsync(bank);
+            dbContext.Banks.Add(bank);
             var account = new Models.Account() {Transactions = new List<Models.Transaction>(), Bank = bank};
-            await dbContext.Accounts.AddAsync(account);
-            await dbContext.Transactions.AddAsync(new Transaction()
+            dbContext.Accounts.Add(account);
+            dbContext.Transactions.Add(new Transaction()
             {
                 DateTime = DateTime.Now,
                 Amount = 10,
                 Description = "Description #1",
                 Account = account
             });
-            await dbContext.Transactions.AddAsync(new Transaction()
+            dbContext.Transactions.Add(new Transaction()
             {
                 DateTime = DateTime.Now,
                 Amount = 5,
@@ -63,16 +63,16 @@ namespace MyFinanceServer.Tests
             optionsBuilder.UseInMemoryDatabase("PatchTransaction_NoContentResult");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
             var user = new Models.User() {Id = 1, Password = "Password #1", Email = "Email #1"};
-            await dbContext.Users.AddAsync(user);
+            dbContext.Users.Add(user);
             var bank = new Models.Bank() {Title = "Bank #1", User = user};
-            await dbContext.Banks.AddAsync(bank);
+            dbContext.Banks.Add(bank);
             var account = new Models.Account() {Transactions = new List<Models.Transaction>(), Bank = bank};
-            await dbContext.Accounts.AddAsync(account);
+            dbContext.Accounts.Add(account);
             var transaction = new Transaction()
                 {DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account};
-            await dbContext.Transactions.AddAsync(transaction);
+            dbContext.Transactions.Add(transaction);
             var category = new Models.Category() {Title = "Category #1", User = user};
-            await dbContext.Category.AddAsync(category);
+            dbContext.Category.Add(category);
             await dbContext.SaveChangesAsync();
 
             var controller = new TransactionsController(dbContext);
