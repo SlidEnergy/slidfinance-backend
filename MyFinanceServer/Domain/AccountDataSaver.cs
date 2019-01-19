@@ -18,6 +18,8 @@ namespace MyFinanceServer.Domain
 
         public async Task Save(Models.Account account, float? accountBalance, ICollection<Models.Transaction> transactions)
         {
+            // TODO: метод должен сам запрашивать список транзакций, если они не заданы
+
             if (account.Transactions == null)
                 throw new ArgumentException(nameof(account));
 

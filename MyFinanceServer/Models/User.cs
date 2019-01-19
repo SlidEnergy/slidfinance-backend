@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Models
 {
+    // TODO: Использовать Identity из asp.net core
+
     public class User
     {
         public int Id { get; set; }

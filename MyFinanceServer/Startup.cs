@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -98,6 +99,7 @@ namespace MyFinanceServer
                         };
                     });
 
+            services.AddAutoMapper(x=>x.AddProfile<MappingProfile>());
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -176,6 +178,18 @@ namespace MyFinanceServer
             });
 
             app.UseMvc();
+        }
+
+        private void ConfigureAutoMapper(IServiceCollection services)
+        {
+            // Auto Mapper Configurations
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         private string GetConnectionString()

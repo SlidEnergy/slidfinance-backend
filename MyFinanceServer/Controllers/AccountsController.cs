@@ -41,6 +41,8 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(401)]
         public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
         {
+            // TODO: добавить подробное протоколирование, т.к. метод содержит логику
+
             Console.Write("accountId: {0}, balance: {1}, transactionsCount: {2}", id, accountData.Balance, accountData.Transactions.Count);
 
             var userId = Int32.Parse(User.GetUserId());

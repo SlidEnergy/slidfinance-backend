@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace MyFinanceServer.Api
 {
@@ -16,19 +17,23 @@ namespace MyFinanceServer.Api
     public class TransactionsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public TransactionsController(ApplicationDbContext context)
+        public TransactionsController(ApplicationDbContext context, IMapper mapper)
         {
+            _mapper = mapper;
             _context = context;
         }
 
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetTransactions()
         {
             var userId = Int32.Parse(User.GetUserId());
-            return await _context.Transactions.Where(x => x.Account.Bank.User.Id == userId).ToListAsync();
+
+            return await _context.Transactions.Include(x=>x.Category).Include(x=>x.Account)
+                .Where(x => x.Account.Bank.User.Id == userId).Select(x=>_mapper.Map<Dto.Transaction>(x)).ToListAsync();
         }
 
         // POST: api/account/id
