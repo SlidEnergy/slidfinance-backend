@@ -14,6 +14,8 @@ namespace MyFinanceServer.Tests
 {
     public class AccountTests
     {
+        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+
         [SetUp]
         public void Setup()
         {
@@ -35,13 +37,11 @@ namespace MyFinanceServer.Tests
             await dbContext.SaveChangesAsync();
 
             var accountDataSaver = new AccountDataSaver(dbContext);
-            var controller = new AccountsController(dbContext, accountDataSaver);
+            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.GetAccounts();
 
-            Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Account>>>(result);
-
-            Assert.AreEqual(2, ((ActionResult<IEnumerable<Models.Account>>)result).Value.Count());
+            Assert.AreEqual(2, result.Value.Count());
         }
 
 
@@ -76,7 +76,7 @@ namespace MyFinanceServer.Tests
             };
 
             var accountDataSaver = new AccountDataSaver(dbContext);
-            var controller = new AccountsController(dbContext, accountDataSaver);
+            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
@@ -124,7 +124,7 @@ namespace MyFinanceServer.Tests
                     x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AccountsController(dbContext, accountDataSaverMock.Object);
+            var controller = new AccountsController(dbContext, accountDataSaverMock.Object, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });

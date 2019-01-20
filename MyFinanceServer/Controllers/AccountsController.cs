@@ -8,6 +8,7 @@ using MyFinanceServer.Domain;
 using MyFinanceServer.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace MyFinanceServer.Api
 {
@@ -18,20 +19,22 @@ namespace MyFinanceServer.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly IAccountDataSaver _accountDataSaver;
+        private readonly IMapper _mapper;
 
-        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver)
+        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver, IMapper mapper)
         {
             _context = context;
             _accountDataSaver = accountDataSaver;
+            _mapper = mapper;
         }
 
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Account>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<Dto.Account>>> GetAccounts()
         {
             var userId = Int32.Parse(User.GetUserId());
-            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).ToListAsync();
+            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).Select(x => _mapper.Map<Dto.Account>(x)).ToListAsync();
         }
 
         // POST: api/account/id

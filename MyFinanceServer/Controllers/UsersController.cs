@@ -3,6 +3,7 @@ using MyFinanceServer.Data;
 using MyFinanceServer.Models;
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace MyFinanceServer.Api
 {
@@ -11,17 +12,19 @@ namespace MyFinanceServer.Api
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Users/current
         [HttpGet("current")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<User>> GetCurrentUser()
+        public async Task<ActionResult<Dto.User>> GetCurrentUser()
         {
             var userId = Int32.Parse(User.GetUserId());
 
@@ -31,9 +34,8 @@ namespace MyFinanceServer.Api
             {
                 return NotFound();
             }
-            // обнуляем пароль, чтобы не выдавать.
-            user.Password = null;
-            return user;
+
+            return _mapper.Map<Dto.User>(user);
         }
     }
 }

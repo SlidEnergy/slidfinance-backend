@@ -9,6 +9,8 @@ namespace MyFinanceServer.Tests
 {
     public class UserTests
     {
+        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+
         [SetUp]
         public void Setup()
         {
@@ -24,11 +26,11 @@ namespace MyFinanceServer.Tests
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            var controller = new UsersController(dbContext);
+            var controller = new UsersController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.GetCurrentUser();
 
-            Assert.IsInstanceOf<ActionResult<Models.User>>(result);
+            Assert.IsInstanceOf<ActionResult<Api.Dto.User>>(result);
 
             Assert.AreEqual(user.Id, result.Value.Id);
             Assert.AreEqual(user.Email, result.Value.Email);

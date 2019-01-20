@@ -11,6 +11,8 @@ namespace MyFinanceServer.Tests
 {
     public class CategoryTests
     {
+        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+
         [SetUp]
         public void Setup()
         {
@@ -36,11 +38,9 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new CategoriesController(dbContext);
+            var controller = new CategoriesController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.GetCategory();
-
-            Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Category>>>(result);
 
             Assert.AreEqual(2, result.Value.Count());
         }

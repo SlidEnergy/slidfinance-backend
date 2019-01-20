@@ -11,6 +11,8 @@ namespace MyFinanceServer.Tests
 {
     public class BankTests
     {
+        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+
         [SetUp]
         public void Setup()
         {
@@ -36,13 +38,11 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new BanksController(dbContext);
+            var controller = new BanksController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.GetBanks();
 
-            Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Bank>>>(result);
-
-            Assert.AreEqual(2, ((ActionResult<IEnumerable<Models.Bank>>)result).Value.Count());
+            Assert.AreEqual(2, result.Value.Count());
         }
     }
 }
