@@ -27,12 +27,12 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("GetAccounts_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
+            var user = new ApplicationUser() { Email = "Email #1" };
             dbContext.Users.Add(user);
-            var bank = new Models.Bank() { Title = "Bank #1", User = user };
+            var bank = new Bank() { Title = "Bank #1", User = user };
             dbContext.Banks.Add(bank);
-            dbContext.Accounts.Add(new Models.Account() { Title = "Account #1", Bank = bank });
-            dbContext.Accounts.Add(new Models.Account() { Title = "Account #2", Bank = bank });
+            dbContext.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank });
+            dbContext.Accounts.Add(new BankAccount() { Title = "Account #2", Bank = bank });
 
             await dbContext.SaveChangesAsync();
 
@@ -51,11 +51,11 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("PatchAccountData_NoContentResult");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
+            var user = new ApplicationUser() { Email = "Email #1" };
             dbContext.Users.Add(user);
-            var bank = new Models.Bank() { Title = "Bank #1", User = user };
+            var bank = new Bank() { Title = "Bank #1", User = user };
             dbContext.Banks.Add(bank);
-            var account = new Models.Account() { Transactions = new List<Models.Transaction>(), Bank = bank };
+            var account = new BankAccount() { Code ="code_1", Transactions = new List<Transaction>(), Bank = bank };
             dbContext.Accounts.Add(account);
             await dbContext.SaveChangesAsync();
 
@@ -78,7 +78,7 @@ namespace MyFinanceServer.Tests
             var accountDataSaver = new AccountDataSaver(dbContext);
             var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.PatchAccountData(account.Id,
+            var result = await controller.PatchAccountData(account.Code,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 
             Assert.IsInstanceOf<NoContentResult>(result);
@@ -94,11 +94,11 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("PatchAccountData_SaveCalled");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
+            var user = new ApplicationUser() { Email = "Email #1" };
             dbContext.Users.Add(user);
-            var bank = new Models.Bank() { Title = "Bank #1", User = user };
+            var bank = new Bank() { Title = "Bank #1", User = user };
             dbContext.Banks.Add(bank);
-            var account = new Models.Account() { Transactions = new List<Models.Transaction>(), Bank = bank };
+            var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank };
             dbContext.Accounts.Add(account);
             await dbContext.SaveChangesAsync();
 
@@ -121,7 +121,7 @@ namespace MyFinanceServer.Tests
             var accountDataSaverMock = new Mock<IAccountDataSaver>();
             accountDataSaverMock
                 .Setup(x => 
-                    x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()))
+                    x.Save(It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()))
                 .Returns(Task.CompletedTask);
 
             var controller = new AccountsController(dbContext, accountDataSaverMock.Object, _autoMapper.Create());
@@ -132,7 +132,7 @@ namespace MyFinanceServer.Tests
             Assert.IsInstanceOf<NoContentResult>(result);
 
             accountDataSaverMock.Verify(x=> 
-                x.Save(It.IsAny<Models.Account>(), It.IsAny<float>(), It.IsAny<ICollection<Models.Transaction>>()),
+                x.Save(It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()),
                 Times.Once);
         }
     }

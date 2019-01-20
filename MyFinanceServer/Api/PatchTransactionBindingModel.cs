@@ -5,6 +5,6 @@ namespace MyFinanceServer.Api
 {
     public class PatchTransactionBindingModel
     {
-        public int CategoryId { get; set; }
+        public string CategoryId { get; set; }
     }
 }

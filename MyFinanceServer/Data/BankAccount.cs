@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace MyFinanceServer.Models
+namespace MyFinanceServer.Data
 {
-    public class Account
+    public class BankAccount
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
+
+        public string Code { get; set; }
 
         public float Balance { get; set; }
 
@@ -16,6 +18,6 @@ namespace MyFinanceServer.Models
         public Bank Bank { get; set; }
 
         [Required]
-        public ICollection<Models.Transaction> Transactions { get; set; }
+        public ICollection<Transaction> Transactions { get; set; }
     }
 }

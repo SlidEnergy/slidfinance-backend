@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyFinanceServer.Models
+namespace MyFinanceServer.Data
 {
     public class Category
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         [Required]
         public string Title { get; set; }
 
-        public User User { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

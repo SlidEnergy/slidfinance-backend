@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
-using MyFinanceServer.Models;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Dto.Bank>>> GetBanks()
         {
-            var userId = Int32.Parse(User.GetUserId());
+            var userId = User.GetUserId();
             return await _context.Banks.Where(x => x.User.Id == userId).Select(x => _mapper.Map<Dto.Bank>(x)).ToListAsync();
         }
     }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MyFinanceServer.Data;
 
 namespace MyFinanceServer
 {
@@ -14,7 +15,12 @@ namespace MyFinanceServer
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            var host = CreateWebHostBuilder(args).Build();
+
+            var dbInitializer = new DbInitializer(host.Services);
+            dbInitializer.Initialize().Wait();
+
+            host.Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

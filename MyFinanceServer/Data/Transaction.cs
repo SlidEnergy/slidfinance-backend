@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace MyFinanceServer.Models
+namespace MyFinanceServer.Data
 {
     public class Transaction
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public DateTime DateTime { get; set; }
 
@@ -20,7 +17,7 @@ namespace MyFinanceServer.Models
         public string Description { get; set; }
 
         [Required]
-        public Models.Account Account { get; set; }
+        public BankAccount Account { get; set; }
 
         public int? Mcc { get; set; }
 

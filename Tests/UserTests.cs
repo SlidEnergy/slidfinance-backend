@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
@@ -22,7 +23,7 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("GetCurrentUser_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
+            var user = new ApplicationUser() { UserName = "Email #1", Email = "Email #1" };
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Data;
+﻿using MyFinanceServer.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace MyFinanceServer.Domain
             _dbContext = dbContext;
         }
 
-        public async Task Save(Models.Account account, float? accountBalance, ICollection<Models.Transaction> transactions)
+        public async Task Save(BankAccount account, float? accountBalance, ICollection<Transaction> transactions)
         {
             // TODO: метод должен сам запрашивать список транзакций, если они не заданы
 

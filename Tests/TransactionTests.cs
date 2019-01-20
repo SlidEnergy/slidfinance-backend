@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
-using MyFinanceServer.Models;
+
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -27,11 +27,11 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("GetTransactions_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() {Id = 1, Password = "Password #1", Email = "Email #1"};
+            var user = new ApplicationUser() {Id = Guid.NewGuid().ToString(), Email = "Email #1"};
             dbContext.Users.Add(user);
-            var bank = new Models.Bank() {Title = "Bank #1", User = user};
+            var bank = new Bank() {Title = "Bank #1", User = user};
             dbContext.Banks.Add(bank);
-            var account = new Models.Account() {Transactions = new List<Models.Transaction>(), Bank = bank};
+            var account = new BankAccount() {Transactions = new List<Transaction>(), Bank = bank};
             dbContext.Accounts.Add(account);
             dbContext.Transactions.Add(new Transaction()
             {
@@ -62,17 +62,17 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("PatchTransaction_NoContentResult");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() {Id = 1, Password = "Password #1", Email = "Email #1"};
+            var user = new ApplicationUser() {Email = "Email #1"};
             dbContext.Users.Add(user);
-            var bank = new Models.Bank() {Title = "Bank #1", User = user};
+            var bank = new Bank() {Title = "Bank #1", User = user};
             dbContext.Banks.Add(bank);
-            var account = new Models.Account() {Transactions = new List<Models.Transaction>(), Bank = bank};
+            var account = new BankAccount() {Transactions = new List<Transaction>(), Bank = bank};
             dbContext.Accounts.Add(account);
             var transaction = new Transaction()
                 {DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account};
             dbContext.Transactions.Add(transaction);
-            var category = new Models.Category() {Title = "Category #1", User = user};
-            dbContext.Category.Add(category);
+            var category = new Category() {Title = "Category #1", User = user};
+            dbContext.Categories.Add(category);
             await dbContext.SaveChangesAsync();
 
             var controller = new TransactionsController(dbContext, _autoMapper.Create());

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Data;
-using MyFinanceServer.Models;
+
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -26,7 +26,7 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(404)]
         public async Task<ActionResult<Dto.User>> GetCurrentUser()
         {
-            var userId = Int32.Parse(User.GetUserId());
+            var userId = User.GetUserId();
 
             var user = await _context.Users.FindAsync(userId);
 

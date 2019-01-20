@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
-using MyFinanceServer.Models;
+
 
 namespace MyFinanceServer.Api
 {
@@ -29,8 +29,8 @@ namespace MyFinanceServer.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Dto.Category>>> GetCategory()
         {
-            var userId = Int32.Parse(User.GetUserId());
-            return await _context.Category.Where(x=>x.User.Id == userId).Select(x=> _mapper.Map<Dto.Category>(x)).ToListAsync();
+            var userId = User.GetUserId();
+            return await _context.Categories.Where(x=>x.User.Id == userId).Select(x=> _mapper.Map<Dto.Category>(x)).ToListAsync();
         }
     }
 }

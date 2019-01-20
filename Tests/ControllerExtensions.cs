@@ -1,20 +1,19 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MyFinanceServer.Data;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MyFinanceServer.Tests
 {
     public static class ControllerExtensions
     {
-        public static void AddControllerContext(this ControllerBase controller, Models.User user)
+        public static void AddControllerContext(this ControllerBase controller, ApplicationUser user)
         {
             controller.ControllerContext = CreateControllerContext(user);
         }
 
-        private static ControllerContext CreateControllerContext(Models.User user)
+        private static ControllerContext CreateControllerContext(ApplicationUser user)
         {
             return new ControllerContext
             {
@@ -25,7 +24,7 @@ namespace MyFinanceServer.Tests
             };
         }
 
-        private static ClaimsPrincipal CreatePrincipal(Models.User user)
+        private static ClaimsPrincipal CreatePrincipal(ApplicationUser user)
         {
             var claims = new List<Claim>()
             {

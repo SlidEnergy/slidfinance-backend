@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
+using MyFinanceServer.Api;
 
 namespace MyFinanceServer.Tests
 {

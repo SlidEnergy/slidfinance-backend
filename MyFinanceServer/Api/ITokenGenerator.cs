@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MyFinanceServer.Data;
 
-namespace MyFinanceServer
+namespace MyFinanceServer.Api
 {
     public interface ITokenGenerator
     {
-        string Get(Models.User user);
+        string Get(ApplicationUser user);
     }
 }

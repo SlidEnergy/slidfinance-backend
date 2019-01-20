@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
@@ -24,14 +25,14 @@ namespace MyFinanceServer.Tests
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("GetCategories_Ok");
             var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new Models.User() { Id = 1, Password = "Password #1", Email = "Email #1" };
+            var user = new ApplicationUser() { Email = "Email #1" };
             dbContext.Users.Add(user);
-            dbContext.Category.Add(new Models.Category()
+            dbContext.Categories.Add(new Category()
             {
                 Title = "Category #1",
                 User = user
             });
-            dbContext.Category.Add(new Models.Category()
+            dbContext.Categories.Add(new Category()
             {
                 Title = "Category #2",
                 User = user

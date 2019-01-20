@@ -3,7 +3,9 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
+using MyFinanceServer.Data;
 
 namespace MyFinanceServer.Api
 {
@@ -16,7 +18,7 @@ namespace MyFinanceServer.Api
             _appSettings = appSettings.Value;
         }
 
-        public string Get(Models.User user)
+        public string Get(ApplicationUser user)
         {
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
@@ -34,13 +36,33 @@ namespace MyFinanceServer.Api
             return serializedToken;
         }
 
-        private ClaimsIdentity CreateIdentity(Models.User user)
+        private ClaimsIdentity CreateIdentity(ApplicationUser user)
         {
             return new ClaimsIdentity(new Claim[]
                 {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                    // _jwtOptions.IssuedAt
+                    new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64),
+
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Email) // equal ClaimsIdentity.DefaultNameClaimType
                 });
+
+            return new ClaimsIdentity(new GenericIdentity(user.Email, "Token"), new Claim[]
+            {
+                new Claim("id", user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                // _jwtOptions.IssuedAt
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64)
+            });
         }
+
+        /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
+        private long ToUnixEpochDate(DateTime date)
+            => (long)Math.Round((date.ToUniversalTime() -
+                                 new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                .TotalSeconds);
     }
 }

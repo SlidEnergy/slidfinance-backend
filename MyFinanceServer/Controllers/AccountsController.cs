@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
 using MyFinanceServer.Domain;
-using MyFinanceServer.Models;
+
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -33,30 +33,30 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Dto.Account>>> GetAccounts()
         {
-            var userId = Int32.Parse(User.GetUserId());
+            var userId = User.GetUserId();
             return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).Select(x => _mapper.Map<Dto.Account>(x)).ToListAsync();
         }
 
         // POST: api/account/id
-        [HttpPatch("{id}")]
+        [HttpPatch("{code}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> PatchAccountData(int id, PatchAccountDataBindingModel accountData)
+        public async Task<ActionResult> PatchAccountData(string code, PatchAccountDataBindingModel accountData)
         {
             // TODO: добавить подробное протоколирование, т.к. метод содержит логику
 
-            Console.Write("accountId: {0}, balance: {1}, transactionsCount: {2}", id, accountData.Balance, accountData.Transactions.Count);
+            Console.Write("accountId: {0}, balance: {1}, transactionsCount: {2}", code, accountData.Balance, accountData.Transactions.Count);
 
-            var userId = Int32.Parse(User.GetUserId());
+            var userId = User.GetUserId();
 
             Console.Write("userId: {0}", userId);
 
             var account = await _context.Accounts.Include(x => x.Transactions)
-              .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == id);
+              .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Code == code);
 
             if (account == null)
-                NotFound();
+                return NotFound();
 
             Console.Write("Account found");
 
@@ -69,7 +69,7 @@ namespace MyFinanceServer.Api
                 Mcc = x.Mcc
             }).ToList());
 
-            return  NoContent();
+            return NoContent();
         }
     }
 }
