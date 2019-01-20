@@ -131,6 +131,8 @@ namespace MyFinanceServer
                     { "Oauth2", Enumerable.Empty<string>() },
                     { "Bearer", Enumerable.Empty<string>() },
                 });
+
+                c.OperationFilter<ResponseWithDescriptionOperationFilter>();
             });
 
             // добавить services.AddIdentityCore, 

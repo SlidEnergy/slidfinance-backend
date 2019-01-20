@@ -12,8 +12,10 @@ using MyFinanceServer.Domain;
 
 namespace MyFinanceServer.Tests
 {
-    public class TransactionTests : TestBase
+    public class TransactionTests
     {
+        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+
         [SetUp]
         public void Setup()
         {
@@ -47,8 +49,8 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext, CreateAutoMapper());
-            controller.ControllerContext = CreateControllerContext(user);
+            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            controller.AddControllerContext(user);
             var result = await controller.GetTransactions();
 
             Assert.AreEqual(2, result.Value.Count());
@@ -73,8 +75,8 @@ namespace MyFinanceServer.Tests
             dbContext.Category.Add(category);
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext, CreateAutoMapper());
-            controller.ControllerContext = CreateControllerContext(user);
+            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            controller.AddControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
                 new PatchTransactionBindingModel() {CategoryId = category.Id});
 

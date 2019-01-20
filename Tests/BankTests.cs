@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class BankTests : TestBase
+    public class BankTests
     {
         [SetUp]
         public void Setup()
@@ -37,7 +37,7 @@ namespace MyFinanceServer.Tests
             await dbContext.SaveChangesAsync();
 
             var controller = new BanksController(dbContext);
-            controller.ControllerContext = CreateControllerContext(user);
+            controller.AddControllerContext(user);
             var result = await controller.GetBanks();
 
             Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Bank>>>(result);

@@ -12,7 +12,7 @@ using Moq;
 
 namespace MyFinanceServer.Tests
 {
-    public class AccountTests : TestBase
+    public class AccountTests
     {
         [SetUp]
         public void Setup()
@@ -36,7 +36,7 @@ namespace MyFinanceServer.Tests
 
             var accountDataSaver = new AccountDataSaver(dbContext);
             var controller = new AccountsController(dbContext, accountDataSaver);
-            controller.ControllerContext = CreateControllerContext(user);
+            controller.AddControllerContext(user);
             var result = await controller.GetAccounts();
 
             Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Account>>>(result);
@@ -77,7 +77,7 @@ namespace MyFinanceServer.Tests
 
             var accountDataSaver = new AccountDataSaver(dbContext);
             var controller = new AccountsController(dbContext, accountDataSaver);
-            controller.ControllerContext = CreateControllerContext(user);
+            controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 
@@ -125,7 +125,7 @@ namespace MyFinanceServer.Tests
                 .Returns(Task.CompletedTask);
 
             var controller = new AccountsController(dbContext, accountDataSaverMock.Object);
-            controller.ControllerContext = CreateControllerContext(user);
+            controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Id,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 

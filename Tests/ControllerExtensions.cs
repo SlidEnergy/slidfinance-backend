@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using AutoMapper;
+using System.Text;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MyFinanceServer.Tests
 {
-    public class TestBase
+    public static class ControllerExtensions
     {
-        protected IMapper CreateAutoMapper()
+        public static void AddControllerContext(this ControllerBase controller, Models.User user)
         {
-            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            return new Mapper(configuration);
+            controller.ControllerContext = CreateControllerContext(user);
         }
 
-        protected ControllerContext CreateControllerContext(Models.User user)
+        private static ControllerContext CreateControllerContext(Models.User user)
         {
             return new ControllerContext
             {
@@ -25,7 +25,7 @@ namespace MyFinanceServer.Tests
             };
         }
 
-        protected ClaimsPrincipal CreatePrincipal(Models.User user)
+        private static ClaimsPrincipal CreatePrincipal(Models.User user)
         {
             var claims = new List<Claim>()
             {

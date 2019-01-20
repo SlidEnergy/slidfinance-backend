@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class UserTests : TestBase
+    public class UserTests
     {
         [SetUp]
         public void Setup()
@@ -25,7 +25,7 @@ namespace MyFinanceServer.Tests
             await dbContext.SaveChangesAsync();
 
             var controller = new UsersController(dbContext);
-            controller.ControllerContext = CreateControllerContext(user);
+            controller.AddControllerContext(user);
             var result = await controller.GetCurrentUser();
 
             Assert.IsInstanceOf<ActionResult<Models.User>>(result);
