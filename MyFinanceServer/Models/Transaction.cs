@@ -21,5 +21,10 @@ namespace MyFinanceServer.Models
 
         [Required]
         public Models.Account Account { get; set; }
+
+        public int? Mcc { get; set; }
+
+        [Required]
+        public string BankCategory { get; set; }
     }
 }

@@ -47,13 +47,11 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext);
+            var controller = new TransactionsController(dbContext, CreateAutoMapper());
             controller.ControllerContext = CreateControllerContext(user);
             var result = await controller.GetTransactions();
 
-            Assert.IsInstanceOf<ActionResult<IEnumerable<Models.Transaction>>>(result);
-
-            Assert.AreEqual(2, ((ActionResult<IEnumerable<Models.Transaction>>) result).Value.Count());
+            Assert.AreEqual(2, result.Value.Count());
         }
 
         [Test]
@@ -75,7 +73,7 @@ namespace MyFinanceServer.Tests
             dbContext.Category.Add(category);
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext);
+            var controller = new TransactionsController(dbContext, CreateAutoMapper());
             controller.ControllerContext = CreateControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
                 new PatchTransactionBindingModel() {CategoryId = category.Id});
