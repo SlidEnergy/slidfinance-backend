@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api.Dto
 {
@@ -20,5 +17,7 @@ namespace MyFinanceServer.Api.Dto
         public string Description { get; set; }
 
         public int? Mcc { get; set; }
+
+        public string BankCategory { get; set; }
     }
 }
