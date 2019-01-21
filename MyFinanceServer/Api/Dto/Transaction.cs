@@ -18,5 +18,7 @@ namespace MyFinanceServer.Api.Dto
         public string CategoryId { get; set; }
 
         public string Description { get; set; }
+
+        public int? Mcc { get; set; }
     }
 }

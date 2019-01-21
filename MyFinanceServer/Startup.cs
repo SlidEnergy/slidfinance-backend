@@ -104,14 +104,9 @@ namespace MyFinanceServer
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            if (System.Environment.MachineName == "KLUCHKO")
-                services.AddEntityFrameworkSqlServer()
-                    .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("LocalDbConnectionString")))
-                    .BuildServiceProvider();
-            else
-                services.AddEntityFrameworkNpgsql()
-                    .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
-                    .BuildServiceProvider();
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
+                .BuildServiceProvider();
 
             // DI
             services.AddScoped<ITokenGenerator, TokenGenerator>();

@@ -13,6 +13,6 @@ namespace MyFinanceServer.Api
 
         public string Description { get; set; }
 
-        public int Mcc { get; set; }
+        public int? Mcc { get; set; }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MyFinanceServer.Data;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Text;
-using MyFinanceServer.Data;
 
 namespace MyFinanceServer.Api
 {
@@ -40,23 +39,18 @@ namespace MyFinanceServer.Api
         {
             return new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    // Asp.net core Identity восстанавливает это значение в поле User.Identity.Name
+                    // Допустипо ClaimTypes.Name или ClaimsIdentity.DefaultNameClaimType
+                    new Claim(ClaimTypes.Name, user.Email),
+
+                    // JWT specification
+
+                    // Asp.net core Identity использует claims "sub", как альтернативу ClaimTypes.NameIdentifier
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                     // _jwtOptions.IssuedAt
-                    new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64),
-
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Email) // equal ClaimsIdentity.DefaultNameClaimType
+                    new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64)
                 });
-
-            return new ClaimsIdentity(new GenericIdentity(user.Email, "Token"), new Claim[]
-            {
-                new Claim("id", user.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                // _jwtOptions.IssuedAt
-                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64)
-            });
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
