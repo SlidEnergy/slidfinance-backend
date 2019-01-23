@@ -42,8 +42,8 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var transaction =
-                await _context.Transactions.SingleOrDefaultAsync(x => x.Id == id && x.Account.Bank.User.Id == userId);
+            var transaction = await _context.Transactions.Include(x=>x.Category)
+                .SingleOrDefaultAsync(x => x.Id == id && x.Account.Bank.User.Id == userId);
 
             if (transaction == null)
                 return NotFound();
