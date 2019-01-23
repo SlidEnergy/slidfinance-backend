@@ -57,7 +57,7 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
-        public async Task PatchTransaction_NoContentResult()
+        public async Task PatchTransactionCategory_NoContentResult()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
             optionsBuilder.UseInMemoryDatabase("PatchTransaction_NoContentResult");
@@ -86,6 +86,37 @@ namespace MyFinanceServer.Tests
                 .SingleOrDefaultAsync(x => x.Id == transaction.Id);
             Assert.IsNotNull(newTransaction.Category);
             Assert.AreEqual(category.Id, newTransaction.Category.Id);
+        }
+
+        [Test]
+        public async Task PatchTransactionNullCategory_NoContentResult()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("PatchTransaction_NoContentResult");
+            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
+            var user = new ApplicationUser() { Email = "Email #1" };
+            dbContext.Users.Add(user);
+            var bank = new Bank() { Title = "Bank #1", User = user };
+            dbContext.Banks.Add(bank);
+            var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank };
+            dbContext.Accounts.Add(account);
+            var category = new Category() { Title = "Category #1", User = user };
+            dbContext.Categories.Add(category);
+            var transaction = new Transaction()
+            { DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account, Category = category };
+            dbContext.Transactions.Add(transaction);
+            await dbContext.SaveChangesAsync();
+
+            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            controller.AddControllerContext(user);
+            var result = await controller.PatchTransaction(transaction.Id,
+                new PatchTransactionBindingModel() { CategoryId = null});
+
+            Assert.IsInstanceOf<NoContentResult>(result);
+
+            var newTransaction = await dbContext.Transactions.Include(x => x.Category)
+                .SingleOrDefaultAsync(x => x.Id == transaction.Id);
+            Assert.IsNull(newTransaction.Category);
         }
     }
 }

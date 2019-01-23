@@ -48,12 +48,20 @@ namespace MyFinanceServer.Api
             if (transaction == null)
                 return NotFound();
 
-            var category = await _context.Categories.FindAsync(transactionData.CategoryId);
+            if (string.IsNullOrEmpty(transactionData.CategoryId))
+            {
+                transaction.Category = null;
+            }
+            else
+            {
+                var category = await _context.Categories.FindAsync(transactionData.CategoryId);
 
-            if (category == null)
-                return NotFound();
+                if (category == null)
+                    return NotFound();
 
-            transaction.Category = category;
+                transaction.Category = category;
+            }
+
             await _context.SaveChangesAsync();
 
             return NoContent();
