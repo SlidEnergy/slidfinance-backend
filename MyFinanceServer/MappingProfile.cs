@@ -22,7 +22,9 @@ namespace MyFinanceServer.Api
 
             CreateMap<Bank, Api.Dto.Bank>()
                 .ForMember(dest => dest.AccountIds,
-                    opt => opt.MapFrom(src => src.Accounts == null ? new string[0] : src.Accounts.Select(x => x.Id)));
+                    opt => opt.MapFrom(src => src.Accounts == null ? new string[0] : src.Accounts.Select(x => x.Id)))
+                .ForMember(dest => dest.Balance,
+                    opt => opt.MapFrom(src => src.Accounts.Sum(x => x.Balance)));
 
             CreateMap<ApplicationUser, Api.Dto.User>()
                 .ForMember(dest => dest.BankIds,

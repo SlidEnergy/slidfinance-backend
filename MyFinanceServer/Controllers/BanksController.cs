@@ -31,7 +31,11 @@ namespace MyFinanceServer.Api
         public async Task<ActionResult<IEnumerable<Dto.Bank>>> GetBanks()
         {
             var userId = User.GetUserId();
-            return await _context.Banks.Where(x => x.User.Id == userId).Select(x => _mapper.Map<Dto.Bank>(x)).ToListAsync();
+
+            return await _context.Banks.Include(x=>x.Accounts)
+                .Where(x => x.User.Id == userId)
+                .Select(x => _mapper.Map<Dto.Bank>(x))
+                .ToListAsync();
         }
     }
 }
