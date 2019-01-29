@@ -6,6 +6,8 @@ namespace MyFinanceServer.Api.Dto
     {
         public string Id { get; set; }
 
+        public string Order { get; set; }
+
         public string AccountId { get; set; }
 
         public string CategoryId { get; set; }

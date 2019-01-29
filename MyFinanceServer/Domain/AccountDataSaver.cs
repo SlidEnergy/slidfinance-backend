@@ -29,6 +29,7 @@ namespace MyFinanceServer.Domain
             var rules = await _dbContext.Rules
                 .Include(x=>x.Account)
                 .Include(x=>x.Category)
+                .OrderBy(x=>x.Order)
                 .Where(x => x.Category.User.Id == userId)
                 .ToListAsync();
 
