@@ -100,7 +100,7 @@ namespace MyFinanceServer.Api
             var userId = User.GetUserId();
 
             var generatedRules = await _context.Transactions.AsNoTracking()
-                .Where(x => x.Account.Bank.User.Id == userId)
+                .Where(x => x.Account.Bank.User.Id == userId && x.Category != null)
                 .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.Mcc })
                 .Select(x => new GeneratedRule
                 {
@@ -113,6 +113,7 @@ namespace MyFinanceServer.Api
                         .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count(c => c != null) }).ToArray(),
                     Count = x.Count(c => c.Id != null)
                 })
+                .Where(x => x.Count > 5)
                 .ToListAsync();
 
             var rules = await _context.Rules.AsNoTracking()
