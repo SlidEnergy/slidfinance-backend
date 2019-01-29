@@ -14,7 +14,7 @@ namespace MyFinanceServer.Api
                 .ForMember(dest => dest.AccountId, 
                     opt => opt.MapFrom((src => src.Account == null ? null :src.Account.Id)));
 
-            CreateMap<BankAccount, Api.Dto.Account>()
+            CreateMap<BankAccount, Api.Dto.BankAccount>()
                 .ForMember(dest => dest.BankId,
                     opt => opt.MapFrom(src => src.Bank == null ?  null : src.Bank.Id))
                 .ForMember(dest => dest.TransactionIds,

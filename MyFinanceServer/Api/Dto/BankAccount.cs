@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Api.Dto
 {
-    public class Account
+    public class BankAccount
     {
         public string Id { get; set; }
 

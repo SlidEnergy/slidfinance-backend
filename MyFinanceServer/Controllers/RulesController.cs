@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using MyFinanceServer.Api.Dto;
+using BankAccount = MyFinanceServer.Data.BankAccount;
 using Rule = MyFinanceServer.Data.Rule;
 
 namespace MyFinanceServer.Api
@@ -43,11 +44,16 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var account = await _context.Accounts
+            BankAccount account = null;
+
+            if(string.IsNullOrEmpty(rule.AccountId))
+            {
+                account = await _context.Accounts
                 .FirstOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == rule.AccountId);
 
-            if (account == null)
-                return NotFound();
+                if (account == null)
+                    return NotFound();
+            }
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(x => x.User.Id == userId && x.Id == rule.CategoryId);

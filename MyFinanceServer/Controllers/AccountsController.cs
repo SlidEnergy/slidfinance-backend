@@ -31,10 +31,10 @@ namespace MyFinanceServer.Api
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Account>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetAccounts()
         {
             var userId = User.GetUserId();
-            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).Select(x => _mapper.Map<Dto.Account>(x)).ToListAsync();
+            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).Select(x => _mapper.Map<Dto.BankAccount>(x)).ToListAsync();
         }
 
         // POST: api/account/id
