@@ -32,6 +32,12 @@ namespace MyFinanceServer.Api
                 .ForMember(dest => dest.CategoryIds,
                     opt => opt.MapFrom(src => src.Categories == null ? new string[0] : src.Categories.Select(x => x.Id)));
 
+            CreateMap<Rule, Api.Dto.Rule>()
+                .ForMember(dest => dest.CategoryId,
+                    opt => opt.MapFrom(src => src.Category == null ? null : src.Category.Id))
+                .ForMember(dest => dest.AccountId,
+                    opt => opt.MapFrom((src => src.Account == null ? null : src.Account.Id)));
+
             CreateMap<Category, Api.Dto.Category>();
         }
     }

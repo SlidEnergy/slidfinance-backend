@@ -6,6 +6,6 @@ namespace MyFinanceServer.Domain
 {
     public interface IAccountDataSaver
     {
-        Task Save(BankAccount account, float? accountBalance, ICollection<Transaction> transactions);
+        Task Save(string userId, BankAccount account, float? accountBalance, ICollection<Transaction> transactions);
     }
 }

@@ -60,7 +60,7 @@ namespace MyFinanceServer.Api
 
             Console.Write("Account found");
 
-            await _accountDataSaver.Save(account, accountData.Balance, accountData.Transactions.Select(x => new Transaction() {
+            await _accountDataSaver.Save(userId, account, accountData.Balance, accountData.Transactions.Select(x => new Transaction() {
                 Account = account,
                 Amount = x.Amount,
                 DateTime = x.DateTime,

@@ -98,7 +98,7 @@ namespace MyFinanceServer.Tests
             dbContext.Users.Add(user);
             var bank = new Bank() { Title = "Bank #1", User = user };
             dbContext.Banks.Add(bank);
-            var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank };
+            var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank, Code = "Code #1"};
             dbContext.Accounts.Add(account);
             await dbContext.SaveChangesAsync();
 
@@ -121,18 +121,18 @@ namespace MyFinanceServer.Tests
             var accountDataSaverMock = new Mock<IAccountDataSaver>();
             accountDataSaverMock
                 .Setup(x => 
-                    x.Save(It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()))
+                    x.Save(It.IsAny<string>(), It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()))
                 .Returns(Task.CompletedTask);
 
             var controller = new AccountsController(dbContext, accountDataSaverMock.Object, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.PatchAccountData(account.Id,
+            var result = await controller.PatchAccountData(account.Code,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
 
             Assert.IsInstanceOf<NoContentResult>(result);
 
             accountDataSaverMock.Verify(x=> 
-                x.Save(It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()),
+                x.Save(It.IsAny<string>(), It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()),
                 Times.Once);
         }
     }

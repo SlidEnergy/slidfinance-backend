@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MyFinanceServer.Data;
 
 namespace MyFinanceServer.Data
 {
@@ -24,5 +25,7 @@ namespace MyFinanceServer.Data
         public DbSet<Bank> Banks { get; set; }
 
         public DbSet<Category> Categories { get; set; }
+
+        public DbSet<Rule> Rules { get; set; }
     }
 }
