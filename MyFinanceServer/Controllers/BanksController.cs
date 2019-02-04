@@ -37,5 +37,42 @@ namespace MyFinanceServer.Api
                 .Select(x => _mapper.Map<Dto.Bank>(x))
                 .ToListAsync();
         }
+
+        [HttpPost]
+        public async Task<ActionResult<Dto.Bank>> AddBank(AddBankBindingModel bank)
+        {
+            var userId = User.GetUserId();
+
+            var user = await _context.Users
+                .Include(x => x.Banks)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var newBank = user.LinkBank(bank.Title);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetBanks", new { id = newBank.Id }, _mapper.Map<Dto.Bank>(newBank));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Dto.Bank>> DeleteBank(string id)
+        {
+            var userId = User.GetUserId();
+
+            var user = await _context.Users
+               .Include(x => x.Banks)
+               .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var bank = user.UnlinkBank(id);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<Dto.Bank>(bank);
+        }
     }
 }
