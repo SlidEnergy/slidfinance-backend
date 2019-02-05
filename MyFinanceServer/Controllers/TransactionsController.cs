@@ -66,5 +66,18 @@ namespace MyFinanceServer.Api
 
             return NoContent();
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Dto.Transaction>> DeleteTransaction(string id)
+        {
+            var userId = User.GetUserId();
+
+            var t = await _context.Transactions.FindAsync(id);
+            //var t2 = await _context.Transactions.FirstOrDefaultAsync(x => x.Account.Bank.User.Id == userId);
+            
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

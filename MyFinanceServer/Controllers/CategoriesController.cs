@@ -27,7 +27,7 @@ namespace MyFinanceServer.Api
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Dto.Category>>> GetList()
+        public async Task<ActionResult<IEnumerable<Dto.Category>>> GetCategories()
         {
             var userId = User.GetUserId();
             return await _context.Categories.Where(x=>x.User.Id == userId).Select(x=> _mapper.Map<Dto.Category>(x)).ToListAsync();

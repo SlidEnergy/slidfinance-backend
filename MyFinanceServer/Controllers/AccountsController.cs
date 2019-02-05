@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
 using MyFinanceServer.Domain;
-
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 
 namespace MyFinanceServer.Api
 {
@@ -28,16 +27,19 @@ namespace MyFinanceServer.Api
             _mapper = mapper;
         }
 
-        // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetAccounts()
+        public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetList(string bankId = null)
         {
             var userId = User.GetUserId();
-            return await _context.Accounts.Where(x=>x.Bank.User.Id == userId).Select(x => _mapper.Map<Dto.BankAccount>(x)).ToListAsync();
+
+            return await _context.Accounts
+                .Include(x=>x.Bank)
+                .Where(x => (bankId == null || x.Bank.Id == bankId) && x.Bank.User.Id == userId)
+                .Select(x => _mapper.Map<Dto.BankAccount>(x))
+                .ToListAsync();
         }
 
-        // POST: api/account/id
         [HttpPatch("{code}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -68,6 +70,55 @@ namespace MyFinanceServer.Api
                 BankCategory = x.Category ?? "",
                 Mcc = x.Mcc
             }).ToList());
+
+            return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Dto.BankAccount>> Add(AddBankAccountBindingModel account)
+        {
+            var userId = User.GetUserId();
+
+            var bank = await _context.Banks.FirstOrDefaultAsync(x => x.Id == account.BankId && x.User.Id == userId);
+
+            var newAccount = bank.LinkAccount(account.Title, account.Code, account.Balance);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetAccounts", _mapper.Map<Dto.BankAccount>(newAccount));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(string id, EditBankAccountBindingModel account)
+        {
+            var userId = User.GetUserId();
+
+            var editAccount = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == id && x.Bank.User.Id == userId);
+
+            editAccount.Rename(account.Title);
+            editAccount.ChangeCode(account.Code);
+            editAccount.SetBalance(account.Balance);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            var userId = User.GetUserId();
+
+            var account = await _context.Accounts
+                .Include(x => x.Bank)
+                .FirstOrDefaultAsync(x => x.Id == id && x.Bank.User.Id == userId);
+
+            if (account == null)
+                return NotFound();
+
+            account.Bank.UnlinkAccount(id);
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

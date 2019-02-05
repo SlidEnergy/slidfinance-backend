@@ -14,19 +14,33 @@ namespace MyFinanceServer.Data
         [Required]
         public IEnumerable<Category> Categories { get; set; }
 
-        public Bank LinkBank(string title)
+        public void RenameBank(string id, string title)
         {
             if (Banks == null)
                 throw new InvalidOperationException();
 
-            var bank = new Bank() { Title = title };
+            var bank = Banks.FirstOrDefault(x => x.Id == id);
+
+            if (bank == null)
+                throw new ArgumentException("Банк с указанным идентификатором не найден.", id);
+
+            bank.Rename(title);
+        }
+
+        public Bank LinkBank(string title)
+        {
+            var bank = new Bank(title, this);
+
+            if (Banks == null)
+                Banks = new List<Bank>();
 
             Banks.Add(bank);
 
             return bank;
         }
 
-        public Bank UnlinkBank(string id) {
+        public void UnlinkBank(string id)
+        {
             if (Banks == null)
                 throw new InvalidOperationException();
 
@@ -36,8 +50,6 @@ namespace MyFinanceServer.Data
                 throw new ArgumentException("Банк с указанным идентификатором не найден.", id);
 
             Banks.Remove(bank);
-
-            return bank;
         }
     }
 }

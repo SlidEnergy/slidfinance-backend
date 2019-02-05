@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 using NUnit.Framework;
@@ -41,7 +39,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new BanksController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.GetBanks();
+            var result = await controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -73,7 +71,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new BanksController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.GetBanks();
+            var result = await controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }

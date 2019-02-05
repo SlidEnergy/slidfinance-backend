@@ -19,5 +19,29 @@ namespace MyFinanceServer.Data
 
         [Required]
         public ICollection<Transaction> Transactions { get; set; }
+
+        public BankAccount() { }
+
+        public BankAccount(string title, string code, float balance)
+        {
+            Title = title;
+            Code = code;
+            Balance = balance;
+        }
+
+        public void Rename(string title)
+        {
+            Title = title;
+        }
+
+        public void ChangeCode(string code)
+        {
+            Code = code;
+        }
+
+        public void SetBalance(float balance)
+        {
+            Balance = balance;
+        }
     }
 }

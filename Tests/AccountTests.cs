@@ -39,7 +39,7 @@ namespace MyFinanceServer.Tests
             var accountDataSaver = new AccountDataSaver(dbContext);
             var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.GetAccounts();
+            var result = await controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }

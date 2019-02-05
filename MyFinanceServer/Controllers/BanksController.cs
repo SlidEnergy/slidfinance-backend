@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using System.Linq;
 
 namespace MyFinanceServer.Api
 {
@@ -25,21 +23,9 @@ namespace MyFinanceServer.Api
             _mapper = mapper;
         }
 
-        // GET: api/Banks
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Bank>>> GetBanks()
-        {
-            var userId = User.GetUserId();
-
-            return await _context.Banks.Include(x=>x.Accounts)
-                .Where(x => x.User.Id == userId)
-                .Select(x => _mapper.Map<Dto.Bank>(x))
-                .ToListAsync();
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<Dto.Bank>> AddBank(AddBankBindingModel bank)
+        public async Task<ActionResult<IEnumerable<Dto.Bank>>> GetList()
         {
             var userId = User.GetUserId();
 
@@ -50,29 +36,56 @@ namespace MyFinanceServer.Api
             if (user == null)
                 return Unauthorized();
 
-            var newBank = user.LinkBank(bank.Title);
-
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetBanks", new { id = newBank.Id }, _mapper.Map<Dto.Bank>(newBank));
+            return _mapper.Map<Dto.Bank[]>(user.Banks);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Bank>> DeleteBank(string id)
+        [HttpPost]
+        public async Task<ActionResult<Dto.Bank>> Add(AddBankBindingModel bank)
         {
             var userId = User.GetUserId();
 
             var user = await _context.Users
-               .Include(x => x.Banks)
-               .FirstOrDefaultAsync(x => x.Id == userId);
+                .FirstOrDefaultAsync(x => x.Id == userId);
 
             if (user == null)
                 return Unauthorized();
 
-            var bank = user.UnlinkBank(id);
+            var newBank = user.LinkBank(bank.Title);
+
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<Dto.Bank>(bank);
+            return CreatedAtAction("GetBanks", _mapper.Map<Dto.Bank>(newBank));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(string id, EditBankBindingModel bank)
+        {
+            var userId = User.GetUserId();
+
+            var editBank = await _context.Banks.FirstOrDefaultAsync(x => x.Id == id && x.User.Id == userId);
+
+            editBank.Rename(bank.Title);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            var userId = User.GetUserId();
+
+            var bank = await _context.Banks.Include(x => x.User).FirstOrDefaultAsync(b => b.Id == id && b.User.Id == userId);
+
+            if (bank == null)
+                return NotFound();
+
+            bank.User.UnlinkBank(id);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

@@ -16,8 +16,6 @@ namespace MyFinanceServer.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<ApplicationUser> Users { get; set; }
-
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<BankAccount> Accounts { get; set; }
