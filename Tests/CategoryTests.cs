@@ -41,7 +41,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new CategoriesController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
-            var result = await controller.GetCategories();
+            var result = await controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }

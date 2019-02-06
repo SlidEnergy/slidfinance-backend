@@ -27,41 +27,69 @@ namespace MyFinanceServer.Api
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Dto.Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Dto.Category>>> GetList()
         {
             var userId = User.GetUserId();
             return await _context.Categories.Where(x=>x.User.Id == userId).Select(x=> _mapper.Map<Dto.Category>(x)).ToListAsync();
         }
 
         [HttpPost]
-        public async Task<ActionResult<Dto.Category>> AddCategory(Dto.Category category)
+        public async Task<ActionResult<Dto.Category>> Add(Dto.Category category)
         {
             var userId = User.GetUserId();
-            var user = await _context.Users.FindAsync(userId);
 
-            var newCategory = new Category { Title = category.Title, User = user};
-            _context.Categories.Add(newCategory);
+            var user = await _context.Users
+                .Include(x => x.Categories)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user == null)
+                return Unauthorized();
+
+            var newCategory = user.AddCategory(category.Title);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetList", new { id = newCategory.Id }, _mapper.Map<Dto.Category>(newCategory));
+            return CreatedAtAction("GetList", _mapper.Map<Dto.Category>(newCategory));
         }
 
-        // DELETE: api/Rules/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Category>> DeleteCategory(string id)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(string id, Dto.Category category)
         {
             var userId = User.GetUserId();
 
-            var category = await _context.Categories.SingleOrDefaultAsync(x => x.User.Id == userId && x.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
+            var user = await _context.Users
+               .Include(x => x.Categories)
+               .FirstOrDefaultAsync(x => x.Id == userId);
 
-            _context.Categories.Remove(category);
+            if (user == null)
+                return Unauthorized();
+
+            var editCategory = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id && x.User.Id == userId);
+
+            editCategory.Rename(category.Title);
+
+            user.ReorderCategories(editCategory, category.Order);
+
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<Dto.Category>(category);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            var userId = User.GetUserId();
+
+            var category = await _context.Categories.Include(x => x.User).FirstOrDefaultAsync(b => b.Id == id && b.User.Id == userId);
+
+            if (category == null)
+                return NotFound();
+
+            category.User.DeleteCategory(id);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
