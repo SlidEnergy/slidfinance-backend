@@ -34,6 +34,7 @@ namespace MyFinanceServer.Api
             return await _context.Rules.AsNoTracking()
                 .Include(x=>x.Account)
                 .Include(x=>x.Category)
+                .OrderBy(x => x.Order)
                 .Where(x=>x.Account.Bank.User.Id == userId)
                 .Select(x=>_mapper.Map<Dto.Rule>(x)).ToListAsync();
         }

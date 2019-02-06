@@ -36,6 +36,7 @@ namespace MyFinanceServer.Api
             return await _context.Accounts
                 .Include(x=>x.Bank)
                 .Where(x => (bankId == null || x.Bank.Id == bankId) && x.Bank.User.Id == userId)
+                .OrderBy(x => x.Title)
                 .Select(x => _mapper.Map<Dto.BankAccount>(x))
                 .ToListAsync();
         }
@@ -79,7 +80,9 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var bank = await _context.Banks.FirstOrDefaultAsync(x => x.Id == account.BankId && x.User.Id == userId);
+            var bank = await _context.Banks
+                .OrderBy(x => x.Title)
+                .FirstOrDefaultAsync(x => x.Id == account.BankId && x.User.Id == userId);
 
             var newAccount = bank.LinkAccount(account.Title, account.Code, account.Balance);
 

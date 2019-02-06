@@ -30,7 +30,12 @@ namespace MyFinanceServer.Api
         public async Task<ActionResult<IEnumerable<Dto.Category>>> GetList()
         {
             var userId = User.GetUserId();
-            return await _context.Categories.Where(x=>x.User.Id == userId).Select(x=> _mapper.Map<Dto.Category>(x)).ToListAsync();
+
+            return await _context.Categories
+                .Where(x => x.User.Id == userId)
+                .OrderBy(x => x.Order)
+                .Select(x => _mapper.Map<Dto.Category>(x))
+                .ToListAsync();
         }
 
         [HttpPost]

@@ -29,14 +29,11 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var user = await _context.Users
-                .Include(x => x.Banks)
-                .FirstOrDefaultAsync(x => x.Id == userId);
-
-            if (user == null)
-                return Unauthorized();
-
-            return _mapper.Map<Dto.Bank[]>(user.Banks);
+            return await _context.Banks
+               .Where(x => x.User.Id == userId)
+               .OrderBy(x => x.Title)
+               .Select(x => _mapper.Map<Dto.Bank>(x))
+               .ToListAsync();
         }
 
         [HttpPost]
