@@ -85,7 +85,7 @@ namespace MyFinanceServer.Api
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAccounts", _mapper.Map<Dto.BankAccount>(newAccount));
+            return CreatedAtAction("GetList", _mapper.Map<Dto.BankAccount>(newAccount));
         }
 
         [HttpPut("{id}")]

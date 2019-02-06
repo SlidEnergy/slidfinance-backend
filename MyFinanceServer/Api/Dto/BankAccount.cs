@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace MyFinanceServer.Api.Dto
+﻿namespace MyFinanceServer.Api.Dto
 {
     public class BankAccount
     {
         public string Id { get; set; }
+
+        public string Code { get; set; }
 
         public float Balance { get; set; }
 

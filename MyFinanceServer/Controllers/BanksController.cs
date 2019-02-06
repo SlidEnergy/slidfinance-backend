@@ -54,7 +54,7 @@ namespace MyFinanceServer.Api
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetBanks", _mapper.Map<Dto.Bank>(newBank));
+            return CreatedAtAction("GetList", _mapper.Map<Dto.Bank>(newBank));
         }
 
         [HttpPut("{id}")]
