@@ -35,7 +35,6 @@ namespace MyFinanceServer.Api
                     where
                         t.DateTime >= startDate &&
                         t.DateTime <= endDate &&
-                        t.Amount < 0 &&
                         t.Category != null &&
                         t.Account.Bank.User.Id == userId
                     group t by new
