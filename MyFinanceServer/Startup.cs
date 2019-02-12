@@ -91,7 +91,12 @@ namespace MyFinanceServer
                         };
                     });
 
-            services.AddAutoMapper(x=>x.AddProfile<MappingProfile>());
+            // AutoMapper
+            services.AddScoped(provider => new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MappingProfile(provider.GetService<ApplicationDbContext>()));
+            }).CreateMapper());
+
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -169,18 +174,6 @@ namespace MyFinanceServer
             });
 
             app.UseMvc();
-        }
-
-        private void ConfigureAutoMapper(IServiceCollection services)
-        {
-            // Auto Mapper Configurations
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
         }
 
         private string GetConnectionString()

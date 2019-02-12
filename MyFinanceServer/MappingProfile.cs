@@ -6,13 +6,19 @@ namespace MyFinanceServer.Api
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile()
+        public MappingProfile(ApplicationDbContext context)
         {
             CreateMap<Transaction, Api.Dto.Transaction>()
                 .ForMember(dest => dest.CategoryId,
                     opt => opt.MapFrom(src => src.Category == null ? null : src.Category.Id))
-                .ForMember(dest => dest.AccountId, 
-                    opt => opt.MapFrom((src => src.Account == null ? null :src.Account.Id)));
+                .ForMember(dest => dest.AccountId,
+                    opt => opt.MapFrom(src => src.Account == null ? null : src.Account.Id));
+
+            CreateMap<Api.Dto.Transaction, Transaction>()
+                .ForMember(dest => dest.Category,
+                    opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
+                .ForMember(dest => dest.Account,
+                    opt => opt.MapFrom(src => src.AccountId == null ? null : context.Find<BankAccount>(src.AccountId)));
 
             CreateMap<BankAccount, Api.Dto.BankAccount>()
                 .ForMember(dest => dest.BankId,

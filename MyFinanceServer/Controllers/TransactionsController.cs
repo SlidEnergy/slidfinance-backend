@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Data;
@@ -38,8 +39,11 @@ namespace MyFinanceServer.Api
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PatchTransaction(string id, PatchTransactionBindingModel transactionData)
+        public async Task<ActionResult> PatchTransaction(string id, JsonPatchDocument<Dto.Transaction> patchDoc)
         {
+            if (patchDoc == null)
+                return BadRequest();
+
             var userId = User.GetUserId();
 
             var transaction = await _context.Transactions.Include(x=>x.Category)
@@ -48,19 +52,10 @@ namespace MyFinanceServer.Api
             if (transaction == null)
                 return NotFound();
 
-            if (string.IsNullOrEmpty(transactionData.CategoryId))
-            {
-                transaction.Category = null;
-            }
-            else
-            {
-                var category = await _context.Categories.FindAsync(transactionData.CategoryId);
+            var dto = _mapper.Map<Dto.Transaction>(transaction);
+            patchDoc.ApplyTo(dto);
 
-                if (category == null)
-                    return NotFound();
-
-                transaction.Category = category;
-            }
+            _mapper.Map(dto, transaction);
 
             await _context.SaveChangesAsync();
 
@@ -72,8 +67,8 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var t = await _context.Transactions.FindAsync(id);
-            //var t2 = await _context.Transactions.FirstOrDefaultAsync(x => x.Account.Bank.User.Id == userId);
+            var t = await _context.Transactions.FirstOrDefaultAsync(x => x.Account.Bank.User.Id == userId && x.Id == id);
+            _context.Transactions.Remove(t);
             
             await _context.SaveChangesAsync();
 
