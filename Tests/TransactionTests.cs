@@ -8,7 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using MyFinanceServer.Domain;
+using Newtonsoft.Json.Serialization;
 
 namespace MyFinanceServer.Tests
 {
@@ -78,7 +81,11 @@ namespace MyFinanceServer.Tests
             var controller = new TransactionsController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
-                new PatchTransactionBindingModel() {CategoryId = category.Id});
+                new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
+                    {
+                        new Operation<Api.Dto.Transaction>("replace", "/categoryId", category.Id)
+                    },
+                    new CamelCasePropertyNamesContractResolver()));
 
             Assert.IsInstanceOf<NoContentResult>(result);
 
@@ -110,7 +117,11 @@ namespace MyFinanceServer.Tests
             var controller = new TransactionsController(dbContext, _autoMapper.Create());
             controller.AddControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
-                new PatchTransactionBindingModel() { CategoryId = null});
+                new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
+                    {
+                        new Operation<Api.Dto.Transaction>("replace", "/categoryId", null)
+                    }, 
+                    new CamelCasePropertyNamesContractResolver()));
 
             Assert.IsInstanceOf<NoContentResult>(result);
 

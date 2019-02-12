@@ -19,5 +19,7 @@ namespace MyFinanceServer.Api.Dto
         public int? Mcc { get; set; }
 
         public string BankCategory { get; set; }
+
+        public bool Approved { get; set; }
     }
 }

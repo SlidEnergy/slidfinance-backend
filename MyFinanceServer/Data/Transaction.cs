@@ -23,5 +23,7 @@ namespace MyFinanceServer.Data
 
         [Required]
         public string BankCategory { get; set; }
+
+        public bool Approved { get; set; }
     }
 }
