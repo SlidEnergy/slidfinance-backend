@@ -30,6 +30,7 @@ namespace MyFinanceServer.Api
             var userId = User.GetUserId();
 
             return await _context.Banks
+               .Include(x=>x.Accounts)
                .Where(x => x.User.Id == userId)
                .OrderBy(x => x.Title)
                .Select(x => _mapper.Map<Dto.Bank>(x))
