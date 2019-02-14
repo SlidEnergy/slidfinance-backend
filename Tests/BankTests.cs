@@ -37,7 +37,7 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create());
+            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 
@@ -69,7 +69,7 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create());
+            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 

@@ -39,7 +39,7 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new CategoriesController(dbContext, _autoMapper.Create());
+            var controller = new CategoriesController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 

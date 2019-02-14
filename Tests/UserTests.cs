@@ -27,7 +27,7 @@ namespace MyFinanceServer.Tests
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            var controller = new UsersController(dbContext, _autoMapper.Create());
+            var controller = new UsersController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetCurrentUser();
 

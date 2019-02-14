@@ -52,7 +52,7 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetTransactions();
 
@@ -78,7 +78,7 @@ namespace MyFinanceServer.Tests
             dbContext.Categories.Add(category);
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
@@ -114,7 +114,7 @@ namespace MyFinanceServer.Tests
             dbContext.Transactions.Add(transaction);
             await dbContext.SaveChangesAsync();
 
-            var controller = new TransactionsController(dbContext, _autoMapper.Create());
+            var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.PatchTransaction(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()

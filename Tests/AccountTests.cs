@@ -37,7 +37,7 @@ namespace MyFinanceServer.Tests
             await dbContext.SaveChangesAsync();
 
             var accountDataSaver = new AccountDataSaver(dbContext);
-            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
+            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 
@@ -76,7 +76,7 @@ namespace MyFinanceServer.Tests
             };
 
             var accountDataSaver = new AccountDataSaver(dbContext);
-            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create());
+            var controller = new AccountsController(dbContext, accountDataSaver, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Code,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });
@@ -124,7 +124,7 @@ namespace MyFinanceServer.Tests
                     x.Save(It.IsAny<string>(), It.IsAny<BankAccount>(), It.IsAny<float>(), It.IsAny<ICollection<Transaction>>()))
                 .Returns(Task.CompletedTask);
 
-            var controller = new AccountsController(dbContext, accountDataSaverMock.Object, _autoMapper.Create());
+            var controller = new AccountsController(dbContext, accountDataSaverMock.Object, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.PatchAccountData(account.Code,
                 new PatchAccountDataBindingModel { Balance = 500, Transactions = new[] { transaction1, transaction2 } });

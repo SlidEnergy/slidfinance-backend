@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFinanceServer", "MyFinanceServer\MyFinanceServer.csproj", "{D3421DBC-363B-447D-8958-4DF137B7D732}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{34E7BE67-1216-4961-98CC-646FC4441369}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{34E7BE67-1216-4961-98CC-646FC4441369}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

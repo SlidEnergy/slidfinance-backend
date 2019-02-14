@@ -51,7 +51,7 @@ namespace MyFinanceServer.Tests
 
             await dbContext.SaveChangesAsync();
 
-            var controller = new RulesController(dbContext, _autoMapper.Create());
+            var controller = new RulesController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.GetRule();
 
@@ -86,7 +86,7 @@ namespace MyFinanceServer.Tests
 
             await dbContext.SaveChangesAsync();
 
-            var controller = new RulesController(dbContext, _autoMapper.Create());
+            var controller = new RulesController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
             var result = await controller.PostRule(new Api.Dto.Rule()
             {
