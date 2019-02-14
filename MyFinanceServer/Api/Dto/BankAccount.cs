@@ -8,10 +8,10 @@
 
         public float Balance { get; set; }
 
+        public float CreditLimit { get; set; }
+
         public string Title { get; set; }
 
         public string BankId { get; set; }
-
-        public string[] TransactionIds { get; set; }
     }
 }

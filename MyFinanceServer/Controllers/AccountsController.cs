@@ -33,12 +33,12 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            return await _context.Accounts
-                .Include(x=>x.Bank)
+            var accounts = await _context.Accounts
                 .Where(x => (bankId == null || x.Bank.Id == bankId) && x.Bank.User.Id == userId)
                 .OrderBy(x => x.Title)
-                .Select(x => _mapper.Map<Dto.BankAccount>(x))
                 .ToListAsync();
+
+            return _mapper.Map<Dto.BankAccount[]>(accounts);
         }
 
         [HttpPatch("{code}")]
@@ -84,7 +84,7 @@ namespace MyFinanceServer.Api
                 .OrderBy(x => x.Title)
                 .FirstOrDefaultAsync(x => x.Id == account.BankId && x.User.Id == userId);
 
-            var newAccount = bank.LinkAccount(account.Title, account.Code, account.Balance);
+            var newAccount = bank.LinkAccount(account.Title, account.Code, account.Balance, account.CreditLimit);
 
             await _context.SaveChangesAsync();
 
@@ -101,6 +101,7 @@ namespace MyFinanceServer.Api
             editAccount.Rename(account.Title);
             editAccount.ChangeCode(account.Code);
             editAccount.SetBalance(account.Balance);
+            editAccount.ChangeCreditLimit(account.CreditLimit);
 
             await _context.SaveChangesAsync();
 

@@ -9,11 +9,11 @@ namespace MyFinanceServer.Data
         public int Order { get; set; }
 
         [Required]
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
         public string Description { get; set; }
 
-        public BankAccount Account { get; set; }
+        public virtual BankAccount Account { get; set; }
 
         public int? Mcc { get; set; }
 

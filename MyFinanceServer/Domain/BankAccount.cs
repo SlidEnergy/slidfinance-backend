@@ -11,22 +11,27 @@ namespace MyFinanceServer.Data
 
         public float Balance { get; set; }
 
+        public float CreditLimit { get; set; }
+
+        public float OwnFunds => Balance - CreditLimit;
+
         [Required]
         public string Title { get; set; }
 
         [Required]
-        public Bank Bank { get; set; }
+        public virtual Bank Bank { get; set; }
 
         [Required]
-        public ICollection<Transaction> Transactions { get; set; }
+        public virtual ICollection<Transaction> Transactions { get; set; }
 
         public BankAccount() { }
 
-        public BankAccount(string title, string code, float balance)
+        public BankAccount(string title, string code, float balance, float creditLimit)
         {
             Title = title;
             Code = code;
             Balance = balance;
+            CreditLimit = creditLimit;
         }
 
         public void Rename(string title)
@@ -42,6 +47,11 @@ namespace MyFinanceServer.Data
         public void SetBalance(float balance)
         {
             Balance = balance;
+        }
+
+        public void ChangeCreditLimit(float creditLimit)
+        {
+            CreditLimit = creditLimit;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace MyFinanceServer.Data
         [Required]
         public string Title { get; set; }
 
-        public ApplicationUser User { get; set; }
+        public virtual ApplicationUser User { get; set; }
 
         public Category() { }
 

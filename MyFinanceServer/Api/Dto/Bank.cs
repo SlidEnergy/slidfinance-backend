@@ -14,6 +14,6 @@ namespace MyFinanceServer.Api.Dto
 
         public string[] AccountIds { get; set; }
 
-        public float Balance { get; set; }
+        public float OwnFunds { get; set; }
     }
 }

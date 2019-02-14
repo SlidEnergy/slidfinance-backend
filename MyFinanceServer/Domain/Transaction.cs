@@ -11,13 +11,13 @@ namespace MyFinanceServer.Data
 
         public float Amount { get; set; }
 
-        public Category Category { get; set; }
+        public virtual Category Category { get; set; }
 
         [Required]
         public string Description { get; set; }
 
         [Required]
-        public BankAccount Account { get; set; }
+        public virtual BankAccount Account { get; set; }
 
         public int? Mcc { get; set; }
 

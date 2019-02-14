@@ -9,10 +9,10 @@ namespace MyFinanceServer.Data
     public class ApplicationUser : IdentityUser
     {
         [Required]
-        public ICollection<Bank> Banks { get; set; }
+        public virtual ICollection<Bank> Banks { get; set; }
 
         [Required]
-        public ICollection<Category> Categories { get; set; }
+        public virtual ICollection<Category> Categories { get; set; }
 
         public void RenameBank(string id, string title)
         {

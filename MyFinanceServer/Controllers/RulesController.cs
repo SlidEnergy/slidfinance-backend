@@ -31,7 +31,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            return await _context.Rules.AsNoTracking()
+            return await _context.Rules
                 .Include(x=>x.Account)
                 .Include(x=>x.Category)
                 .OrderBy(x => x.Order)
@@ -106,7 +106,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var generatedRules = await _context.Transactions.AsNoTracking()
+            var generatedRules = await _context.Transactions
                 .Where(x => x.Account.Bank.User.Id == userId && x.Category != null)
                 .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.Mcc })
                 .Select(x => new GeneratedRule
@@ -123,7 +123,7 @@ namespace MyFinanceServer.Api
                 .Where(x => x.Count > 5)
                 .ToListAsync();
 
-            var rules = await _context.Rules.AsNoTracking()
+            var rules = await _context.Rules
                 .Where(x => x.Category.User.Id == userId)
                 .Select(x => new Dto.GeneratedRule
                 {

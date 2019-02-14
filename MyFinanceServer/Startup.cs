@@ -101,7 +101,9 @@ namespace MyFinanceServer
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddEntityFrameworkNpgsql()
-                .AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(GetConnectionString()))
+                .AddDbContext<ApplicationDbContext>(options => options
+                    .UseLazyLoadingProxies()
+                    .UseNpgsql(GetConnectionString()))
                 .BuildServiceProvider();
 
             // DI

@@ -12,11 +12,13 @@ namespace MyFinanceServer.Data
         [Required]
         public string Title { get; set; }
 
-        [Required]
-        public ICollection<BankAccount> Accounts { get; set; }
+        public float OwnFunds => Accounts.Sum(x => x.OwnFunds);
 
         [Required]
-        public ApplicationUser User { get; set; }
+        public virtual ICollection<BankAccount> Accounts { get; set; }
+
+        [Required]
+        public virtual ApplicationUser User { get; set; }
 
         public Bank() { }
 
@@ -30,9 +32,9 @@ namespace MyFinanceServer.Data
             Title = title;
         }
 
-        public BankAccount LinkAccount(string title, string code, float balance)
+        public BankAccount LinkAccount(string title, string code, float balance, float creditLimit)
         {
-            var account = new BankAccount(title, code, balance);
+            var account = new BankAccount(title, code, balance, creditLimit);
 
             if (Accounts == null)
                 Accounts = new List<BankAccount>();
