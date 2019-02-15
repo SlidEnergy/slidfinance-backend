@@ -4,7 +4,7 @@ namespace MyFinanceServer.Api.Dto
 {
     public class CategoryStatistic
     {
-        public string CategoryId { get; set; }
+        public int CategoryId { get; set; }
 
         public MonthStatistic[] Months { get; set; }
         

@@ -47,14 +47,11 @@ namespace MyFinanceServer.Api
 
             BankAccount account = null;
 
-            if(string.IsNullOrEmpty(rule.AccountId))
-            {
-                account = await _context.Accounts
+            account = await _context.Accounts
                 .FirstOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == rule.AccountId);
 
-                if (account == null)
-                    return NotFound();
-            }
+            if (account == null)
+                return NotFound();
 
             var category = await _context.Categories
                 .FirstOrDefaultAsync(x => x.User.Id == userId && x.Id == rule.CategoryId);
@@ -62,10 +59,10 @@ namespace MyFinanceServer.Api
             if (category == null)
                 return NotFound();
 
-            var order = await _context.Rules.MaxAsync(x => (int?)x.Order) ?? 0;
+            var order = await _context.Rules.MaxAsync(x => (int?) x.Order) ?? 0;
             order++;
 
-            var newRule =new Rule
+            var newRule = new Rule
             {
                 Account = account,
                 BankCategory = rule.BankCategory,
@@ -77,12 +74,12 @@ namespace MyFinanceServer.Api
             _context.Rules.Add(newRule);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRule", new { id = newRule.Id }, _mapper.Map<Dto.Rule>(newRule));
+            return CreatedAtAction("GetRule", new {id = newRule.Id}, _mapper.Map<Dto.Rule>(newRule));
         }
 
         // DELETE: api/Rules/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Rule>> DeleteRule(string id)
+        public async Task<ActionResult<Dto.Rule>> DeleteRule(int id)
         {
             var userId = User.GetUserId();
 
@@ -117,8 +114,8 @@ namespace MyFinanceServer.Api
                     Mcc = x.Key.Mcc,
                     Categories = x.Where(s => s.Category != null).Select(s => s.Category.Id)
                         .GroupBy(s => s)
-                        .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count(c => c != null) }).ToArray(),
-                    Count = x.Count(c => c.Id != null)
+                        .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
+                    Count = x.Count()
                 })
                 .Where(x => x.Count > 5)
                 .ToListAsync();
@@ -144,7 +141,7 @@ namespace MyFinanceServer.Api
     {
         bool IEqualityComparer<GeneratedRule>.Equals(GeneratedRule x, GeneratedRule y)
         {
-            return ((string.IsNullOrEmpty(x.AccountId) || x.AccountId.Equals(y.AccountId)) &&
+            return ((x.AccountId == null || x.AccountId.Equals(y.AccountId)) &&
                     (string.IsNullOrEmpty(x.BankCategory) || x.BankCategory.Equals(y.BankCategory)) &&
                     (string.IsNullOrEmpty(x.Description) || x.Description.Equals(y.Description)) &&
                     (x.Mcc == null || x.Mcc.Equals(y.Mcc)));
@@ -155,9 +152,9 @@ namespace MyFinanceServer.Api
             if (obj == null)
                 return 0;
 
-            return (obj.BankCategory ?? "").GetHashCode() * 100 + 
-                   (obj.AccountId ?? "").GetHashCode() * 10 + 
-                   (obj.Description ?? "").GetHashCode() +
+            return (obj.BankCategory ?? "").GetHashCode() * 1000 + 
+                   (obj.Description ?? "").GetHashCode() * 100 +
+                   ((obj.AccountId ?? 0) + 1) * 10 +
                    obj.Mcc ?? 0;
         }
     }

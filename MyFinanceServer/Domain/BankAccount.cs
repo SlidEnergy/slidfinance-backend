@@ -5,7 +5,7 @@ namespace MyFinanceServer.Data
 {
     public class BankAccount
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Code { get; set; }
 

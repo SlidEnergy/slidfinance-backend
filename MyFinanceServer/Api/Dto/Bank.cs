@@ -8,11 +8,11 @@ namespace MyFinanceServer.Api.Dto
 {
     public class Bank
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Title { get; set; }
 
-        public string[] AccountIds { get; set; }
+        public int[] AccountIds { get; set; }
 
         public float OwnFunds { get; set; }
     }

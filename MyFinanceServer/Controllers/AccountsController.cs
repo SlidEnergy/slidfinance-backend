@@ -29,7 +29,7 @@ namespace MyFinanceServer.Api
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetList(string bankId = null)
+        public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetList(int? bankId = null)
         {
             var userId = User.GetUserId();
 
@@ -92,7 +92,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(string id, EditBankAccountBindingModel account)
+        public async Task<ActionResult> Update(int id, EditBankAccountBindingModel account)
         {
             var userId = User.GetUserId();
 
@@ -109,7 +109,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> Delete(int id)
         {
             var userId = User.GetUserId();
 

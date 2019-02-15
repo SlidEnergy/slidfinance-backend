@@ -5,7 +5,7 @@ namespace MyFinanceServer.Data
 {
     public class Transaction
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public DateTime DateTime { get; set; }
 

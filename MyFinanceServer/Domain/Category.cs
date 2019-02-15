@@ -4,7 +4,7 @@ namespace MyFinanceServer.Data
 {
     public class Category
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public int Order { get; set; }
 

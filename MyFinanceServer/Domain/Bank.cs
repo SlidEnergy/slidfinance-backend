@@ -7,7 +7,7 @@ namespace MyFinanceServer.Data
 {
     public class Bank
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Title { get; set; }
@@ -44,7 +44,7 @@ namespace MyFinanceServer.Data
             return account;
         }
 
-        public void UnlinkAccount(string id)
+        public void UnlinkAccount(int id)
         {
             if (Accounts == null)
                 throw new InvalidOperationException();
@@ -52,7 +52,7 @@ namespace MyFinanceServer.Data
             var account = Accounts.FirstOrDefault(x => x.Id == id);
 
             if (account == null)
-                throw new ArgumentException("Банк с указанным идентификатором не найден.", id);
+                throw new ArgumentException($"Банк с идентификатором {id} не найден.");
 
             Accounts.Remove(account);
         }

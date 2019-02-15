@@ -83,7 +83,7 @@ namespace MyFinanceServer.Tests
             var result = await controller.PatchTransaction(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
                     {
-                        new Operation<Api.Dto.Transaction>("replace", "/categoryId", category.Id)
+                        new Operation<Api.Dto.Transaction>("replace", "/categoryId", null, category.Id)
                     },
                     new CamelCasePropertyNamesContractResolver()));
 

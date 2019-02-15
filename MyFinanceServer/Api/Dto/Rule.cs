@@ -4,13 +4,13 @@ namespace MyFinanceServer.Api.Dto
 {
     public class Rule
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Order { get; set; }
 
-        public string AccountId { get; set; }
+        public int? AccountId { get; set; }
 
-        public string CategoryId { get; set; }
+        public int? CategoryId { get; set; }
 
         public string Description { get; set; }
 

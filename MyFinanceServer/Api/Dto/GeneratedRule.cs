@@ -4,7 +4,7 @@ namespace MyFinanceServer.Api.Dto
 {
     public class GeneratedRule
     {
-        public string AccountId { get; set; }
+        public int? AccountId { get; set; }
 
         public string Description { get; set; }
 

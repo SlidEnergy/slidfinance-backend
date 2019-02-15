@@ -2,7 +2,7 @@
 {
     public class AddBankAccountBindingModel
     {
-        public string BankId { get; set; }
+        public int BankId { get; set; }
 
         public string Title { get; set; }
 

@@ -39,7 +39,7 @@ namespace MyFinanceServer.Api
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PatchTransaction(string id, JsonPatchDocument<Dto.Transaction> patchDoc)
+        public async Task<ActionResult> PatchTransaction(int id, JsonPatchDocument<Dto.Transaction> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -62,8 +62,30 @@ namespace MyFinanceServer.Api
             return NoContent();
         }
 
+        [HttpPost]
+        public async Task<ActionResult<Dto.BankAccount>> Add(Dto.Transaction transaction)
+        {
+            var userId = User.GetUserId();
+
+            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == transaction.CategoryId && x.User.Id == userId);
+
+            if (category == null)
+                return NotFound();
+
+            var account = await _context.Accounts
+                    .FirstOrDefaultAsync(x => x.Id == transaction.AccountId && x.Bank.User.Id == userId);
+
+            var newTransaction = _mapper.Map<Transaction>(transaction);
+
+            _context.Transactions.Add(newTransaction);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetList", _mapper.Map<Dto.Transaction>(newTransaction));
+        }
+
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Transaction>> DeleteTransaction(string id)
+        public async Task<ActionResult<Dto.Transaction>> DeleteTransaction(int id)
         {
             var userId = User.GetUserId();
 

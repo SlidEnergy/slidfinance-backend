@@ -14,7 +14,7 @@ namespace MyFinanceServer.Data
         [Required]
         public virtual ICollection<Category> Categories { get; set; }
 
-        public void RenameBank(string id, string title)
+        public void RenameBank(int id, string title)
         {
             if (Banks == null)
                 throw new InvalidOperationException();
@@ -22,7 +22,7 @@ namespace MyFinanceServer.Data
             var bank = Banks.FirstOrDefault(x => x.Id == id);
 
             if (bank == null)
-                throw new ArgumentException("Банк с указанным идентификатором не найден.", id);
+                throw new ArgumentException($"Банк с идентификатором {id} не найден.");
 
             bank.Rename(title);
         }
@@ -39,7 +39,7 @@ namespace MyFinanceServer.Data
             return bank;
         }
 
-        public void UnlinkBank(string id)
+        public void UnlinkBank(int id)
         {
             if (Banks == null)
                 throw new InvalidOperationException();
@@ -47,7 +47,7 @@ namespace MyFinanceServer.Data
             var bank = Banks.FirstOrDefault(x => x.Id == id);
 
             if (bank == null)
-                throw new ArgumentException("Банк с указанным идентификатором не найден.", id);
+                throw new ArgumentException($"Банк с идентификатором {id} не найден.");
 
             Banks.Remove(bank);
         }
@@ -70,7 +70,7 @@ namespace MyFinanceServer.Data
             return category;
         }
 
-        public void DeleteCategory(string id)
+        public void DeleteCategory(int id)
         {
             if (Categories == null)
                 throw new InvalidOperationException();
@@ -78,7 +78,7 @@ namespace MyFinanceServer.Data
             var category = Categories.FirstOrDefault(x => x.Id == id);
 
             if (category == null)
-                throw new ArgumentException("Категория с указанным идентификатором не найдена.", id);
+                throw new ArgumentException($"Категория с идентификатором {id} не найдена.");
 
             Categories.Remove(category);
         }

@@ -2,7 +2,7 @@
 {
     public class BankAccount
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         public string Code { get; set; }
 
@@ -12,6 +12,6 @@
 
         public string Title { get; set; }
 
-        public string BankId { get; set; }
+        public int BankId { get; set; }
     }
 }

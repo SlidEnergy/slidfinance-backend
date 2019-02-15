@@ -58,7 +58,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(string id, Dto.Category category)
+        public async Task<ActionResult> Update(int id, Dto.Category category)
         {
             var userId = User.GetUserId();
 
@@ -81,7 +81,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> Delete(int id)
         {
             var userId = User.GetUserId();
 
