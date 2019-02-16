@@ -15,6 +15,10 @@ namespace MyFinanceServer.Api
                     opt => opt.MapFrom(src => src.Account.Id));
 
             CreateMap<Api.Dto.Transaction, Transaction>()
+                .ForMember(dest => dest.BankCategory,
+                    opt => opt.MapFrom(src => src.BankCategory ?? ""))
+                .ForMember(dest => dest.Description,
+                    opt => opt.MapFrom(src => src.Description ?? ""))
                 .ForMember(dest => dest.Category,
                     opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
                 .ForMember(dest => dest.Account,

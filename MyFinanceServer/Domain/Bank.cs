@@ -12,7 +12,7 @@ namespace MyFinanceServer.Data
         [Required]
         public string Title { get; set; }
 
-        public float OwnFunds => Accounts.Sum(x => x.OwnFunds);
+        public float OwnFunds => Accounts == null ? 0 : Accounts.Sum(x => x.OwnFunds);
 
         [Required]
         public virtual ICollection<BankAccount> Accounts { get; set; }

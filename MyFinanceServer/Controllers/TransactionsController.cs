@@ -27,7 +27,7 @@ namespace MyFinanceServer.Api
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList()
         {
             var userId = User.GetUserId();
 
@@ -39,7 +39,7 @@ namespace MyFinanceServer.Api
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PatchTransaction(int id, JsonPatchDocument<Dto.Transaction> patchDoc)
+        public async Task<ActionResult> Patch(int id, JsonPatchDocument<Dto.Transaction> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -85,7 +85,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Transaction>> DeleteTransaction(int id)
+        public async Task<ActionResult<Dto.Transaction>> Delete(int id)
         {
             var userId = User.GetUserId();
 
