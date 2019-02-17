@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Data;
-
-using System;
 using System.Threading.Tasks;
-using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyFinanceServer.Api
 {
@@ -13,11 +13,13 @@ namespace MyFinanceServer.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public UsersController(ApplicationDbContext context, IMapper mapper)
+        public UsersController(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         // GET: api/Users/current
@@ -36,6 +38,30 @@ namespace MyFinanceServer.Api
             }
 
             return _mapper.Map<Dto.User>(user);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Register(RegistrationBindingModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userIdentity = _mapper.Map<ApplicationUser>(model);
+
+            var result = await _userManager.CreateAsync(userIdentity, model.Password);
+
+            if (!result.Succeeded) {
+                foreach (var e in result.Errors)
+                {
+                    ModelState.TryAddModelError(e.Code, e.Description);
+                }
+
+                return BadRequest(ModelState);
+            }
+
+            return Ok();
         }
     }
 }
