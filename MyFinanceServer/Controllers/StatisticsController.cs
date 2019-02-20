@@ -27,31 +27,33 @@ namespace MyFinanceServer.Api
             endDate = endDate.ToUniversalTime();
             var userId = User.GetUserId();
 
-            //var start = new DateTime(startDate.Year, startDate.Month, 1);
-            //var end = new DateTime(endDate.Year, endDate.Month, DateTime.DaysInMonth(endDate.Year, endDate.Month));
+            var start = startDate.AddMonths(-3);// new DateTime(startDate.Year, startDate.Month, 1);
+            var end = new DateTime(endDate.Year, endDate.Month, DateTime.DaysInMonth(endDate.Year, endDate.Month));
 
             var groupedTransactions = await (from t in _context.Transactions
-                    orderby t.DateTime descending 
-                    where
-                        //t.DateTime >= startDate &&
-                        //t.DateTime <= endDate &&
-                        t.Category != null &&
-                        t.Account.Bank.User.Id == userId
-                    group t by new
-                    {
-                        CategoryId = t.Category.Id,
-                        Year = t.DateTime.Year,
-                        Month = t.DateTime.Month
-                    }
-                    into g
-                    select new
-                    {
-                        CategoryId = g.Key.CategoryId,
-                        Year = g.Key.Year,
-                        Month = g.Key.Month,
-                        Amount = g.Sum(x => x.Amount)
-                    })
-                .ToListAsync();
+                                             orderby t.DateTime descending
+                                             where
+                                                 t.DateTime >= start &&
+                                                 t.DateTime <= end &&
+                                                 t.Category != null &&
+                                                 t.Account.Bank.User.Id == userId
+                                             group t by new
+                                             {
+                                                 CategoryId = t.Category.Id,
+                                                 Year = t.DateTime.Year,
+                                                 Month = t.DateTime.Month
+                                             }
+                                             into g
+                                             select new GroupedTransactions
+                                             {
+                                                 CategoryId = g.Key.CategoryId,
+                                                 Year = g.Key.Year,
+                                                 Month = g.Key.Month,
+                                                 Amount = g.Sum(x => x.Amount)
+                                             })
+                                             .ToListAsync();
+
+            groupedTransactions = await GenerateAbsentRecords(groupedTransactions, start, end);
 
             var statistic = groupedTransactions
                 .GroupBy(g2 => g2.CategoryId)
@@ -74,6 +76,36 @@ namespace MyFinanceServer.Api
                 .ToList();
 
             return statistic;
+        }
+
+        private class GroupedTransactions {
+            public int CategoryId;
+            public int Year;
+            public int Month;
+            public float Amount;
+        }
+
+        private async Task<List<GroupedTransactions>> GenerateAbsentRecords(List<GroupedTransactions> transactions, DateTime startDate, DateTime endDate)
+        {
+            var list = new List<GroupedTransactions>();
+            var categories = await _context.Categories.ToListAsync();
+
+            DateTime currentDate = startDate;
+            while (currentDate < endDate) {
+
+                foreach (var category in categories)
+                {
+                    var t = transactions.FirstOrDefault(x => x.CategoryId == category.Id && x.Year == currentDate.Year && x.Month == currentDate.Month);
+
+                    if (t != null)
+                        list.Add(t);
+                    else
+                        list.Add(new GroupedTransactions { CategoryId = category.Id, Year = currentDate.Year, Month = currentDate.Month, Amount = 0f });
+                }
+                currentDate = currentDate.AddMonths(1);
+            }
+
+            return list;
         }
     }
 }
