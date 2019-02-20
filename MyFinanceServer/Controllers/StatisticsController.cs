@@ -33,8 +33,8 @@ namespace MyFinanceServer.Api
             var groupedTransactions = await (from t in _context.Transactions
                     orderby t.DateTime descending 
                     where
-                        t.DateTime >= startDate &&
-                        t.DateTime <= endDate &&
+                        //t.DateTime >= startDate &&
+                        //t.DateTime <= endDate &&
                         t.Category != null &&
                         t.Account.Bank.User.Id == userId
                     group t by new
@@ -58,11 +58,18 @@ namespace MyFinanceServer.Api
                 .Select(x => new CategoryStatistic
                 {
                     CategoryId = x.Key,
-                    Months = x.Select(x1 => new MonthStatistic()
-                    {
-                        Month = new DateTime(x1.Year, x1.Month, 1, 0, 0, 0, DateTimeKind.Utc),
-                        Amount = x1.Amount
-                    }).ToArray(),
+                    AverageAmount = x.Average(x1 => x1.Amount),
+                    Months = x
+                        .Where(x1 => {
+                            var date = new DateTime(x1.Year, x1.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+                            return date >= startDate && date <= endDate;
+                        })
+                        .Select(x1 => new MonthStatistic()
+                        {
+                            Month = new DateTime(x1.Year, x1.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                            Amount = x1.Amount
+                        }).ToArray(),
                 })
                 .ToList();
 

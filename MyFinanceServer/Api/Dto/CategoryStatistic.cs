@@ -6,8 +6,8 @@ namespace MyFinanceServer.Api.Dto
     {
         public int CategoryId { get; set; }
 
+        public float AverageAmount { get; set; }
+
         public MonthStatistic[] Months { get; set; }
-        
-        public float[] Amounts { get; set; }
     }
 }
