@@ -54,7 +54,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
-            var result = await controller.GetTransactions();
+            var result = await controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -80,7 +80,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
-            var result = await controller.PatchTransaction(transaction.Id,
+            var result = await controller.Patch(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
                     {
                         new Operation<Api.Dto.Transaction>("replace", "/categoryId", null, category.Id)
@@ -116,7 +116,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new TransactionsController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
-            var result = await controller.PatchTransaction(transaction.Id,
+            var result = await controller.Patch(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
                     {
                         new Operation<Api.Dto.Transaction>("replace", "/categoryId", null)

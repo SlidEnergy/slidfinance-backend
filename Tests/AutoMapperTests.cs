@@ -16,7 +16,7 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
-        public async Task CreateMapperProfile_Validated()
+        public void CreateMapperProfile_Validated()
         {
             var context = new ApplicationDbContext(new DbContextOptions<ApplicationDbContext>());
             Mapper.Initialize(x=>x.AddProfile(new MappingProfile(context)));

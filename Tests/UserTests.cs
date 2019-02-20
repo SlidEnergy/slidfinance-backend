@@ -5,6 +5,8 @@ using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Moq;
 
 namespace MyFinanceServer.Tests
 {
@@ -27,7 +29,12 @@ namespace MyFinanceServer.Tests
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            var controller = new UsersController(dbContext, _autoMapper.Create(dbContext));
+            var store = new Mock<IUserStore<ApplicationUser>>();
+            var manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
+            manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(user));
+
+            var controller = new UsersController(dbContext, _autoMapper.Create(dbContext), manager.Object);
             controller.AddControllerContext(user);
             var result = await controller.GetCurrentUser();
 
