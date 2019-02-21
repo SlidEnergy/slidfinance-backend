@@ -15,12 +15,7 @@ namespace MyFinanceServer
     {
         public static void Main(string[] args)
         {
-            var host = CreateWebHostBuilder(args).Build();
-
-            var dbInitializer = new DbInitializer(host.Services);
-            dbInitializer.Initialize().Wait();
-
-            host.Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
