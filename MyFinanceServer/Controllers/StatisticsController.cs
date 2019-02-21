@@ -53,7 +53,7 @@ namespace MyFinanceServer.Api
                                              })
                                              .ToListAsync();
 
-            groupedTransactions = await GenerateAbsentRecords(groupedTransactions, start, end);
+            groupedTransactions = await GenerateAbsentRecords(groupedTransactions, start, end, userId);
 
             var statistic = groupedTransactions
                 .GroupBy(g2 => g2.CategoryId)
@@ -85,10 +85,10 @@ namespace MyFinanceServer.Api
             public float Amount;
         }
 
-        private async Task<List<GroupedTransactions>> GenerateAbsentRecords(List<GroupedTransactions> transactions, DateTime startDate, DateTime endDate)
+        private async Task<List<GroupedTransactions>> GenerateAbsentRecords(List<GroupedTransactions> transactions, DateTime startDate, DateTime endDate, string userId)
         {
             var list = new List<GroupedTransactions>();
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.Where(x=>x.User.Id == userId).ToListAsync();
 
             DateTime currentDate = startDate;
             while (currentDate < endDate) {
