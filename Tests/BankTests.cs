@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Moq;
 using MyFinanceServer.Api;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -37,7 +39,9 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext));
+            var repository = new Mock<IRepository>();
+
+            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext), new BanksService(repository.Object));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 
@@ -69,7 +73,9 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext));
+            var repository = new Mock<IRepository>();
+
+            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext), new BanksService(repository.Object));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 

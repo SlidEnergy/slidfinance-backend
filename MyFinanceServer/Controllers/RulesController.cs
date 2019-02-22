@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Api;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using MyFinanceServer.Api.Dto;
-using BankAccount = MyFinanceServer.Data.BankAccount;
-using Rule = MyFinanceServer.Data.Rule;
 
 namespace MyFinanceServer.Api
 {
@@ -106,7 +103,7 @@ namespace MyFinanceServer.Api
             var generatedRules = await _context.Transactions
                 .Where(x => x.Account.Bank.User.Id == userId && x.Category != null)
                 .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.Mcc })
-                .Select(x => new GeneratedRule
+                .Select(x => new Dto.GeneratedRule
                 {
                     AccountId = x.Key.AccountId,
                     BankCategory = x.Key.BankCategory,
@@ -114,7 +111,7 @@ namespace MyFinanceServer.Api
                     Mcc = x.Key.Mcc,
                     Categories = x.Where(s => s.Category != null).Select(s => s.Category.Id)
                         .GroupBy(s => s)
-                        .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
+                        .Select(s => new Dto.CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
                     Count = x.Count()
                 })
                 .Where(x => x.Count > 5)
@@ -137,9 +134,9 @@ namespace MyFinanceServer.Api
         }
     }
 
-    public class RuleComparer : IEqualityComparer<GeneratedRule>
+    public class RuleComparer : IEqualityComparer<Dto.GeneratedRule>
     {
-        bool IEqualityComparer<GeneratedRule>.Equals(GeneratedRule x, GeneratedRule y)
+        bool IEqualityComparer<Dto.GeneratedRule>.Equals(Dto.GeneratedRule x, Dto.GeneratedRule y)
         {
             return ((x.AccountId == null || x.AccountId.Equals(y.AccountId)) &&
                     (string.IsNullOrEmpty(x.BankCategory) || x.BankCategory.Equals(y.BankCategory)) &&
@@ -147,7 +144,7 @@ namespace MyFinanceServer.Api
                     (x.Mcc == null || x.Mcc.Equals(y.Mcc)));
         }
 
-        int IEqualityComparer<GeneratedRule>.GetHashCode(GeneratedRule obj)
+        int IEqualityComparer<Dto.GeneratedRule>.GetHashCode(Dto.GeneratedRule obj)
         {
             if (obj == null)
                 return 0;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MyFinanceServer.Data;
+using MyFinanceServer.Core;
 using System.Collections.Generic;
 using System.Security.Claims;
 

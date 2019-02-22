@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 
 namespace MyFinanceServer.Api
 {

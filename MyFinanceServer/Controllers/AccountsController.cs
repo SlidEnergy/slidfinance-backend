@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
-using MyFinanceServer.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;

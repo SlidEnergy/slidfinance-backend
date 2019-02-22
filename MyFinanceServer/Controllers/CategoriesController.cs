@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 
 
@@ -18,11 +19,13 @@ namespace MyFinanceServer.Api
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly CategoriesService _categoriesService;
 
-        public CategoriesController(ApplicationDbContext context, IMapper mapper)
+        public CategoriesController(ApplicationDbContext context, IMapper mapper, CategoriesService categoriesService)
         {
             _context = context;
             _mapper = mapper;
+            _categoriesService = categoriesService;
         }
 
         // GET: api/Categories
@@ -43,16 +46,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var user = await _context.Users
-                .Include(x => x.Categories)
-                .FirstOrDefaultAsync(x => x.Id == userId);
-
-            if (user == null)
-                return Unauthorized();
-
-            var newCategory = user.AddCategory(category.Title);
-
-            await _context.SaveChangesAsync();
+            var newCategory = await _categoriesService.AddCategory(userId, category.Title);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Category>(newCategory));
         }
@@ -85,14 +79,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var category = await _context.Categories.Include(x => x.User).FirstOrDefaultAsync(b => b.Id == id && b.User.Id == userId);
-
-            if (category == null)
-                return NotFound();
-
-            category.User.DeleteCategory(id);
-
-            await _context.SaveChangesAsync();
+            await _categoriesService.DeleteCategory(userId, id);
 
             return NoContent();
         }

@@ -8,8 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MyFinanceServer.Api;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
-using MyFinanceServer.Domain;
 using Npgsql;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
@@ -136,6 +136,10 @@ namespace MyFinanceServer
             // https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
             services.AddIdentityCore<ApplicationUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<IRepository, EfRepository>();
+            services.AddScoped<BanksService>();
+            services.AddScoped<CategoriesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

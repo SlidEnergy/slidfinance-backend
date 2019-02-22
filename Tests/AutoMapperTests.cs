@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 using NUnit.Framework;
-using System.Threading.Tasks;
-using AutoMapper;
 
 namespace MyFinanceServer.Tests
 {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using NUnit.Framework;
 using System.Linq;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using System.Linq;
 

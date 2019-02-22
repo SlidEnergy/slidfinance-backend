@@ -7,6 +7,7 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using MyFinanceServer.Core;
 
 namespace MyFinanceServer.Tests
 {

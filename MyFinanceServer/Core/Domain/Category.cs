@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyFinanceServer.Data
+namespace MyFinanceServer.Core
 {
-    public class Category
+    public class Category: IUniqueObject
     {
         public int Id { get; set; }
 
@@ -22,14 +22,10 @@ namespace MyFinanceServer.Data
             User = user;
         }
 
-        public void Rename(string title)
-        {
-            Title = title;
-        }
+        public bool IsBelongsTo(string userId) => User.Id == userId;
 
-        public void SetOrder(int order)
-        {
-            Order = order;
-        }
+        public void Rename(string title) => Title = title;
+
+        public void SetOrder(int order) => Order = order;
     }
 }

@@ -1,11 +1,11 @@
-﻿using MyFinanceServer.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MyFinanceServer.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
-namespace MyFinanceServer.Domain
+namespace MyFinanceServer.Core
 {
     public class AccountDataSaver : IAccountDataSaver
     {

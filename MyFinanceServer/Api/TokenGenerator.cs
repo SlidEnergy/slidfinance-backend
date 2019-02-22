@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MyFinanceServer.Data;
+using MyFinanceServer.Core;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

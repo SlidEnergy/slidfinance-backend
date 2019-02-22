@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Data;
+using MyFinanceServer.Core;
 
 namespace MyFinanceServer.Data
 {

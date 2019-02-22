@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace MyFinanceServer.Data
+namespace MyFinanceServer.Core
 {
-    public class Bank
+    public class Bank: IUniqueObject
     {
         public int Id { get; set; }
 
@@ -25,6 +25,11 @@ namespace MyFinanceServer.Data
         public Bank(string title, ApplicationUser user) {
             Title = title;
             User = user;
+        }
+
+        public bool IsBelongsTo(string userId)
+        {
+            return User.Id == userId;
         }
 
         public void Rename(string title)

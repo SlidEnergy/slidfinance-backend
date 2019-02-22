@@ -1,4 +1,4 @@
-﻿using MyFinanceServer.Data;
+﻿using MyFinanceServer.Core;
 
 namespace MyFinanceServer.Api
 {

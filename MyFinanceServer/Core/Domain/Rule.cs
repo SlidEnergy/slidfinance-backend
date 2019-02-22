@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyFinanceServer.Data
+namespace MyFinanceServer.Core
 {
     public class Rule
     {
