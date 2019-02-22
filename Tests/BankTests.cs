@@ -20,6 +20,58 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
+        public async Task AddBank_ShouldBeCallAddMethodWithRightArguments()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("AddBank_ShouldBeCallAddMethodWithRightArguments");
+            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
+            var user = new ApplicationUser() { Email = "Email #1" };
+            dbContext.Users.Add(user);
+            await dbContext.SaveChangesAsync();
+
+            var repository = new Mock<IRepository>();
+            repository.Setup(x => x.GetById<string, ApplicationUser>(It.IsAny<string>())).ReturnsAsync(user);
+            repository.Setup(x => x.Add<Bank>(It.IsAny<Bank>())).ReturnsAsync(new Bank());
+
+            var banksService = new BanksService(repository.Object);
+
+            var category1 = banksService.AddBank(user.Id, "Bank #1");
+
+            repository.Verify(x => x.Add<Bank>(
+                It.Is<Bank>(c => c.Title == "Bank #1" && c.User.Id == user.Id)), Times.Exactly(1));
+        }
+
+        [Test]
+        public async Task DeleteBank_ShouldBeCallAddMethodWithRightArguments()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+            optionsBuilder.UseInMemoryDatabase("DeleteBank_ShouldBeCallAddMethodWithRightArguments");
+            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
+            var user = new ApplicationUser() { Email = "Email #1" };
+            dbContext.Users.Add(user);
+            var bank = new Bank()
+            {
+                Title = "Bank #1",
+                User = user
+            };
+            dbContext.Banks.Add(bank);
+            await dbContext.SaveChangesAsync();
+
+            var repository = new Mock<IRepository>();
+            repository.Setup(x => x.GetById<string, ApplicationUser>(It.IsAny<string>())).ReturnsAsync(user);
+            repository.Setup(x => x.GetById<int, Bank>(It.IsAny<int>())).ReturnsAsync(bank);
+            repository.Setup(x => x.Delete(It.IsAny<Bank>())).Returns(Task.CompletedTask);
+
+            var banksService = new BanksService(repository.Object);
+
+            await banksService.DeleteBank(user.Id, bank.Id);
+
+            repository.Verify(x => x.Delete(
+                It.Is<Bank>(c => c.Title == bank.Title && bank.User.Id == bank.User.Id)),
+                Times.Exactly(1));
+        }
+
+        [Test]
         public async Task GetBanks_Ok()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
