@@ -48,9 +48,9 @@ namespace MyFinanceServer.Api
                 return BadRequest(ModelState);
             }
 
-            var userIdentity = _mapper.Map<ApplicationUser>(model);
-
-            var result = await _userManager.CreateAsync(userIdentity, model.Password);
+            var user = _mapper.Map<ApplicationUser>(model);
+            
+            var result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded) {
                 foreach (var e in result.Errors)
@@ -61,7 +61,7 @@ namespace MyFinanceServer.Api
                 return BadRequest(ModelState);
             }
 
-            return Ok();
+            return Created("", _mapper.Map<Dto.User>(user));
         }
     }
 }
