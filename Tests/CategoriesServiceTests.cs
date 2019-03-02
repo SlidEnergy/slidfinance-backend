@@ -1,13 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using MyFinanceServer.Api;
 using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MyFinanceServer.Tests
 {
