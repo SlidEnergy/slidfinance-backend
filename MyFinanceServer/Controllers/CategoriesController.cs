@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Api;
 using MyFinanceServer.Core;
 using MyFinanceServer.Data;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using MyFinanceServer.Shared;
 
 namespace MyFinanceServer.Api
@@ -17,13 +12,11 @@ namespace MyFinanceServer.Api
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly CategoriesService _categoriesService;
 
-        public CategoriesController(ApplicationDbContext context, IMapper mapper, CategoriesService categoriesService)
+        public CategoriesController( IMapper mapper, CategoriesService categoriesService)
         {
-            _context = context;
             _mapper = mapper;
             _categoriesService = categoriesService;
         }
@@ -34,11 +27,8 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            return await _context.Categories
-                .Where(x => x.User.Id == userId)
-                .OrderBy(x => x.Order)
-                .Select(x => _mapper.Map<Dto.Category>(x))
-                .ToListAsync();
+            var categories = await _categoriesService.GetList(userId);
+           return _mapper.Map<Dto.Category[]>(categories);
         }
 
         [HttpPost]
@@ -52,26 +42,13 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, Dto.Category category)
+        public async Task<ActionResult<Dto.Category>> Update(int id, Dto.Category category)
         {
             var userId = User.GetUserId();
 
-            var user = await _context.Users
-               .Include(x => x.Categories)
-               .FirstOrDefaultAsync(x => x.Id == userId);
+            var editedCategory = await _categoriesService.EditCategory(userId, id, category.Title, category.Order);
 
-            if (user == null)
-                return Unauthorized();
-
-            var editCategory = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id && x.User.Id == userId);
-
-            editCategory.Rename(category.Title);
-
-            user.ReorderCategories(editCategory, category.Order);
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return _mapper.Map<Dto.Category>(editedCategory);
         }
 
         [HttpDelete("{id}")]

@@ -138,6 +138,7 @@ namespace MyFinanceServer
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IRepository, EfRepository>();
+            services.AddScoped<ICategoriesRepository, EfCategoriesRepository>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<BanksService>();
             services.AddScoped<UsersService>();

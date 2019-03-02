@@ -20,7 +20,7 @@ namespace MyFinanceServer.Data
             return await _dbContext.Set<TEntity>().SingleOrDefaultAsync(e => e.Id.Equals(id));
         }
 
-        public async Task<List<TEntity>> List<TEntity>() where TEntity : class
+        public async Task<List<TEntity>> GetList<TEntity>() where TEntity : class
         {
             return await _dbContext.Set<TEntity>().ToListAsync();
         }
@@ -39,10 +39,12 @@ namespace MyFinanceServer.Data
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task Update<TEntity>(TEntity entity) where TEntity : class
+        public async Task<TEntity> Update<TEntity>(TEntity entity) where TEntity : class
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();
+
+            return entity;
         }
     }
 }

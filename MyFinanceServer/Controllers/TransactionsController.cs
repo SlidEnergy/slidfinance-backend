@@ -41,7 +41,7 @@ namespace MyFinanceServer.Api
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> Patch(int id, JsonPatchDocument<Dto.Transaction> patchDoc)
+        public async Task<ActionResult<Dto.Transaction>> Patch(int id, JsonPatchDocument<Dto.Transaction> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -61,7 +61,7 @@ namespace MyFinanceServer.Api
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return dto;
         }
 
         [HttpPost]
