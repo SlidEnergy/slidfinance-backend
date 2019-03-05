@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace MyFinanceServer.Tests
 {
-    public class UserTests
+    public class UsersControllerTests
     {
         private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
 

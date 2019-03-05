@@ -21,7 +21,7 @@ namespace MyFinanceServer.Core
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<IdentityResult> CreateUser(ApplicationUser user, string password)
+        public async Task<IdentityResult> Register(ApplicationUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
         }

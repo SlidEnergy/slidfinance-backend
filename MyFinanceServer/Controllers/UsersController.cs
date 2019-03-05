@@ -45,7 +45,7 @@ namespace MyFinanceServer.Api
 
             var user = _mapper.Map<ApplicationUser>(model);
 
-            var result = await _usersService.CreateUser(user, model.Password);
+            var result = await _usersService.Register(user, model.Password);
 
             if (!result.Succeeded) {
                 foreach (var e in result.Errors)
