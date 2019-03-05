@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class BankTests
+    public class BanksServiceTests
     {
         private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
 
