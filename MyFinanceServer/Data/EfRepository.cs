@@ -8,7 +8,7 @@ namespace MyFinanceServer.Data
 {
     public class EfRepository : IRepository
     {
-        private readonly ApplicationDbContext _dbContext;
+        protected readonly ApplicationDbContext _dbContext;
 
         public EfRepository(ApplicationDbContext dbContext)
         {

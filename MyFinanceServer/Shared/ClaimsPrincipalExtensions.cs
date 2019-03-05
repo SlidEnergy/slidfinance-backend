@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 
-namespace MyFinanceServer.Api
+namespace MyFinanceServer.Shared
 {
     public static class ClaimsPrincipalExtensions
     {

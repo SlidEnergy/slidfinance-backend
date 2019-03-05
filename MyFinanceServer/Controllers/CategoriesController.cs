@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Api;
 using MyFinanceServer.Core;
 using MyFinanceServer.Data;
-
+using MyFinanceServer.Shared;
 
 namespace MyFinanceServer.Api
 {

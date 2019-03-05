@@ -2,11 +2,13 @@
 using Microsoft.IdentityModel.Tokens;
 using MyFinanceServer.Core;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace MyFinanceServer.Api
+namespace MyFinanceServer.Core
 {
     public class TokenGenerator : ITokenGenerator
     {
@@ -17,14 +19,24 @@ namespace MyFinanceServer.Api
             _appSettings = appSettings.Value;
         }
 
-        public string Get(ApplicationUser user)
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = CreateIdentity(user),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMonths(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };
@@ -35,9 +47,11 @@ namespace MyFinanceServer.Api
             return serializedToken;
         }
 
-        private ClaimsIdentity CreateIdentity(ApplicationUser user)
+        public string GenerateAccessToken(ApplicationUser user) => GenerateAccessToken(CreateClaims(user));
+
+        private IEnumerable<Claim> CreateClaims(ApplicationUser user)
         {
-            return new ClaimsIdentity(new Claim[]
+            return new Claim[]
                 {
                     // Asp.net core Identity восстанавливает это значение в поле User.Identity.Name
                     // Допустипо ClaimTypes.Name или ClaimsIdentity.DefaultNameClaimType
@@ -50,7 +64,7 @@ namespace MyFinanceServer.Api
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                     // _jwtOptions.IssuedAt
                     new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64)
-                });
+                };
         }
 
         /// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

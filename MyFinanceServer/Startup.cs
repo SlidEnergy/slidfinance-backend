@@ -138,8 +138,10 @@ namespace MyFinanceServer
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IRepository, EfRepository>();
+            services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<BanksService>();
             services.AddScoped<CategoriesService>();
+            services.AddScoped<TokenService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

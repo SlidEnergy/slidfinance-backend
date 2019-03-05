@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Core;
-using MyFinanceServer.Data;
+using MyFinanceServer.Shared;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
@@ -11,18 +11,15 @@ namespace MyFinanceServer.Api
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UsersService _usersService;
 
-        public UsersController(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public UsersController(IMapper mapper, UsersService usersService)
         {
-            _context = context;
             _mapper = mapper;
-            _userManager = userManager;
+            _usersService = usersService;
         }
 
-        // GET: api/Users/current
         [HttpGet("current")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -30,7 +27,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _usersService.GetById(userId);
 
             if (user == null)
             {
@@ -40,17 +37,15 @@ namespace MyFinanceServer.Api
             return _mapper.Map<Dto.User>(user);
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterBindingModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
             var user = _mapper.Map<ApplicationUser>(model);
-            
-            var result = await _userManager.CreateAsync(user, model.Password);
+
+            var result = await _usersService.CreateUser(user, model.Password);
 
             if (!result.Succeeded) {
                 foreach (var e in result.Errors)
@@ -62,6 +57,26 @@ namespace MyFinanceServer.Api
             }
 
             return Created("", _mapper.Map<Dto.User>(user));
+        }
+
+        [HttpPost("login")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<TokenInfo>> Login(LoginBindingModel userData)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            try
+            {
+                var tokens = await _usersService.Login(userData.Email, userData.Password);
+
+                return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
+            }
+            catch(AuthenticationException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

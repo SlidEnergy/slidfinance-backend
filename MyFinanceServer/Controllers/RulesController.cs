@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Core;
 using MyFinanceServer.Data;
+using MyFinanceServer.Shared;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

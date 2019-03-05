@@ -25,5 +25,7 @@ namespace MyFinanceServer.Data
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<Rule> Rules { get; set; }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }

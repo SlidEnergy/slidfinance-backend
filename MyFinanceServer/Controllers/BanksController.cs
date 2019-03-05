@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using MyFinanceServer.Core;
+using MyFinanceServer.Shared;
 
 namespace MyFinanceServer.Api
 {

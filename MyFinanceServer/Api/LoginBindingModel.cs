@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Api
 {
-    public class UserBindingModel
+    public class LoginBindingModel
     {
         [Required]
         public string Email { get; set; }
