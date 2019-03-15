@@ -52,7 +52,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, EditBankBindingModel bank)
+        public async Task<ActionResult<Dto.Bank>> Update(int id, EditBankBindingModel bank)
         {
             var userId = User.GetUserId();
 
@@ -62,7 +62,7 @@ namespace MyFinanceServer.Api
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return _mapper.Map<Dto.Bank>(editBank);
         }
 
         [HttpDelete("{id}")]

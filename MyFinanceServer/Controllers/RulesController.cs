@@ -23,9 +23,8 @@ namespace MyFinanceServer.Api
             _mapper = mapper;
         }
 
-        // GET: api/Rules
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Dto.Rule>>> GetRule()
+        public async Task<ActionResult<IEnumerable<Dto.Rule>>> GetList()
         {
             var userId = User.GetUserId();
 
@@ -37,9 +36,8 @@ namespace MyFinanceServer.Api
                 .Select(x=>_mapper.Map<Dto.Rule>(x)).ToListAsync();
         }
 
-        // POST: api/Rules
         [HttpPost]
-        public async Task<ActionResult<Dto.Rule>> PostRule(Dto.Rule rule)
+        public async Task<ActionResult<Dto.Rule>> Add(Dto.Rule rule)
         {
             var userId = User.GetUserId();
 
@@ -75,9 +73,8 @@ namespace MyFinanceServer.Api
             return CreatedAtAction("GetRule", new {id = newRule.Id}, _mapper.Map<Dto.Rule>(newRule));
         }
 
-        // DELETE: api/Rules/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Dto.Rule>> DeleteRule(int id)
+        public async Task<ActionResult<Dto.Rule>> Delete(int id)
         {
             var userId = User.GetUserId();
 
@@ -93,7 +90,6 @@ namespace MyFinanceServer.Api
             return _mapper.Map<Dto.Rule>(rule);
         }
 
-        // GET: api/Users/current
         [HttpGet("generated")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]

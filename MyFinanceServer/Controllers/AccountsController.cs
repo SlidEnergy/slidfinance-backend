@@ -46,7 +46,7 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> PatchAccountData(string code, PatchAccountDataBindingModel accountData)
+        public async Task<ActionResult<Dto.BankAccount>> PatchAccountData(string code, PatchAccountDataBindingModel accountData)
         {
             // TODO: добавить подробное протоколирование, т.к. метод содержит логику
 
@@ -73,7 +73,7 @@ namespace MyFinanceServer.Api
                 Mcc = x.Mcc
             }).ToList());
 
-            return NoContent();
+            return _mapper.Map<Dto.BankAccount>(account);
         }
 
         [HttpPost]
@@ -93,7 +93,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, EditBankAccountBindingModel account)
+        public async Task<ActionResult<Dto.BankAccount>> Update(int id, EditBankAccountBindingModel account)
         {
             var userId = User.GetUserId();
 
@@ -106,7 +106,7 @@ namespace MyFinanceServer.Api
 
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return _mapper.Map<Dto.BankAccount>(editAccount);
         }
 
         [HttpDelete("{id}")]
