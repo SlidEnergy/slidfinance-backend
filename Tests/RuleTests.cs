@@ -54,7 +54,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new RulesController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
-            var result = await controller.GetRule();
+            var result = await controller.GetGeneratedRules();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -89,7 +89,7 @@ namespace MyFinanceServer.Tests
 
             var controller = new RulesController(dbContext, _autoMapper.Create(dbContext));
             controller.AddControllerContext(user);
-            var result = await controller.PostRule(new Api.Dto.Rule()
+            var result = await controller.Add(new Api.Dto.Rule()
             {
                 AccountId = rule.Account.Id,
                 BankCategory = rule.BankCategory,
