@@ -14,7 +14,6 @@ namespace MyFinanceServer.Core
             _repository = repository;
         }
 
-
         public async Task<List<Category>> GetList(string userId)
         {
             var categories = await _repository.GetListWithAccessCheck(userId);

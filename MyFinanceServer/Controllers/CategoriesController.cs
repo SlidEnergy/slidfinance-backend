@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Core;
-using MyFinanceServer.Data;
+using MyFinanceServer.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MyFinanceServer.Shared;
 
 namespace MyFinanceServer.Api
 {
@@ -21,14 +20,13 @@ namespace MyFinanceServer.Api
             _categoriesService = categoriesService;
         }
 
-        // GET: api/Categories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Dto.Category>>> GetList()
         {
             var userId = User.GetUserId();
 
             var categories = await _categoriesService.GetList(userId);
-           return _mapper.Map<Dto.Category[]>(categories);
+            return _mapper.Map<Dto.Category[]>(categories);
         }
 
         [HttpPost]

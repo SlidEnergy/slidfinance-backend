@@ -14,7 +14,7 @@ namespace MyFinanceServer.Data
 
         public async Task<List<Category>> GetListWithAccessCheck(string userId)
         {
-            return await _dbContext.Categories.Where(x=>x.User.Id == userId).ToListAsync();
+            return await _dbContext.Categories.Where(x => x.User.Id == userId).OrderBy(x => x.Order).ToListAsync();
         }
     }
 }

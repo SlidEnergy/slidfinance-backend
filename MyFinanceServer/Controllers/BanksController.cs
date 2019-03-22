@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 using MyFinanceServer.Core;
 using MyFinanceServer.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
 {
@@ -16,13 +13,11 @@ namespace MyFinanceServer.Api
     [ApiController]
     public class BanksController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly BanksService _banksService;
 
-        public BanksController(ApplicationDbContext context, IMapper mapper, BanksService banksService)
+        public BanksController(IMapper mapper, BanksService banksService)
         {
-            _context = context;
             _mapper = mapper;
             _banksService = banksService;
         }
@@ -33,11 +28,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var banks = await _context.Banks
-                .Where(x => x.User.Id == userId)
-                .OrderBy(x => x.Title)
-                .ToListAsync();
-
+            var banks = await _banksService.GetList(userId);
             return _mapper.Map<Dto.Bank[]>(banks);
         }
 
@@ -56,13 +47,8 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var editBank = await _context.Banks.FirstOrDefaultAsync(x => x.Id == id && x.User.Id == userId);
-
-            editBank.Rename(bank.Title);
-
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<Dto.Bank>(editBank);
+            var editedBank = await _banksService.EditBank(userId, id, bank.Title);
+            return _mapper.Map<Dto.Bank>(editedBank);
         }
 
         [HttpDelete("{id}")]

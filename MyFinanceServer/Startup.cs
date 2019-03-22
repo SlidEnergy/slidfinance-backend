@@ -140,6 +140,7 @@ namespace MyFinanceServer
             services.AddScoped<IRepository, EfRepository>();
             services.AddScoped<ICategoriesRepository, EfCategoriesRepository>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<IBanksRepository, EfBanksRepository>();
             services.AddScoped<BanksService>();
             services.AddScoped<UsersService>();
             services.AddScoped<CategoriesService>();

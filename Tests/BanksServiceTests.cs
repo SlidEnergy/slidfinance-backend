@@ -29,7 +29,7 @@ namespace MyFinanceServer.Tests
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            var repository = new Mock<IRepository>();
+            var repository = new Mock<IBanksRepository>();
             repository.Setup(x => x.GetById<string, ApplicationUser>(It.IsAny<string>())).ReturnsAsync(user);
             repository.Setup(x => x.Add<Bank>(It.IsAny<Bank>())).ReturnsAsync(new Bank());
 
@@ -57,7 +57,7 @@ namespace MyFinanceServer.Tests
             dbContext.Banks.Add(bank);
             await dbContext.SaveChangesAsync();
 
-            var repository = new Mock<IRepository>();
+            var repository = new Mock<IBanksRepository>();
             repository.Setup(x => x.GetById<string, ApplicationUser>(It.IsAny<string>())).ReturnsAsync(user);
             repository.Setup(x => x.GetById<int, Bank>(It.IsAny<int>())).ReturnsAsync(bank);
             repository.Setup(x => x.Delete(It.IsAny<Bank>())).Returns(Task.CompletedTask);
@@ -91,9 +91,9 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var repository = new Mock<IRepository>();
+            var repository = new Mock<IBanksRepository>();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext), new BanksService(repository.Object));
+            var controller = new BanksController(_autoMapper.Create(dbContext), new BanksService(repository.Object));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 
@@ -125,9 +125,9 @@ namespace MyFinanceServer.Tests
             });
             await dbContext.SaveChangesAsync();
 
-            var repository = new Mock<IRepository>();
+            var repository = new Mock<IBanksRepository>();
 
-            var controller = new BanksController(dbContext, _autoMapper.Create(dbContext), new BanksService(repository.Object));
+            var controller = new BanksController(_autoMapper.Create(dbContext), new BanksService(repository.Object));
             controller.AddControllerContext(user);
             var result = await controller.GetList();
 
