@@ -24,7 +24,7 @@ namespace MyFinanceServer.Api
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Bank>>> GetList()
+        public async Task<ActionResult<Dto.Bank[]>> GetList()
         {
             var userId = User.GetUserId();
 

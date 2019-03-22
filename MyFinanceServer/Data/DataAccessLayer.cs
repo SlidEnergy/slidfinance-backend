@@ -10,12 +10,15 @@ namespace MyFinanceServer.Data
     {
         public ICategoriesRepository Categories;
 
+        public IBanksRepository Banks;
+
         public IRepository Users => _all;
 
         private IRepository _all;
 
-        public DataAccessLayer(ICategoriesRepository categories, IRepository repository)
+        public DataAccessLayer(IBanksRepository banks, ICategoriesRepository categories, IRepository repository)
         {
+            Banks = banks;
             Categories = categories;
             _all = repository;
         }
