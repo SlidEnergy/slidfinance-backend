@@ -1,76 +1,58 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Moq;
 using MyFinanceServer.Api;
-using MyFinanceServer.Data;
+using MyFinanceServer.Core;
 using NUnit.Framework;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Moq;
-using MyFinanceServer.Core;
-using Microsoft.Extensions.Options;
 
 namespace MyFinanceServer.Tests
 {
-    public class UsersControllerTests
+    public class UsersControllerTests : TestsBase
     {
-        private readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
+        UsersService _service;
+        Mock<UserManager<ApplicationUser>> _manager;
 
         [SetUp]
         public void Setup()
         {
+            var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));
+            var store = new Mock<IUserStore<ApplicationUser>>();
+
+            _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
+            _service = new UsersService(_manager.Object, tokenGenerator);
         }
 
         [Test]
         public async Task GetCurrentUser_Ok()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("GetCurrentUser_Ok");
-            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new ApplicationUser() { UserName = "Email #1", Email = "Email #1" };
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
+            _manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
-            var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            var manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-            manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(user));
-
-            var controller = new UsersController(_autoMapper.Create(dbContext), new UsersService(manager.Object, tokenGenerator));
-            controller.AddControllerContext(user);
+            var controller = new UsersController(_autoMapper.Create(_db), _service);
+            controller.AddControllerContext(_user);
             var result = await controller.GetCurrentUser();
 
             Assert.IsInstanceOf<ActionResult<Api.Dto.User>>(result);
 
-            Assert.AreEqual(user.Id, result.Value.Id);
-            Assert.AreEqual(user.Email, result.Value.Email);
+            Assert.AreEqual(_user.Id, result.Value.Id);
+            Assert.AreEqual(_user.Email, result.Value.Email);
         }
 
         [Test]
         public async Task GetToken_Ok()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseInMemoryDatabase("Add_Transaction_Created");
-            var dbContext = new ApplicationDbContext(optionsBuilder.Options);
-            var user = new ApplicationUser() { Email = "email@domain.com" };
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
+            _manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+            _manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
-            var userBindingModel = new LoginBindingModel() { Email = user.Email, Password = "Password #1" };
+            var userBindingModel = new LoginBindingModel() { Email = _user.Email, Password = "Password #1" };
 
-            var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));
-            var store = new Mock<IUserStore<ApplicationUser>>();
-            var manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-            manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(user));
-
-            var controller = new UsersController(_autoMapper.Create(dbContext), new UsersService(manager.Object, tokenGenerator));
+            var controller = new UsersController(_autoMapper.Create(_db), _service);
             var result = await controller.Login(userBindingModel);
 
             Assert.NotNull(result.Value.Token);
             Assert.IsNotEmpty(result.Value.Token);
-            Assert.AreEqual(user.Email, result.Value.Email);
+            Assert.AreEqual(_user.Email, result.Value.Email);
         }
     }
 }
