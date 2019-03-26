@@ -2,7 +2,7 @@
 
 namespace MyFinanceServer.Core
 {
-    public class Rule
+    public class Rule : IUniqueObject
     {
         public int Id { get; set; }
 
@@ -18,5 +18,19 @@ namespace MyFinanceServer.Core
         public int? Mcc { get; set; }
 
         public string BankCategory { get; set; }
+
+        public Rule() { }
+
+        public Rule(BankAccount account, string bankCategory, Category category, string description, int? mcc, int order)
+        {
+            Account = account;
+            BankCategory = bankCategory;
+            Category = category;
+            Description = description;
+            Mcc = mcc;
+            Order = order;
+        }
+
+        public bool IsBelongsTo(string userId) => Account.Bank.User.Id == userId;
     }
 }

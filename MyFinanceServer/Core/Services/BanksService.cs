@@ -6,52 +6,52 @@ namespace MyFinanceServer.Core
 {
     public class BanksService
     {
-        private IBanksRepository _repository;
+        private DataAccessLayer _dal;
 
-        public BanksService(IBanksRepository repository)
+        public BanksService(DataAccessLayer dal)
         {
-            _repository = repository;
+            _dal = dal;
         }
 
         public async Task<List<Bank>> GetList(string userId)
         {
-            var categories = await _repository.GetListWithAccessCheck(userId);
+            var banks = await _dal.Banks.GetListWithAccessCheck(userId);
 
-            return categories.OrderBy(x => x.Title).ToList();
+            return banks.OrderBy(x => x.Title).ToList();
         }
 
         public async Task<Bank> AddBank(string userId, string title)
         {
-            var user = await _repository.GetById<string, ApplicationUser>(userId);
+            var user = await _dal.Users.GetById(userId);
 
-            var bank = await _repository.Add<Bank>(new Bank(title, user));
+            var bank = await _dal.Banks.Add(new Bank(title, user));
 
             return bank;
         }
 
         public async Task<Bank> EditBank(string userId, int bankId, string title)
         {
-            var editBank = await _repository.GetById(bankId);
+            var editBank = await _dal.Banks.GetById(bankId);
 
             if (!editBank.IsBelongsTo(userId))
                 throw new EntityAccessDeniedException();
 
             editBank.Rename(title);
 
-            await _repository.Update(editBank);
+            await _dal.Banks.Update(editBank);
 
             return editBank;
         }
 
         public async Task DeleteBank(string userId, int bankId)
         {
-            var user = await _repository.GetById<string, ApplicationUser>(userId);
+            var user = await _dal.Users.GetById(userId);
 
-            var bank = await _repository.GetById<int, Bank>(bankId);
+            var bank = await _dal.Banks.GetById(bankId);
 
             bank.IsBelongsTo(userId);
 
-            await _repository.Delete<Bank>(bank);
+            await _dal.Banks.Delete(bank);
         }
     }
 }

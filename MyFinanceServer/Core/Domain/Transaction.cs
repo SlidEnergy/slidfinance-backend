@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Core
 {
-    public class Transaction
+    public class Transaction: IUniqueObject<int>
     {
         public int Id { get; set; }
 

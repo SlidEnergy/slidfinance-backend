@@ -14,14 +14,12 @@ namespace MyFinanceServer.Tests
     [TestFixture]
     public class CategoriesControllerTests : TestsBase
     {
-        private Mock<ICategoriesRepository> _repository;
         private CategoriesService _service;
 
         [SetUp]
         public void Setup()
         {
-            _repository = new Mock<ICategoriesRepository>();
-            _service = new CategoriesService(_repository.Object);
+            _service = new CategoriesService(_mockedDal);
         }
 
         [Test]
@@ -38,7 +36,7 @@ namespace MyFinanceServer.Tests
                 User = _user
             });
 
-            _repository.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
+            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
 
             var controller = new CategoriesController(_autoMapper.Create(_db), _service);
             controller.AddControllerContext(_user);
@@ -50,7 +48,7 @@ namespace MyFinanceServer.Tests
         [Test]
         public async Task GetEmptyCategoryList_ShouldBeEmptyListReturned()
         {
-            _repository.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
+            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
 
             var controller = new CategoriesController(_autoMapper.Create(_db), _service);
             controller.AddControllerContext(_user);

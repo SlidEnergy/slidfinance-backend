@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Data
 {
-    public class EfRepository : IRepository
+    public class EfRepository<TEntity, T> : IRepository<TEntity, T> where TEntity : class, IUniqueObject<T>
     {
         protected readonly ApplicationDbContext _dbContext;
 
@@ -15,17 +15,17 @@ namespace MyFinanceServer.Data
             _dbContext = dbContext;
         }
 
-        public async Task<TEntity> GetById<T, TEntity>(T id) where TEntity : class, IUniqueObject<T>
+        public async Task<TEntity> GetById(T id)
         {
             return await _dbContext.Set<TEntity>().SingleOrDefaultAsync(e => e.Id.Equals(id));
         }
 
-        public async Task<List<TEntity>> GetList<TEntity>() where TEntity : class
+        public async Task<List<TEntity>> GetList()
         {
             return await _dbContext.Set<TEntity>().ToListAsync();
         }
 
-        public async Task<TEntity> Add<TEntity>(TEntity entity) where TEntity : class
+        public async Task<TEntity> Add(TEntity entity)
         {
             _dbContext.Set<TEntity>().Add(entity);
             await _dbContext.SaveChangesAsync();
@@ -33,13 +33,13 @@ namespace MyFinanceServer.Data
             return entity;
         }
 
-        public async Task Delete<TEntity>(TEntity entity) where TEntity : class
+        public async Task Delete(TEntity entity)
         {
             _dbContext.Set<TEntity>().Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<TEntity> Update<TEntity>(TEntity entity) where TEntity : class
+        public async Task<TEntity> Update(TEntity entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();

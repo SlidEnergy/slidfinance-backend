@@ -9,14 +9,12 @@ namespace MyFinanceServer.Tests
 {
     public class BanksControllerTests : TestsBase
     {
-        private Mock<IBanksRepository> _repository;
         private BanksService _service;
 
         [SetUp]
         public void Setup()
         {
-            _repository = new Mock<IBanksRepository>();
-            _service = new BanksService(_repository.Object);
+            _service = new BanksService(_mockedDal);
         }
 
         [Test]
@@ -33,7 +31,7 @@ namespace MyFinanceServer.Tests
                 User = _user
             });
 
-            _repository.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
+            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
 
             var controller = new BanksController(_autoMapper.Create(_db), _service);
             controller.AddControllerContext(_user);
@@ -45,7 +43,7 @@ namespace MyFinanceServer.Tests
         [Test]
         public async Task GetEmptyBanksList_ShouldBeEmptyListReturned()
         {
-            _repository.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
+            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
 
             var controller = new BanksController(_autoMapper.Create(_db), _service);
             controller.AddControllerContext(_user);

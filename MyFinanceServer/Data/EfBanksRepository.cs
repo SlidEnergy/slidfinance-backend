@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Data
 {
-    public class EfBanksRepository : EfRepository, IBanksRepository
+    public class EfBanksRepository : EfRepository<Bank, int>, IRepositoryWithAccessCheck<Bank>
     {
         public EfBanksRepository(ApplicationDbContext dbContext) : base(dbContext) {}
-
-        public async Task<Bank> GetById(int id) => await GetById<int, Bank>(id);
 
         public async Task<List<Bank>> GetListWithAccessCheck(string userId)
         {

@@ -137,11 +137,15 @@ namespace MyFinanceServer
             services.AddIdentityCore<ApplicationUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddScoped<IRepository, EfRepository>();
-            services.AddScoped<ICategoriesRepository, EfCategoriesRepository>();
+            services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
+            services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
+            services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
+            services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
+            services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
+            services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<IBanksRepository, EfBanksRepository>();
             services.AddScoped<BanksService>();
+            services.AddScoped<RulesService>();
             services.AddScoped<UsersService>();
             services.AddScoped<CategoriesService>();
             services.AddScoped<TokenService>();

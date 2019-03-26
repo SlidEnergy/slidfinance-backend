@@ -3,8 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Api
 {
-    public class AddRuleBindingModel
+    public class EditRuleBindingModel
     {
+        public int Id { get; set; }
+
         public int? AccountId { get; set; }
 
         public int? CategoryId { get; set; }

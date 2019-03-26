@@ -14,26 +14,23 @@ namespace MyFinanceServer.Api
     [ApiController]
     public class RulesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly RulesService _rulesService;
 
-        public RulesController(ApplicationDbContext context, IMapper mapper)
+        public RulesController(IMapper mapper, RulesService rulesService)
         {
-            _context = context;
             _mapper = mapper;
+            _rulesService = rulesService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Dto.Rule>>> GetList()
+        public async Task<ActionResult<Dto.Rule[]>> GetList()
         {
             var userId = User.GetUserId();
 
-            return await _context.Rules
-                .Include(x=>x.Account)
-                .Include(x=>x.Category)
-                .OrderBy(x => x.Order)
-                .Where(x=>x.Account.Bank.User.Id == userId)
-                .Select(x=>_mapper.Map<Dto.Rule>(x)).ToListAsync();
+            var rules = await this._rulesService.GetList(userId);
+
+            return _mapper.Map<Dto.Rule[]>(rules);
         }
 
         [HttpPost]
@@ -41,36 +38,18 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            BankAccount account = null;
-
-            account = await _context.Accounts
-                .FirstOrDefaultAsync(x => x.Bank.User.Id == userId && x.Id == rule.AccountId);
-
-            if (account == null)
-                return NotFound();
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(x => x.User.Id == userId && x.Id == rule.CategoryId);
-
-            if (category == null)
-                return NotFound();
-
-            var order = await _context.Rules.MaxAsync(x => (int?) x.Order) ?? 0;
-            order++;
-
-            var newRule = new Rule
-            {
-                Account = account,
-                BankCategory = rule.BankCategory,
-                Category = category,
-                Description = rule.Description,
-                Mcc = rule.Mcc,
-                Order = order
-            };
-            _context.Rules.Add(newRule);
-            await _context.SaveChangesAsync();
+            var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
 
             return CreatedAtAction("GetRule", new {id = newRule.Id}, _mapper.Map<Dto.Rule>(newRule));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Dto.Rule>> Update(int id, EditRuleBindingModel rule)
+        {
+            var userId = User.GetUserId();
+
+            var editedRule = await _rulesService.EditRule(userId, id, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
+            return _mapper.Map<Dto.Rule>(editedRule);
         }
 
         [HttpDelete("{id}")]
@@ -78,16 +57,9 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var rule = await _context.Rules.SingleOrDefaultAsync(x => x.Account.Bank.User.Id == userId && x.Id == id);
-            if (rule == null)
-            {
-                return NotFound();
-            }
+            await _rulesService.DeleteRule(userId, id);
 
-            _context.Rules.Remove(rule);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<Dto.Rule>(rule);
+            return NoContent();
         }
 
         [HttpGet("generated")]
@@ -97,59 +69,9 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var generatedRules = await _context.Transactions
-                .Where(x => x.Account.Bank.User.Id == userId && x.Category != null)
-                .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.Mcc })
-                .Select(x => new Dto.GeneratedRule
-                {
-                    AccountId = x.Key.AccountId,
-                    BankCategory = x.Key.BankCategory,
-                    Description = x.Key.Description,
-                    Mcc = x.Key.Mcc,
-                    Categories = x.Where(s => s.Category != null).Select(s => s.Category.Id)
-                        .GroupBy(s => s)
-                        .Select(s => new Dto.CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
-                    Count = x.Count()
-                })
-                .Where(x => x.Count > 5)
-                .ToListAsync();
+            var rules = await _rulesService.GenerateRules(userId);
 
-            var rules = await _context.Rules
-                .Where(x => x.Category.User.Id == userId)
-                .Select(x => new Dto.GeneratedRule
-                {
-                    AccountId = x.Account.Id,
-                    BankCategory = x.BankCategory,
-                    Description = x.Description,
-                    Mcc = x.Mcc,
-                })
-                .ToListAsync();
-
-            generatedRules = generatedRules.Except(rules, new RuleComparer()).ToList();
-
-            return _mapper.Map<Dto.GeneratedRule[]>(generatedRules);
-        }
-    }
-
-    public class RuleComparer : IEqualityComparer<Dto.GeneratedRule>
-    {
-        bool IEqualityComparer<Dto.GeneratedRule>.Equals(Dto.GeneratedRule x, Dto.GeneratedRule y)
-        {
-            return ((x.AccountId == null || x.AccountId.Equals(y.AccountId)) &&
-                    (string.IsNullOrEmpty(x.BankCategory) || x.BankCategory.Equals(y.BankCategory)) &&
-                    (string.IsNullOrEmpty(x.Description) || x.Description.Equals(y.Description)) &&
-                    (x.Mcc == null || x.Mcc.Equals(y.Mcc)));
-        }
-
-        int IEqualityComparer<Dto.GeneratedRule>.GetHashCode(Dto.GeneratedRule obj)
-        {
-            if (obj == null)
-                return 0;
-
-            return (obj.BankCategory ?? "").GetHashCode() * 1000 + 
-                   (obj.Description ?? "").GetHashCode() * 100 +
-                   ((obj.AccountId ?? 0) + 1) * 10 +
-                   obj.Mcc ?? 0;
+            return rules;
         }
     }
 }

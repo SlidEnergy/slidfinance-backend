@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyFinanceServer.Core
 {
-    public class BankAccount
+    public class BankAccount : IUniqueObject
     {
         public int Id { get; set; }
 
@@ -53,5 +53,7 @@ namespace MyFinanceServer.Core
         {
             CreditLimit = creditLimit;
         }
+
+        public bool IsBelongsTo(string userId) => Bank.User.Id == userId;
     }
 }

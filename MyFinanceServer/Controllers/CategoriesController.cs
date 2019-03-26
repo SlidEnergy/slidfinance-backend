@@ -14,7 +14,7 @@ namespace MyFinanceServer.Api
         private readonly IMapper _mapper;
         private readonly CategoriesService _categoriesService;
 
-        public CategoriesController( IMapper mapper, CategoriesService categoriesService)
+        public CategoriesController(IMapper mapper, CategoriesService categoriesService)
         {
             _mapper = mapper;
             _categoriesService = categoriesService;
