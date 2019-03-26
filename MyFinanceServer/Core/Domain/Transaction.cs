@@ -25,5 +25,7 @@ namespace MyFinanceServer.Core
         public string BankCategory { get; set; }
 
         public bool Approved { get; set; }
+
+        public bool IsBelongsTo(string userId) => Account.Bank.User.Id == userId;
     }
 }

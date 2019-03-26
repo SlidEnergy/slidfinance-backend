@@ -2,13 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MyFinanceServer.Data;
 using MyFinanceServer.Core;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MyFinanceServer.Shared;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
 {
@@ -17,13 +14,13 @@ namespace MyFinanceServer.Api
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        TransactionsService _service;
 
-        public TransactionsController(ApplicationDbContext context, IMapper mapper)
+        public TransactionsController(IMapper mapper, TransactionsService service)
         {
             _mapper = mapper;
-            _context = context;
+            _service = service;
         }
 
         // GET: api/Transactions
@@ -33,8 +30,9 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            return await _context.Transactions.Include(x=>x.Category).Include(x=>x.Account)
-                .Where(x => x.Account.Bank.User.Id == userId).Select(x=>_mapper.Map<Dto.Transaction>(x)).ToListAsync();
+            var transactions = await _service.GetList(userId);
+
+            return _mapper.Map<Dto.Transaction[]>(transactions);
         }
 
         // POST: api/account/id
@@ -48,20 +46,16 @@ namespace MyFinanceServer.Api
 
             var userId = User.GetUserId();
 
-            var transaction = await _context.Transactions.Include(x=>x.Category)
-                .SingleOrDefaultAsync(x => x.Id == id && x.Account.Bank.User.Id == userId);
-
-            if (transaction == null)
-                return NotFound();
+            var transaction = await _service.GetById(userId, id);
 
             var dto = _mapper.Map<Dto.Transaction>(transaction);
             patchDoc.ApplyTo(dto);
 
             _mapper.Map(dto, transaction);
 
-            await _context.SaveChangesAsync();
+            var patchedTransaction = await _service.PatchTransaction(userId, transaction);
 
-            return dto;
+            return _mapper.Map<Dto.Transaction>(patchedTransaction);
         }
 
         [HttpPost]
@@ -69,19 +63,9 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == transaction.CategoryId && x.User.Id == userId);
+            var t = _mapper.Map<Transaction>(transaction);
 
-            if (category == null)
-                return NotFound();
-
-            var account = await _context.Accounts
-                    .FirstOrDefaultAsync(x => x.Id == transaction.AccountId && x.Bank.User.Id == userId);
-
-            var newTransaction = _mapper.Map<Transaction>(transaction);
-
-            _context.Transactions.Add(newTransaction);
-
-            await _context.SaveChangesAsync();
+            var newTransaction = await _service.AddTransaction(userId, t);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Transaction>(newTransaction));
         }
@@ -91,10 +75,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var t = await _context.Transactions.FirstOrDefaultAsync(x => x.Account.Bank.User.Id == userId && x.Id == id);
-            _context.Transactions.Remove(t);
-            
-            await _context.SaveChangesAsync();
+            await _service.DeleteTransaction(userId, id);
 
             return NoContent();
         }

@@ -9,7 +9,10 @@ namespace MyFinanceServer.Api
     {
         public MappingProfile(ApplicationDbContext context)
         {
-            CreateMap<RegisterBindingModel, ApplicationUser>().ForMember(dest => dest.UserName, map => map.MapFrom(src => src.Email));
+            CreateMap<RegisterBindingModel, ApplicationUser>()
+                .ForMember(dest => dest.UserName,
+                    opt => opt.MapFrom(src => src.Email))
+                .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<Transaction, Api.Dto.Transaction>()
                 .ForMember(dest => dest.CategoryId,

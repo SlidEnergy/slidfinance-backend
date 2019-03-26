@@ -36,30 +36,5 @@ namespace MyFinanceServer.Core
         {
             Title = title;
         }
-
-        public BankAccount LinkAccount(string title, string code, float balance, float creditLimit)
-        {
-            var account = new BankAccount(title, code, balance, creditLimit);
-
-            if (Accounts == null)
-                Accounts = new List<BankAccount>();
-
-            Accounts.Add(account);
-
-            return account;
-        }
-
-        public void UnlinkAccount(int id)
-        {
-            if (Accounts == null)
-                throw new InvalidOperationException();
-
-            var account = Accounts.FirstOrDefault(x => x.Id == id);
-
-            if (account == null)
-                throw new ArgumentException($"Банк с идентификатором {id} не найден.");
-
-            Accounts.Remove(account);
-        }
     }
 }

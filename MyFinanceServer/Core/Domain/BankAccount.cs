@@ -26,7 +26,7 @@ namespace MyFinanceServer.Core
 
         public BankAccount() { }
 
-        public BankAccount(string title, string code, float balance, float creditLimit)
+        public BankAccount(Bank bank, string title, string code, float balance, float creditLimit)
         {
             Title = title;
             Code = code;
@@ -34,23 +34,11 @@ namespace MyFinanceServer.Core
             CreditLimit = creditLimit;
         }
 
-        public void Rename(string title)
+        public void Update(string title, string code, float balance, float creditLimit)
         {
             Title = title;
-        }
-
-        public void ChangeCode(string code)
-        {
             Code = code;
-        }
-
-        public void SetBalance(float balance)
-        {
             Balance = balance;
-        }
-
-        public void ChangeCreditLimit(float creditLimit)
-        {
             CreditLimit = creditLimit;
         }
 

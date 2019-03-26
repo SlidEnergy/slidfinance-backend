@@ -20,12 +20,14 @@ namespace MyFinanceServer.Api
         private readonly ApplicationDbContext _context;
         private readonly IAccountDataSaver _accountDataSaver;
         private readonly IMapper _mapper;
+        private readonly AccountsService _service;
 
-        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver, IMapper mapper)
+        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver, IMapper mapper, AccountsService service)
         {
             _context = context;
             _accountDataSaver = accountDataSaver;
             _mapper = mapper;
+            _service = service;
         }
 
         [HttpGet]
@@ -34,10 +36,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var accounts = await _context.Accounts
-                .Where(x => (bankId == null || x.Bank.Id == bankId) && x.Bank.User.Id == userId)
-                .OrderBy(x => x.Title)
-                .ToListAsync();
+            var accounts = await _service.GetList(userId, bankId);
 
             return _mapper.Map<Dto.BankAccount[]>(accounts);
         }
@@ -81,13 +80,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var bank = await _context.Banks
-                .OrderBy(x => x.Title)
-                .FirstOrDefaultAsync(x => x.Id == account.BankId && x.User.Id == userId);
-
-            var newAccount = bank.LinkAccount(account.Title, account.Code, account.Balance, account.CreditLimit);
-
-            await _context.SaveChangesAsync();
+            var newAccount = await _service.AddAccount(userId, account.BankId, account.Title, account.Code, account.Balance, account.CreditLimit);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.BankAccount>(newAccount));
         }
@@ -97,14 +90,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var editAccount = await _context.Accounts.FirstOrDefaultAsync(x => x.Id == id && x.Bank.User.Id == userId);
-
-            editAccount.Rename(account.Title);
-            editAccount.ChangeCode(account.Code);
-            editAccount.SetBalance(account.Balance);
-            editAccount.ChangeCreditLimit(account.CreditLimit);
-
-            await _context.SaveChangesAsync();
+            var editAccount = await _service.EditAccount(userId, id, account.Title, account.Code, account.Balance, account.CreditLimit);
 
             return _mapper.Map<Dto.BankAccount>(editAccount);
         }
@@ -114,16 +100,7 @@ namespace MyFinanceServer.Api
         {
             var userId = User.GetUserId();
 
-            var account = await _context.Accounts
-                .Include(x => x.Bank)
-                .FirstOrDefaultAsync(x => x.Id == id && x.Bank.User.Id == userId);
-
-            if (account == null)
-                return NotFound();
-
-            account.Bank.UnlinkAccount(id);
-
-            await _context.SaveChangesAsync();
+            await _service.DeleteAccount(userId, id);
 
             return NoContent();
         }
