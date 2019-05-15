@@ -34,8 +34,8 @@ namespace MyFinanceServer.Core
 
                 if (!existTransaction)
                 {
-                    t.Category = GetCategoryByRules(t, rules);
                     t.Account = account;
+                    t.Category = GetCategoryByRules(t, rules);
                     await _dal.Transactions.Add(t);
                     count++;
                 }
