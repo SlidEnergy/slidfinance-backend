@@ -9,6 +9,6 @@ namespace MyFinanceServer.Api
 
         public float? Balance { get; set; }
 
-        public ICollection<Dto.Transaction> Transactions { get; set; }
+        public ICollection<TransactionBindingModel> Transactions { get; set; }
     }
 }

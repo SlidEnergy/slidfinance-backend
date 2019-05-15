@@ -22,7 +22,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPost]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<int>> Import(PatchAccountDataBindingModel data)
         {
