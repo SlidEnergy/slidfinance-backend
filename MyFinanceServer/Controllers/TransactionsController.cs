@@ -59,7 +59,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPost]
-        public async Task<ActionResult<Dto.BankAccount>> Add(Dto.Transaction transaction)
+        public async Task<ActionResult<Dto.Transaction>> Add(Dto.Transaction transaction)
         {
             var userId = User.GetUserId();
 

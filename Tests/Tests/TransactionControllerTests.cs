@@ -52,6 +52,45 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
+        public async Task AddTransaction_ShouldCallAddMethodWithRightArguments()
+        {
+            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
+            var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
+            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
+            var transaction = new Api.Dto.Transaction()
+            {
+                DateTime = DateTime.Now,
+                Amount = 10,
+                Description = "Description #1",
+                AccountId = account.Id,
+                CategoryId = category.Id,
+                BankCategory = "Bank category #1",
+                Approved = false,
+                Mcc = 111
+            };
+
+            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
+            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
+            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
+            _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
+
+            var controller = new TransactionsController(_autoMapper.Create(_db), _service);
+            controller.AddControllerContext(_user);
+            var result = await controller.Add(transaction);
+
+            _transactions.Verify(x => x.Add(It.Is<Transaction>(t => 
+                t.DateTime == transaction.DateTime &&
+                t.Amount == transaction.Amount &&
+                t.Description == transaction.Description &&
+                t.Account.Id == transaction.AccountId &&
+                t.Category.Id == transaction.CategoryId &&
+                t.BankCategory == transaction.BankCategory &&
+                t.Approved == transaction.Approved &&
+                t.Mcc == transaction.Mcc
+                )), Times.Once);
+        }
+
+        [Test]
         public async Task PatchTransactionCategory_ShouldSetCategory()
         {
             var bank = await _dal.Banks.Add(new Bank() {Title = "Bank #1", User = _user});

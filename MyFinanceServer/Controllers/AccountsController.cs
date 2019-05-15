@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Core;
@@ -17,15 +18,11 @@ namespace MyFinanceServer.Api
     [ApiController]
     public sealed class AccountsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IAccountDataSaver _accountDataSaver;
         private readonly IMapper _mapper;
         private readonly AccountsService _service;
 
-        public AccountsController(ApplicationDbContext context, IAccountDataSaver accountDataSaver, IMapper mapper, AccountsService service)
+        public AccountsController(IMapper mapper, AccountsService service)
         {
-            _context = context;
-            _accountDataSaver = accountDataSaver;
             _mapper = mapper;
             _service = service;
         }
@@ -41,38 +38,27 @@ namespace MyFinanceServer.Api
             return _mapper.Map<Dto.BankAccount[]>(accounts);
         }
 
-        [HttpPatch("{code}")]
+        [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult<Dto.BankAccount>> PatchAccountData(string code, PatchAccountDataBindingModel accountData)
+        public async Task<ActionResult<Dto.BankAccount>> PatchAccount(int id, JsonPatchDocument<Dto.BankAccount> patchDoc)
         {
-            // TODO: добавить подробное протоколирование, т.к. метод содержит логику
-
-            Console.Write("accountId: {0}, balance: {1}, transactionsCount: {2}", code, accountData.Balance, accountData.Transactions.Count);
+            if (patchDoc == null)
+                return BadRequest();
 
             var userId = User.GetUserId();
 
-            Console.Write("userId: {0}", userId);
+            var account = await _service.GetById(userId, id);
 
-            var account = await _context.Accounts.Include(x => x.Transactions)
-              .SingleOrDefaultAsync(x => x.Bank.User.Id == userId && x.Code == code);
+            var dto = _mapper.Map<Dto.BankAccount>(account);
+            patchDoc.ApplyTo(dto);
 
-            if (account == null)
-                return NotFound();
+            _mapper.Map(dto, account);
 
-            Console.Write("Account found");
+            var patchedAccount = await _service.PatchAccount(userId, account);
 
-            await _accountDataSaver.Save(userId, account, accountData.Balance, accountData.Transactions.Select(x => new Transaction() {
-                Account = account,
-                Amount = x.Amount,
-                DateTime = x.DateTime,
-                Description = x.Description ?? "",
-                BankCategory = x.Category ?? "",
-                Mcc = x.Mcc
-            }).ToList());
-
-            return _mapper.Map<Dto.BankAccount>(account);
+            return _mapper.Map<Dto.BankAccount>(patchedAccount);
         }
 
         [HttpPost]

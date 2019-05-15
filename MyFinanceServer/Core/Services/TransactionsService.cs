@@ -26,7 +26,6 @@ namespace MyFinanceServer.Core
             return transactions;
         }
 
-
         public async Task<List<Transaction>> GetList(string userId)
         {
             var transactions = await _dal.Transactions.GetListWithAccessCheck(userId);
@@ -38,13 +37,19 @@ namespace MyFinanceServer.Core
         {
             var user = await _dal.Users.GetById(userId);
 
-            var category = await _dal.Categories.GetById(transaction.Category.Id);
+            if (transaction.Category != null)
+            {
+                var category = await _dal.Categories.GetById(transaction.Category.Id);
 
-            if (category == null)
-                throw new EntityNotFoundException();
+                if (category == null)
+                    throw new EntityNotFoundException();
 
-            if (!category.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
+                if (!category.IsBelongsTo(userId))
+                    throw new EntityAccessDeniedException();
+            }
+
+            if (transaction.Account == null)
+                throw new System.ArgumentException();
 
             var account = await _dal.Accounts.GetById(transaction.Account.Id);
 

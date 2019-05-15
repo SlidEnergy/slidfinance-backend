@@ -13,6 +13,19 @@ namespace MyFinanceServer.Core
             _dal = dal;
         }
 
+        public async Task<BankAccount> GetById(string userId, int id)
+        {
+            var account = await _dal.Accounts.GetById(id);
+
+            if (account == null)
+                throw new EntityNotFoundException();
+
+            if (!account.IsBelongsTo(userId))
+                throw new EntityAccessDeniedException();
+
+            return account;
+        }
+
         public async Task<List<BankAccount>> GetList(string userId, int? bankId)
         {
             var accounts = await _dal.Accounts.GetListWithAccessCheck(userId);
@@ -46,6 +59,28 @@ namespace MyFinanceServer.Core
             await _dal.Accounts.Update(editAccount);
 
             return editAccount;
+        }
+
+        public async Task<BankAccount> PatchAccount(string userId, BankAccount account)
+        {
+            var user = await _dal.Users.GetById(userId);
+
+            Bank bank = null;
+
+            if (account.Bank!= null)
+            {
+                bank = await _dal.Banks.GetById(account.Bank.Id);
+
+                if (bank == null)
+                    throw new EntityNotFoundException();
+
+                if (!bank.IsBelongsTo(userId))
+                    throw new EntityAccessDeniedException();
+            }
+
+            var newAccount = await _dal.Accounts.Update(account);
+
+            return newAccount;
         }
 
         public async Task DeleteAccount(string userId, int accountId)

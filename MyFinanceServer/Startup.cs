@@ -108,7 +108,6 @@ namespace MyFinanceServer
 
             // DI
             services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<IAccountDataSaver, AccountDataSaver>();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -144,11 +143,15 @@ namespace MyFinanceServer
             services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
             services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
             services.AddScoped<ITokenGenerator, TokenGenerator>();
+            services.AddScoped<AccountsService>();
             services.AddScoped<BanksService>();
             services.AddScoped<RulesService>();
             services.AddScoped<UsersService>();
             services.AddScoped<CategoriesService>();
             services.AddScoped<TokenService>();
+            services.AddScoped<TransactionsService>();
+            services.AddScoped<DataAccessLayer>();
+            services.AddScoped<ImportService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

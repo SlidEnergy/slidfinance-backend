@@ -28,6 +28,7 @@ namespace MyFinanceServer.Core
 
         public BankAccount(Bank bank, string title, string code, float balance, float creditLimit)
         {
+            Bank = bank;
             Title = title;
             Code = code;
             Balance = balance;
