@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyFinanceServer.Core;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
 {
+    [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class RulesController : ControllerBase

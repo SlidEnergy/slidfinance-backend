@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MyFinanceServer.Core;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
 {
+    [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
     public sealed class TokenController : ControllerBase

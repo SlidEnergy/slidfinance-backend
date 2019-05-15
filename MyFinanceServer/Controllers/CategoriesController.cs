@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Core;
 using MyFinanceServer.Shared;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Api
 {
+    [Authorize]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
