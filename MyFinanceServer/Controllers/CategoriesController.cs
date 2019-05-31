@@ -52,11 +52,11 @@ namespace MyFinanceServer.Api
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult> Delete(int id, int? moveCategoryId = null)
         {
             var userId = User.GetUserId();
 
-            await _categoriesService.DeleteCategory(userId, id);
+            await _categoriesService.DeleteCategory(userId, id, moveCategoryId);
 
             return NoContent();
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,7 +34,7 @@ namespace MyFinanceServer.Core
             return category;
         }
 
-        public async Task DeleteCategory(string userId, int categoryId)
+        public async Task DeleteCategory(string userId, int categoryId, int? moveCategoryId = null)
         {
             var user = await _dal.Users.GetById(userId);
 
@@ -41,6 +42,22 @@ namespace MyFinanceServer.Core
 
             if(!category.IsBelongsTo(userId))
                 throw new EntityAccessDeniedException();
+
+            // Перемещаем все транзакции в новую категорию, если она указана, или очищаем категорию
+
+            var allTransactions = await _dal.Transactions.GetListWithAccessCheck(userId);
+
+            var moveCategory = moveCategoryId == null ? null : await _dal.Categories.GetById(moveCategoryId.Value);
+
+            var categoryTransactions = allTransactions.Where(x => x.Category != null && x.Category.Id == categoryId).ToList();
+
+            foreach (var transaction in categoryTransactions) {
+                transaction.Category = moveCategory;
+
+                await _dal.Transactions.Update(transaction);
+            }
+
+            // Удаляем категорию
 
             await _dal.Categories.Delete(category);
 
@@ -82,6 +99,7 @@ namespace MyFinanceServer.Core
             foreach (Category c in categories.OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
+                await _dal.Categories.Update(c);
                 newOrder++;
             }
         }
@@ -95,6 +113,7 @@ namespace MyFinanceServer.Core
             foreach (Category c in categories.Where(x => x.Order >= order && x.Id != category.Id).OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
+                await _dal.Categories.Update(c);
                 newOrder++;
             }
         }
