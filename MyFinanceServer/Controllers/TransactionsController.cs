@@ -29,7 +29,12 @@ namespace MyFinanceServer.Api
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList(int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
-            var userId = User.GetUserId();
+			if(startDate.HasValue)
+				startDate = startDate.Value.ToUniversalTime();
+			if(endDate.HasValue)
+				endDate = endDate.Value.ToUniversalTime();
+
+			var userId = User.GetUserId();
 
             var transactions = await _service.GetList(userId, categoryId, startDate, endDate);
 
