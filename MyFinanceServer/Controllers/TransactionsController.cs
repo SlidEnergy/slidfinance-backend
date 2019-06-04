@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MyFinanceServer.Core;
 using MyFinanceServer.Shared;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -26,11 +27,11 @@ namespace MyFinanceServer.Api
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList()
+        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList(int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             var userId = User.GetUserId();
 
-            var transactions = await _service.GetList(userId);
+            var transactions = await _service.GetList(userId, categoryId, startDate, endDate);
 
             return _mapper.Map<Dto.Transaction[]>(transactions);
         }

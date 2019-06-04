@@ -51,7 +51,83 @@ namespace MyFinanceServer.Tests
             Assert.AreEqual(2, result.Value.Count());
         }
 
-        [Test]
+		[Test]
+		public async Task GetTransactionsForCategoryAndPeriod_ShouldReturnFilteredList()
+		{
+			var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
+			var account = await _dal.Accounts.Add(new BankAccount() { Transactions = new List<Transaction>(), Bank = bank });
+			var category1 = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
+			var category2 = await _dal.Categories.Add(new Category() { Title = "Category #2", User = _user });
+			await _dal.Transactions.Add(new Transaction()
+			{
+				DateTime = new DateTime(2019, 6, 1),
+				Amount = 10,
+				Description = "Description #1",
+				Account = account,
+				Category = category1
+			});
+			var transaction = await _dal.Transactions.Add(new Transaction()
+			{
+				DateTime = new DateTime(2019, 6, 2),
+				Amount = 5,
+				Description = "Description #2",
+				Account = account,
+				Category = category1
+			});
+			await _dal.Transactions.Add(new Transaction()
+			{
+				DateTime = new DateTime(2019, 6, 3),
+				Amount = 10,
+				Description = "Description #1",
+				Account = account,
+				Category = category2
+			});
+			await _dal.Transactions.Add(new Transaction()
+			{
+				DateTime = new DateTime(2019, 6, 4),
+				Amount = 5,
+				Description = "Description #2",
+				Account = account,
+				Category = null
+			});
+			await _dal.Transactions.Add(new Transaction()
+			{
+				DateTime = new DateTime(2019, 6, 5),
+				Amount = 5,
+				Description = "Description #2",
+				Account = account,
+				Category = category1
+			});
+
+			_transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Transactions.GetListWithAccessCheck(_user.Id));
+
+			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
+			controller.AddControllerContext(_user);
+			var result = await controller.GetList(category1.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
+
+			Assert.AreEqual(1, result.Value.Count());
+			Assert.AreEqual(transaction.Id, result.Value.ToArray()[0].Id);
+		}
+
+		[Test]
+		public void GetTransactionsWithInvalidArguments_ShouldThrowArgumentOutOfRangeException()
+		{
+			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
+			controller.AddControllerContext(_user);
+
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => controller.GetList(-1));
+		}
+
+		[Test]
+		public void GetTransactionsWithInvalidPeriod_ShouldThrowArgumentOutOfRangeException()
+		{
+			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
+			controller.AddControllerContext(_user);
+
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => controller.GetList(null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
+		}
+
+		[Test]
         public async Task AddTransaction_ShouldCallAddMethodWithRightArguments()
         {
             var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });

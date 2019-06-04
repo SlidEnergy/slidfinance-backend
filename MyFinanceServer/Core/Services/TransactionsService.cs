@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using MyFinanceServer.Core.Utils;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,11 +28,23 @@ namespace MyFinanceServer.Core
             return transactions;
         }
 
-        public async Task<List<Transaction>> GetList(string userId)
+        public async Task<List<Transaction>> GetList(string userId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
+			if(categoryId.HasValue)
+				ArgumentValidator.ValidateId(categoryId.Value);
+
+			if(startDate.HasValue && endDate.HasValue)
+				ArgumentValidator.ValidatePeriodAllowEqual(startDate.Value, endDate.Value);
+
             var transactions = await _dal.Transactions.GetListWithAccessCheck(userId);
 
-            return transactions;
+			if (categoryId != null) 
+				transactions = transactions.Where(t => t.Category != null && t.Category.Id == categoryId).ToList();
+
+			if(startDate.HasValue && endDate.HasValue)
+				transactions = transactions.Where(t => t.DateTime >= startDate && t.DateTime <= endDate).ToList();
+
+			return transactions;
         }
 
         public async Task<Transaction> AddTransaction(string userId, Transaction transaction)
