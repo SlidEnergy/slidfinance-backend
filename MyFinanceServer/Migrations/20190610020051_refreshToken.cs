@@ -8,17 +8,6 @@ namespace MyFinanceServer.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Rules_Accounts_AccountId",
-                table: "Rules");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "AccountId",
-                table: "Rules",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldNullable: true);
-
             migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
@@ -45,30 +34,12 @@ namespace MyFinanceServer.Migrations
                 name: "IX_RefreshTokens_UserId",
                 table: "RefreshTokens",
                 column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Rules_Accounts_AccountId",
-                table: "Rules",
-                column: "AccountId",
-                principalTable: "Accounts",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Rules_Accounts_AccountId",
-                table: "Rules");
-
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "AccountId",
-                table: "Rules",
-                nullable: true,
-                oldClrType: typeof(int));
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Rules_Accounts_AccountId",

@@ -13,7 +13,6 @@ namespace MyFinanceServer.Core
 
         public string Description { get; set; }
 
-        [Required]
         public virtual BankAccount Account { get; set; }
 
         public int? Mcc { get; set; }
