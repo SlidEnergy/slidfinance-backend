@@ -21,6 +21,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="4.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
   <Target Name="PrePublishTarget" AfterTargets="Publish">
     <Exec Command="dotnet ef database update" />
   </Target>

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MyFinanceServer.Data;
 using MyFinanceServer.Shared;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,24 +9,26 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Core
 {
-    public class TokenService
+	public class TokenService
     {
-        private readonly EfRefreshTokensRepository _repository;
+        private readonly IRefreshTokensRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
+		private readonly AppSettings _appSettings;
 
-        public TokenService(EfRefreshTokensRepository repository, ITokenGenerator tokenGenerator)
+		public TokenService(IRefreshTokensRepository repository, ITokenGenerator tokenGenerator, IOptions<AppSettings> appSettings)
         {
             _repository = repository;
             _tokenGenerator = tokenGenerator;
-        }
+			_appSettings = appSettings.Value;
+		}
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
+			var savedToken = await _repository.GetByUserId(userId);
 
-            var savedRefreshToken = await GetRefreshToken(userId);
-            if (savedRefreshToken != refreshToken)
+            if (savedToken == null || savedToken.Token != refreshToken)
                 throw new SecurityTokenException("Invalid refresh token");
 
             var newToken = _tokenGenerator.GenerateAccessToken(principal.Claims);
@@ -38,25 +39,30 @@ namespace MyFinanceServer.Core
             return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
         }
 
-        private async Task<string> GetRefreshToken(string userId) => (await _repository.GetByUserId(userId)).Token;
+		public async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
+		{
+			var token = new RefreshToken("any", refreshToken, user);
+			await _repository.Add(token);
+			return token;
+		}
 
-        private async Task UpdateRefreshToken(string userId, string refreshToken)
+		private async Task UpdateRefreshToken(string userId, string refreshToken)
         {
             var token = await _repository.GetByUserId(userId);
-            token.Token = refreshToken;
-            token.ExpirationDate = DateTime.Now.AddMonths(6);
-            token.DeviceId = "any";
+			token.Update("any", refreshToken);
             await _repository.Update(token);
         }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-            var tokenValidationParameters = new TokenValidationParameters
+			var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+
+			var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("the server key used to sign the JWT token is here, use more than 16 chars")),
+                IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
             };
 

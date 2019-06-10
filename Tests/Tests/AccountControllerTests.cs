@@ -1,27 +1,23 @@
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.JsonPatch.Operations;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using MyFinanceServer.Api;
 using MyFinanceServer.Core;
-using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class AccountControllerTests : TestsBase
+	public class AccountControllerTests : TestsBase
     {
-        private AccountsService _service;
+		private AccountsController _controller;
 
-        [SetUp]
+		[SetUp]
         public void Setup()
         {
-            _service = new AccountsService(_mockedDal);
-        }
+            var service = new AccountsService(_mockedDal);
+			_controller = new AccountsController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
         public async Task GetAccounts_ShouldReturnList()
@@ -32,9 +28,7 @@ namespace MyFinanceServer.Tests
 
             _accounts.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(bank.Accounts.ToList());
 
-            var controller = new AccountsController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }

@@ -21,6 +21,7 @@ namespace MyFinanceServer.Tests
         protected Mock<IRepositoryWithAccessCheck<BankAccount>> _accounts;
         protected Mock<IRepositoryWithAccessCheck<Rule>> _rules;
         protected Mock<IRepositoryWithAccessCheck<Transaction>> _transactions;
+		protected Mock<IRefreshTokensRepository> _refreshTokens;
 
         [SetUp]
         public async Task SetupBase()
@@ -34,7 +35,8 @@ namespace MyFinanceServer.Tests
                 new EfRepository<ApplicationUser, string>(_db),
                 new EfBankAccountsRepository(_db),
                 new EfRulesRepository(_db),
-                new EfTransactionsRepository(_db));
+                new EfTransactionsRepository(_db),
+				new EfRefreshTokensRepository(_db));
 
             _banks = new Mock<IRepositoryWithAccessCheck<Bank>>();
             _categories = new Mock<IRepositoryWithAccessCheck<Category>>();
@@ -42,10 +44,12 @@ namespace MyFinanceServer.Tests
             _accounts = new Mock<IRepositoryWithAccessCheck<BankAccount>>();
             _rules = new Mock<IRepositoryWithAccessCheck<Rule>>();
             _transactions = new Mock<IRepositoryWithAccessCheck<Transaction>>();
+			_refreshTokens = new Mock<IRefreshTokensRepository>();
 
-            _mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object);
+			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 
+				_refreshTokens.Object);
 
-            _user = await _dal.Users.Add(new ApplicationUser() { Email = "Email #1" });
+            _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com" });
         }
     }
 }

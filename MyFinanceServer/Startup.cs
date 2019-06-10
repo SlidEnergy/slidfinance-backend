@@ -142,7 +142,8 @@ namespace MyFinanceServer
             services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
             services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
             services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
-            services.AddScoped<ITokenGenerator, TokenGenerator>();
+			services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+			services.AddScoped<ITokenGenerator, TokenGenerator>();
             services.AddScoped<AccountsService>();
             services.AddScoped<BanksService>();
             services.AddScoped<RulesService>();

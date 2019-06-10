@@ -10,13 +10,15 @@ namespace MyFinanceServer.Tests
 {
     public class RulesControllerTests : TestsBase
     {
-        RulesService _service;
+		private RulesController _controller;
 
-        [SetUp]
+		[SetUp]
         public void Setup()
         {
-            _service = new RulesService(_mockedDal);
-        }
+            var service = new RulesService(_mockedDal);
+			_controller = new RulesController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
         public async Task GetRules_ShouldReturnList()
@@ -45,9 +47,7 @@ namespace MyFinanceServer.Tests
 
             _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Rule>() { rule1, rule2 });
 
-            var controller = new RulesController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }

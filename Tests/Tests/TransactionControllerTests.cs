@@ -12,15 +12,17 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class TransactionControllerTests : TestsBase
+	public class TransactionControllerTests : TestsBase
     {
-        private TransactionsService _service;
+		private TransactionsController _controller;
 
-        [SetUp]
+		[SetUp]
         public void Setup()
         {
-            _service = new TransactionsService(_mockedDal);
-        }
+            var service = new TransactionsService(_mockedDal);
+			_controller = new TransactionsController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
         public async Task GetTransactions_ShouldReturnList()
@@ -44,9 +46,7 @@ namespace MyFinanceServer.Tests
 
             _transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Transactions.GetListWithAccessCheck(_user.Id));
 
-            var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -101,9 +101,7 @@ namespace MyFinanceServer.Tests
 
 			_transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Transactions.GetListWithAccessCheck(_user.Id));
 
-			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-			controller.AddControllerContext(_user);
-			var result = await controller.GetList(category1.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
+			var result = await _controller.GetList(category1.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
 
 			Assert.AreEqual(1, result.Value.Count());
 			Assert.AreEqual(transaction.Id, result.Value.ToArray()[0].Id);
@@ -112,19 +110,13 @@ namespace MyFinanceServer.Tests
 		[Test]
 		public void GetTransactionsWithInvalidArguments_ShouldThrowArgumentOutOfRangeException()
 		{
-			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-			controller.AddControllerContext(_user);
-
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => controller.GetList(-1));
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _controller.GetList(-1));
 		}
 
 		[Test]
 		public void GetTransactionsWithInvalidPeriod_ShouldThrowArgumentOutOfRangeException()
 		{
-			var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-			controller.AddControllerContext(_user);
-
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => controller.GetList(null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _controller.GetList(null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
 		}
 
 		[Test]
@@ -150,9 +142,7 @@ namespace MyFinanceServer.Tests
             _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
             _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
 
-            var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.Add(transaction);
+            var result = await _controller.Add(transaction);
 
             _transactions.Verify(x => x.Add(It.Is<Transaction>(t => 
                 t.DateTime == transaction.DateTime &&
@@ -181,9 +171,7 @@ namespace MyFinanceServer.Tests
             _transactions.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(transaction);
             _transactions.Setup(x => x.Update(It.IsAny<Transaction>())).ReturnsAsync(transaction);
 
-            var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.Patch(transaction.Id,
+            var result = await _controller.Patch(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
                     {
                         new Operation<Api.Dto.Transaction>("replace", "/categoryId", null, category.Id)
@@ -208,9 +196,7 @@ namespace MyFinanceServer.Tests
             _transactions.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(transaction);
             _transactions.Setup(x => x.Update(It.IsAny<Transaction>())).ReturnsAsync(transaction);
 
-            var controller = new TransactionsController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.Patch(transaction.Id,
+            var result = await _controller.Patch(transaction.Id,
                 new JsonPatchDocument<Api.Dto.Transaction>(new List<Operation<Api.Dto.Transaction>>()
                     {
                         new Operation<Api.Dto.Transaction>("replace", "/categoryId", null)

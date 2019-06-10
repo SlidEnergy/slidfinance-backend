@@ -20,13 +20,16 @@ namespace MyFinanceServer.Core
 
         public IRepository<ApplicationUser, string> Users;
 
-        public DataAccessLayer(
+		public IRefreshTokensRepository RefreshTokens;
+
+		public DataAccessLayer(
             IRepositoryWithAccessCheck<Bank> banks, 
             IRepositoryWithAccessCheck<Category> categories,
             IRepository<ApplicationUser, string> users,
             IRepositoryWithAccessCheck<BankAccount> bankAccounts,
             IRepositoryWithAccessCheck<Rule> rules,
-            IRepositoryWithAccessCheck<Transaction> transactions)
+            IRepositoryWithAccessCheck<Transaction> transactions,
+			IRefreshTokensRepository refreshTokens)
         {
             Banks = banks;
             Categories = categories;
@@ -34,6 +37,7 @@ namespace MyFinanceServer.Core
             Accounts = bankAccounts;
             Rules = rules;
             Transactions = transactions;
+			RefreshTokens = refreshTokens;
         }
     }
 }

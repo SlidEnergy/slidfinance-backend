@@ -12,7 +12,9 @@ namespace MyFinanceServer.Api
             CreateMap<RegisterBindingModel, ApplicationUser>()
                 .ForMember(dest => dest.UserName,
                     opt => opt.MapFrom(src => src.Email))
-                .ForAllOtherMembers(opt => opt.Ignore());
+				.ForMember(dest => dest.Email,
+					opt => opt.MapFrom(src => src.Email))
+				.ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<Transaction, Api.Dto.Transaction>()
                 .ForMember(dest => dest.CategoryId,

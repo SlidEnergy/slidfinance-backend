@@ -20,5 +20,22 @@ namespace MyFinanceServer.Core
         public DateTime ExpirationDate { get; set; }
 
         public bool IsExpired() => DateTime.Now > ExpirationDate;
+
+		public RefreshToken() { }
+
+		public RefreshToken(string deviceId, string token, ApplicationUser user)
+		{
+			DeviceId = deviceId;
+			Token = token;
+			ExpirationDate = DateTime.Today.AddYears(10);
+			User = user;
+		}
+
+		public void Update(string deviceId, string token)
+		{
+			DeviceId = deviceId;
+			Token = token;
+			ExpirationDate = DateTime.Today.AddYears(10);
+		}
     }
 }

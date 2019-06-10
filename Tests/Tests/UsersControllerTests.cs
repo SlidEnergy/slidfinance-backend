@@ -11,27 +11,30 @@ namespace MyFinanceServer.Tests
 {
     public class UsersControllerTests : TestsBase
     {
-        UsersService _service;
         Mock<UserManager<ApplicationUser>> _manager;
+		private UsersController _controller;
 
-        [SetUp]
+		[SetUp]
         public void Setup()
         {
-            var tokenGenerator = new TokenGenerator(Options.Create(new AppSettings() { Secret = "Very very very long secret #1" }));
+			var options = Options.Create(new AppSettings() { Secret = "Very very very long secret #1" });
+			var tokenGenerator = new TokenGenerator(options);
             var store = new Mock<IUserStore<ApplicationUser>>();
 
             _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-            _service = new UsersService(_manager.Object, tokenGenerator);
-        }
+			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, options);
+            var service = new UsersService(_manager.Object, tokenGenerator, tokenService);
+
+			_controller = new UsersController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
-        public async Task GetCurrentUser_Ok()
+        public async Task GetCurrentUser_ShouldReturnUser()
         {
             _manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
-            var controller = new UsersController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetCurrentUser();
+            var result = await _controller.GetCurrentUser();
 
             Assert.IsInstanceOf<ActionResult<Api.Dto.User>>(result);
 
@@ -40,19 +43,34 @@ namespace MyFinanceServer.Tests
         }
 
         [Test]
-        public async Task GetToken_Ok()
+        public async Task Login_ShouldReturnTokenAndEmail()
         {
             _manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
             var userBindingModel = new LoginBindingModel() { Email = _user.Email, Password = "Password #1" };
 
-            var controller = new UsersController(_autoMapper.Create(_db), _service);
-            var result = await controller.Login(userBindingModel);
+            var result = await _controller.Login(userBindingModel);
 
             Assert.NotNull(result.Value.Token);
             Assert.IsNotEmpty(result.Value.Token);
             Assert.AreEqual(_user.Email, result.Value.Email);
         }
-    }
+
+		[Test]
+		public async Task Register_ShouldReturnUser()
+		{
+			var password = "Password #2";
+			var email = "test2@email.com";
+
+			_manager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
+
+			var registerBindingModel = new RegisterBindingModel() { Email = email, Password = password, ConfirmPassword = password };
+
+			var result = await _controller.Register(registerBindingModel);
+
+			Assert.NotNull(((CreatedResult)result.Result).Value);
+			Assert.AreEqual(email, ((Api.Dto.User)((CreatedResult)result.Result).Value).Email);
+		}
+	}
 }

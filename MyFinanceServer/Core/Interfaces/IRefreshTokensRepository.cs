@@ -6,6 +6,8 @@ namespace MyFinanceServer.Core
     {
         Task<RefreshToken> GetByUserId(string userId);
 
-        Task<RefreshToken> Update(RefreshToken entity);
+		Task<RefreshToken> Add(RefreshToken entity);
+
+		Task<RefreshToken> Update(RefreshToken entity);
     }
 }

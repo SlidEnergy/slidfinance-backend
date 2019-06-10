@@ -1,26 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Moq;
+﻿using Moq;
 using MyFinanceServer.Api;
 using MyFinanceServer.Core;
-using MyFinanceServer.Data;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MyFinanceServer.Tests
 {
-    [TestFixture]
+	[TestFixture]
     public class CategoriesControllerTests : TestsBase
     {
-        private CategoriesService _service;
+		private CategoriesController _controller;
 
         [SetUp]
         public void Setup()
         {
-            _service = new CategoriesService(_mockedDal);
-        }
+            var service = new CategoriesService(_mockedDal);
+			_controller = new CategoriesController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
         public async Task GetCategories_ShouldBeListReturned()
@@ -38,9 +36,7 @@ namespace MyFinanceServer.Tests
 
             _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
 
-            var controller = new CategoriesController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -50,9 +46,7 @@ namespace MyFinanceServer.Tests
         {
             _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
 
-            var controller = new CategoriesController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(0, result.Value.Count());
         }

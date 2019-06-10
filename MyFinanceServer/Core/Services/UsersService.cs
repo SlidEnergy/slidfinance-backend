@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
 namespace MyFinanceServer.Core
 {
-    public class UsersService
+	public class UsersService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenGenerator _tokenGenerator;
+		private readonly TokenService _tokenService;
 
-        public UsersService(UserManager<ApplicationUser> userManager, ITokenGenerator tokenGenerator)
+		public UsersService(UserManager<ApplicationUser> userManager, ITokenGenerator tokenGenerator, TokenService tokenService)
         {
-            _userManager = userManager;
+			_tokenService = tokenService;
+			_userManager = userManager;
             _tokenGenerator = tokenGenerator;
         }
 
@@ -38,10 +39,13 @@ namespace MyFinanceServer.Core
             if (!checkResult)
                 throw new AuthenticationException();
 
+			var refreshToken = _tokenGenerator.GenerateRefreshToken();
+			await _tokenService.AddRefreshToken(refreshToken, user);
+
             return new TokensCortage()
             {
                 Token = _tokenGenerator.GenerateAccessToken(user),
-                RefreshToken = _tokenGenerator.GenerateRefreshToken()
+                RefreshToken = refreshToken
             };
         }
     }

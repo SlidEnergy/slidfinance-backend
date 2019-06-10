@@ -18,7 +18,15 @@ namespace MyFinanceServer.Data
             return await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.User.Id == userId);
         }
 
-        public async Task<RefreshToken> Update(RefreshToken entity)
+		public async Task<RefreshToken> Add(RefreshToken entity)
+		{
+			_dbContext.Set<RefreshToken>().Add(entity);
+			await _dbContext.SaveChangesAsync();
+
+			return entity;
+		}
+
+		public async Task<RefreshToken> Update(RefreshToken entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             await _dbContext.SaveChangesAsync();

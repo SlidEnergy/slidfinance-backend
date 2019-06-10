@@ -38,7 +38,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register(RegisterBindingModel model)
+        public async Task<ActionResult<Dto.User>> Register(RegisterBindingModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

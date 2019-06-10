@@ -14,7 +14,7 @@ using MyFinanceServer.Core;
 
 namespace MyFinanceServer.Tests
 {
-    public class TokenTests
+    public class TokenServiceTests
     {
         [SetUp]
         public void Setup()

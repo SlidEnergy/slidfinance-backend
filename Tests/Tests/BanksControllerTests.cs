@@ -9,13 +9,15 @@ namespace MyFinanceServer.Tests
 {
     public class BanksControllerTests : TestsBase
     {
-        private BanksService _service;
+		private BanksController _controller;
 
-        [SetUp]
+		[SetUp]
         public void Setup()
         {
-            _service = new BanksService(_mockedDal);
-        }
+            var service = new BanksService(_mockedDal);
+			_controller = new BanksController(_autoMapper.Create(_db), service);
+			_controller.AddControllerContext(_user);
+		}
 
         [Test]
         public async Task GetBanks_ShouldReturnList()
@@ -33,9 +35,7 @@ namespace MyFinanceServer.Tests
 
             _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
 
-            var controller = new BanksController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(2, result.Value.Count());
         }
@@ -45,9 +45,7 @@ namespace MyFinanceServer.Tests
         {
             _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
 
-            var controller = new BanksController(_autoMapper.Create(_db), _service);
-            controller.AddControllerContext(_user);
-            var result = await controller.GetList();
+            var result = await _controller.GetList();
 
             Assert.AreEqual(0, result.Value.Count());
         }
