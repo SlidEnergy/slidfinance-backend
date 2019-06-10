@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyFinanceServer", "MyFinanceServer\MyFinanceServer.csproj", "{D3421DBC-363B-447D-8958-4DF137B7D732}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{34E7BE67-1216-4961-98CC-646FC4441369}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "IntegrationTests\IntegrationTests.csproj", "{68F555AC-BFBB-4747-8555-00A337CDD5A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4649F453-6E74-4072-B2A6-7CB5988523D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +25,17 @@ Global
 		{34E7BE67-1216-4961-98CC-646FC4441369}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34E7BE67-1216-4961-98CC-646FC4441369}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34E7BE67-1216-4961-98CC-646FC4441369}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{34E7BE67-1216-4961-98CC-646FC4441369} = {4649F453-6E74-4072-B2A6-7CB5988523D1}
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3} = {4649F453-6E74-4072-B2A6-7CB5988523D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3376287-CFC8-45FA-991A-574C494815C9}
