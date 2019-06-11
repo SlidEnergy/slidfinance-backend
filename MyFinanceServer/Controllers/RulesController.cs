@@ -42,7 +42,7 @@ namespace MyFinanceServer.Api
 
             var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
 
-            return CreatedAtAction("GetRule", new {id = newRule.Id}, _mapper.Map<Dto.Rule>(newRule));
+            return CreatedAtAction("GetList", _mapper.Map<Dto.Rule>(newRule));
         }
 
         [HttpPut("{id}")]
