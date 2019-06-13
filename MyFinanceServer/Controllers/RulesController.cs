@@ -46,7 +46,7 @@ namespace MyFinanceServer.Api
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.Rule>> Update(int id, EditRuleBindingModel rule)
+        public async Task<ActionResult<Dto.Rule>> Update(int id, Dto.Rule rule)
         {
             var userId = User.GetUserId();
 

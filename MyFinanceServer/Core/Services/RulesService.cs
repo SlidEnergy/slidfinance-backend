@@ -130,7 +130,7 @@ namespace MyFinanceServer.Core
                         .Select(s => new Api.Dto.CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
                     Count = x.Count()
                 })
-                .Where(x => x.Count > 5);
+                .Where(x => x.Count >= 5);
 
             var existRules = await _dal.Rules.GetListWithAccessCheck(userId);
 
