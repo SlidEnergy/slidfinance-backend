@@ -13,13 +13,13 @@ namespace MyFinanceServer.Core
     {
         private readonly IRefreshTokensRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
-		private readonly AppSettings _appSettings;
+		private readonly AuthSettings _authSettings;
 
-		public TokenService(IRefreshTokensRepository repository, ITokenGenerator tokenGenerator, IOptions<AppSettings> appSettings)
+		public TokenService(IRefreshTokensRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings)
         {
             _repository = repository;
             _tokenGenerator = tokenGenerator;
-			_appSettings = appSettings.Value;
+			_authSettings = authSettings;
 		}
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
@@ -55,14 +55,12 @@ namespace MyFinanceServer.Core
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-			var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-
 			var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
+                IssuerSigningKey = _authSettings.GetSymmetricSecurityKey(),
                 ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
             };
 

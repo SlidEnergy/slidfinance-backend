@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using MyFinanceServer.Api;
 using MyFinanceServer.Core;
 using MyFinanceServer.Data;
 using Newtonsoft.Json;
@@ -14,9 +12,8 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.IntegrationTests
 {
-	public class ControllerTestBase : TestFixtureBase
+	public class ControllerTestBase
 	{
-		// protected HttpClient Client => _server.CreateClient();
 		protected WebApiApplicationFactory<Startup> _factory;
 		protected HttpClient _client;
 		protected string _accessToken;
@@ -24,7 +21,6 @@ namespace MyFinanceServer.IntegrationTests
 		protected UserManager<ApplicationUser> _manager;
 		protected ApplicationUser _user;
 		protected DataAccessLayer _dal;
-		//protected TestServer _server;
 
 		[OneTimeSetUp]
 		public async Task HttpClientSetup()
@@ -41,9 +37,6 @@ namespace MyFinanceServer.IntegrationTests
 			Assert.NotNull(_db);
 			Assert.NotNull(_manager);
 			
-			//_server = WebApi.Instance;
-			//Assert.NotNull(_server);
-
 			_dal = new DataAccessLayer(
 				new EfBanksRepository(_db),
 				new EfCategoriesRepository(_db),

@@ -1,24 +1,28 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MyFinanceServer.Core;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace MyFinanceServer.Core
 {
-    public class TokenGenerator : ITokenGenerator
+	/// <summary>
+	/// Формирует AccessToken и RefreshToken, необходимые для авторизации.
+	/// </summary>
+	public class TokenGenerator : ITokenGenerator
     {
-        private readonly AppSettings _appSettings;
+        private readonly AuthSettings _authSettings;
 
-        public TokenGenerator(IOptions<AppSettings> appSettings)
+        public TokenGenerator(AuthSettings appSettings)
         {
-            _appSettings = appSettings.Value;
+            _authSettings = appSettings;
         }
 
+		/// <summary>
+		/// Формирует RefreshToken, нужный для получения нового AccessToken после его истечения
+		/// </summary>
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -29,25 +33,27 @@ namespace MyFinanceServer.Core
             }
         }
 
-        public string GenerateAccessToken(IEnumerable<Claim> claims)
+		/// <summary>
+		/// Формирует AccessToken для указанного пользователя.
+		/// </summary>
+		public string GenerateAccessToken(ApplicationUser user) => GenerateAccessToken(CreateClaims(user));
+
+		/// <summary>
+		/// Формирует AccessToken с указанными Claims.
+		/// </summary>
+		public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+			var token = new JwtSecurityToken(
+				issuer: _authSettings.Issuer,
+				audience: _authSettings.Audience,
+				claims: claims,
+				expires: DateTime.UtcNow.AddMinutes(_authSettings.LifetimeMinutes),
+				signingCredentials: new SigningCredentials(_authSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMonths(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-            };
+            var encodedToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var serializedToken = tokenHandler.WriteToken(token);
-
-            return serializedToken;
+            return encodedToken;
         }
-
-        public string GenerateAccessToken(ApplicationUser user) => GenerateAccessToken(CreateClaims(user));
 
         private IEnumerable<Claim> CreateClaims(ApplicationUser user)
         {

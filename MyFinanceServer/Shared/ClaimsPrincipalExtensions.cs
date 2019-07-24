@@ -3,14 +3,21 @@ using System.Security.Claims;
 
 namespace MyFinanceServer.Shared
 {
+	/// <summary>
+	/// Класс расширений для ClaimsPrincipal, содержит методы получения данных из Claims.
+	/// </summary>
     public static class ClaimsPrincipalExtensions
     {
-        public static string GetUserId(this ClaimsPrincipal principal)
+		/// <summary>
+		/// Получает идентификатор пользователя из Claims.
+		/// </summary>
+		/// <param name="user">Пользователь</param>
+        public static string GetUserId(this ClaimsPrincipal user)
         {
-            if (principal == null)
-                throw new ArgumentNullException(nameof(principal));
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
 
-            return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

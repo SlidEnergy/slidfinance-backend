@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using Moq;
 using MyFinanceServer.Api;
 using MyFinanceServer.Core;
@@ -9,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyFinanceServer.Tests
 {
-    public class TokenControllerTests : TestsBase
+	public class TokenControllerTests : TestsBase
     {
         Mock<UserManager<ApplicationUser>> _manager;
 		TokenController _controller;
@@ -18,12 +17,12 @@ namespace MyFinanceServer.Tests
 		[SetUp]
         public void Setup()
         {
-			var options = Options.Create(new AppSettings() { Secret = "Very very very long secret #1" });
-			_tokenGenerator = new TokenGenerator(options);
+			var authSettings = SettingsFactory.CreateAuth();
+			_tokenGenerator = new TokenGenerator(authSettings);
             var store = new Mock<IUserStore<ApplicationUser>>();
 
             _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.RefreshTokens, _tokenGenerator, options);
+			var tokenService = new TokenService(_mockedDal.RefreshTokens, _tokenGenerator, authSettings);
 
 			_controller = new TokenController(tokenService);
 			_controller.AddControllerContext(_user);

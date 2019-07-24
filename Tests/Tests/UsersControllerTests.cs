@@ -17,12 +17,12 @@ namespace MyFinanceServer.Tests
 		[SetUp]
         public void Setup()
         {
-			var options = Options.Create(new AppSettings() { Secret = "Very very very long secret #1" });
-			var tokenGenerator = new TokenGenerator(options);
+			var authSettings = SettingsFactory.CreateAuth();
+			var tokenGenerator = new TokenGenerator(authSettings);
             var store = new Mock<IUserStore<ApplicationUser>>();
 
             _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, options);
+			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, authSettings);
             var service = new UsersService(_manager.Object, tokenGenerator, tokenService);
 
 			_controller = new UsersController(_autoMapper.Create(_db), service);
