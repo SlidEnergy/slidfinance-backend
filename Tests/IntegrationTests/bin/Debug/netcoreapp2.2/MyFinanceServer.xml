@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MyFinanceServer</name>
+    </assembly>
+    <members>
+        <member name="T:MyFinanceServer.Api.RegisterBindingModel">
+            <summary>
+            Модель для регистрации нового пользователя
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.Api.RegisterBindingModel.Email">
+            <summary>
+            Уникальная электронная почта
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.Api.RegisterBindingModel.Password">
+            <summary>
+            Пароль
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.Api.RegisterBindingModel.ConfirmPassword">
+            <summary>
+            Подтверждение пароля
+            </summary>
+        </member>
+        <member name="T:MyFinanceServer.Api.ResponseWithDescriptionOperationFilter">
+            <summary>
+            Фильтр операции для ответов. Добавляет описание к ответам полученных от наших контроллеров.
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Api.ResponseWithDescriptionOperationFilter.Apply(Swashbuckle.AspNetCore.Swagger.Operation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            Применяет фильтр для переданного ApiDescription.
+            </summary>
+        </member>
+        <member name="T:MyFinanceServer.AuthSettings">
+            <summary>
+            Параметры для генерации JWT-токена.
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.AuthSettings.Issuer">
+            <summary>
+            Издатель токена
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.AuthSettings.Audience">
+            <summary>
+            Потребитель токена
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.AuthSettings.Key">
+            <summary>
+            Ключ для шифрования.
+            </summary>
+        </member>
+        <member name="P:MyFinanceServer.AuthSettings.LifetimeMinutes">
+            <summary>
+            Время жизни токена (в минутах).
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.AuthSettings.GetSymmetricSecurityKey">
+            <summary>
+            Получает симметричный ключ безопасности
+            </summary>
+        </member>
+        <member name="T:MyFinanceServer.Core.TokenGenerator">
+            <summary>
+            Формирует AccessToken и RefreshToken, необходимые для авторизации.
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Core.TokenGenerator.GenerateRefreshToken">
+            <summary>
+            Формирует RefreshToken, нужный для получения нового AccessToken после его истечения
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Core.TokenGenerator.GenerateAccessToken(MyFinanceServer.Core.ApplicationUser)">
+            <summary>
+            Формирует AccessToken для указанного пользователя.
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Core.TokenGenerator.GenerateAccessToken(System.Collections.Generic.IEnumerable{System.Security.Claims.Claim})">
+            <summary>
+            Формирует AccessToken с указанными Claims.
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Core.TokenGenerator.ToUnixEpochDate(System.DateTime)">
+            <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
+        </member>
+        <member name="T:MyFinanceServer.Shared.ClaimsPrincipalExtensions">
+            <summary>
+            Класс расширений для ClaimsPrincipal, содержит методы получения данных из Claims.
+            </summary>
+        </member>
+        <member name="M:MyFinanceServer.Shared.ClaimsPrincipalExtensions.GetUserId(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Получает идентификатор пользователя из Claims.
+            </summary>
+            <param name="user">Пользователь</param>
+        </member>
+    </members>
+</doc>

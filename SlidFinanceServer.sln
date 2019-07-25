@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29102.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.WebApi", "SlidFinance.WebApi\SlidFinance.WebApi.csproj", "{D3421DBC-363B-447D-8958-4DF137B7D732}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{34E7BE67-1216-4961-98CC-646FC4441369}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTests", "Tests\IntegrationTests\IntegrationTests.csproj", "{68F555AC-BFBB-4747-8555-00A337CDD5A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4649F453-6E74-4072-B2A6-7CB5988523D1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.Infrastucture", "SlidFinance.Infrastucture\SlidFinance.Infrastucture.csproj", "{F3A692A3-5F67-4E3F-945F-B2145BE1A0C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.Domain", "SlidFinance.Domain\SlidFinance.Domain.csproj", "{12A75725-C0BE-4F12-B231-358ED9FD922E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.App", "SlidFinance.App\SlidFinance.App.csproj", "{12681719-8259-4819-A6EE-7FD1F936F6D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3421DBC-363B-447D-8958-4DF137B7D732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3421DBC-363B-447D-8958-4DF137B7D732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3421DBC-363B-447D-8958-4DF137B7D732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3421DBC-363B-447D-8958-4DF137B7D732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E7BE67-1216-4961-98CC-646FC4441369}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E7BE67-1216-4961-98CC-646FC4441369}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E7BE67-1216-4961-98CC-646FC4441369}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E7BE67-1216-4961-98CC-646FC4441369}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3A692A3-5F67-4E3F-945F-B2145BE1A0C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3A692A3-5F67-4E3F-945F-B2145BE1A0C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3A692A3-5F67-4E3F-945F-B2145BE1A0C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3A692A3-5F67-4E3F-945F-B2145BE1A0C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12A75725-C0BE-4F12-B231-358ED9FD922E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12A75725-C0BE-4F12-B231-358ED9FD922E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12A75725-C0BE-4F12-B231-358ED9FD922E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12A75725-C0BE-4F12-B231-358ED9FD922E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12681719-8259-4819-A6EE-7FD1F936F6D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12681719-8259-4819-A6EE-7FD1F936F6D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12681719-8259-4819-A6EE-7FD1F936F6D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12681719-8259-4819-A6EE-7FD1F936F6D5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{34E7BE67-1216-4961-98CC-646FC4441369} = {4649F453-6E74-4072-B2A6-7CB5988523D1}
+		{68F555AC-BFBB-4747-8555-00A337CDD5A3} = {4649F453-6E74-4072-B2A6-7CB5988523D1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3376287-CFC8-45FA-991A-574C494815C9}
+	EndGlobalSection
+EndGlobal
