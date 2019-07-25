@@ -5,7 +5,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public class BanksControllerTests : TestsBase
     {

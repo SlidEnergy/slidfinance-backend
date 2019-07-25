@@ -4,7 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public class AccountServiceTests : TestsBase
     {

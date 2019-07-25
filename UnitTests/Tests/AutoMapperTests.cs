@@ -4,7 +4,7 @@ using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 using NUnit.Framework;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public class AutoMapperTests
     {

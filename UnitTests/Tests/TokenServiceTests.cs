@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Moq;
 using MyFinanceServer.Core;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public class TokenServiceTests
     {

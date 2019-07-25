@@ -4,7 +4,7 @@ using MyFinanceServer.Core;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public static class ControllerExtensions
     {

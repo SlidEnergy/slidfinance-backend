@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     [TestFixture]
     public class CategoriesServiceTests : TestsBase

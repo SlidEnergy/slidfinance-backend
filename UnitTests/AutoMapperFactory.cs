@@ -2,7 +2,7 @@
 using MyFinanceServer.Api;
 using MyFinanceServer.Data;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
     public class AutoMapperFactory
     {

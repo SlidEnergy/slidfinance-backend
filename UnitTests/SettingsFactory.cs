@@ -1,4 +1,4 @@
-﻿namespace MyFinanceServer.Tests
+﻿namespace MyFinanceServer.UnitTests
 {
 	/// <summary>
 	/// Создает объекты с настройками приложения.

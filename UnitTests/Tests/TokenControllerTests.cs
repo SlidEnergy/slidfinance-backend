@@ -6,7 +6,7 @@ using MyFinanceServer.Core;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
-namespace MyFinanceServer.Tests
+namespace MyFinanceServer.UnitTests
 {
 	public class TokenControllerTests : TestsBase
     {
