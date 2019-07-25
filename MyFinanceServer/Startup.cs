@@ -20,21 +20,45 @@ namespace MyFinanceServer
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		public IConfiguration Configuration { get; }
+		private IHostingEnvironment CurrentEnvironment { get; }
+
+		private string ConnectionString => ConnectionStringFactory.Get();
+
+		private AuthSettings AuthSettings
 		{
-			Configuration = configuration;
+			get
+			{
+				if (CurrentEnvironment.IsDevelopment())
+				{
+					return Configuration
+						.GetSection("Security")
+						.GetSection("Token")
+						.Get<AuthSettings>();
+				}
+				else
+				{
+					return new AuthSettings
+					{
+						Audience = Environment.GetEnvironmentVariable("TOKEN_AUDIENCE"),
+						Issuer = Environment.GetEnvironmentVariable("TOKEN_ISSUER"),
+						Key = Environment.GetEnvironmentVariable("TOKEN_KEY"),
+						LifetimeMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable("TOKEN_LIFETIME_MINUTES"))
+					};
+				}
+			}
 		}
 
-		public IConfiguration Configuration { get; }
+		public Startup(IConfiguration configuration, IHostingEnvironment env)
+		{
+			Configuration = configuration;
+			CurrentEnvironment = env;
+		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			// configure AppSettings
-			var appSettings = Configuration
-				.GetSection("Security")
-				.GetSection("Token")
-				.Get<AuthSettings>();
+
 
 			services
 				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -46,17 +70,17 @@ namespace MyFinanceServer
 						// Укзывает, будет ли проверяться издатель при проверке токена
 						ValidateIssuer = false,
 						// Строка, представляющая издателя
-						ValidIssuer = appSettings.Issuer,
+						ValidIssuer = AuthSettings.Issuer,
 
 						// Будет ли проверяться потребитель токена
 						ValidateAudience = false,
 						// Установка потребителя токена
-						ValidAudience = appSettings.Audience,
+						ValidAudience = AuthSettings.Audience,
 						// будет ли валидироваться время существования
 						ValidateLifetime = true,
 
 						// установка ключа безопасности
-						IssuerSigningKey = appSettings.GetSymmetricSecurityKey(),
+						IssuerSigningKey = AuthSettings.GetSymmetricSecurityKey(),
 						// валидация ключа безопасности
 						ValidateIssuerSigningKey = true,
 					};
@@ -75,7 +99,7 @@ namespace MyFinanceServer
 			services.AddEntityFrameworkNpgsql()
 				.AddDbContext<ApplicationDbContext>(options => options
 					.UseLazyLoadingProxies()
-					.UseNpgsql(GetConnectionString()))
+					.UseNpgsql(ConnectionString))
 				.BuildServiceProvider();
 
 			// Register the Swagger generator, defining 1 or more Swagger documents
@@ -106,7 +130,7 @@ namespace MyFinanceServer
 
 			// DI
 
-			services.AddSingleton<AuthSettings>(x => appSettings);
+			services.AddSingleton<AuthSettings>(x => AuthSettings);
 
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
 			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
@@ -166,27 +190,6 @@ namespace MyFinanceServer
 			});
 
 			app.UseMvc();
-		}
-
-		private string GetConnectionString()
-		{
-			var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-
-			var databaseUri = new Uri(databaseUrl);
-			var userInfo = databaseUri.UserInfo.Split(':');
-
-			var builder = new NpgsqlConnectionStringBuilder
-			{
-				Host = databaseUri.Host,
-				Port = databaseUri.Port,
-				Username = userInfo[0],
-				Password = userInfo[1],
-				Database = databaseUri.LocalPath.TrimStart('/'),
-				SslMode = databaseUri.Host == "localhost" ? SslMode.Disable : SslMode.Require,
-				TrustServerCertificate = true
-			};
-
-			return builder.ToString();
 		}
 	}
 }
