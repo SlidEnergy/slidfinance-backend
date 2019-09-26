@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SlidFinance.Domain;
 
-namespace SlidFinance.Infrastucture
+namespace SlidFinance.Infrastructure
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {

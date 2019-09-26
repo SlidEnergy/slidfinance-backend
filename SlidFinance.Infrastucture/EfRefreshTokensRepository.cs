@@ -3,7 +3,7 @@ using SlidFinance.Domain;
 using SlidFinance.App;
 using System.Threading.Tasks;
 
-namespace SlidFinance.Infrastucture
+namespace SlidFinance.Infrastructure
 {
     public class EfRefreshTokensRepository : IRefreshTokensRepository
     {

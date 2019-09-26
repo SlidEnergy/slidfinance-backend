@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using SlidFinance.App;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Net.Http;

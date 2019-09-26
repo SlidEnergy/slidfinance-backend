@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SlidFinance.Infrastucture
+namespace SlidFinance.Infrastructure
 {
     public class EfBanksRepository : EfRepository<Bank, int>, IRepositoryWithAccessCheck<Bank>
     {

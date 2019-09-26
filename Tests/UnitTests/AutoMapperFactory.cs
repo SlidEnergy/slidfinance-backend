@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using SlidFinance.WebApi;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 
 namespace SlidFinance.WebApi.UnitTests
 {

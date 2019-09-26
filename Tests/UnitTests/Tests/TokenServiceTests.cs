@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SlidFinance.WebApi;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

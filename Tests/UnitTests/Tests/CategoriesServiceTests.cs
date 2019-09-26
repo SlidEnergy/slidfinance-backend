@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
 using SlidFinance.App;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;

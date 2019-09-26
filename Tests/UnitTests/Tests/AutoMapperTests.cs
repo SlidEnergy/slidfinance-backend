@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SlidFinance.WebApi;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 using NUnit.Framework;
 
 namespace SlidFinance.WebApi.UnitTests

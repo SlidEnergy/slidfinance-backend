@@ -1,4 +1,4 @@
-﻿using SlidFinance.Infrastucture;
+﻿using SlidFinance.Infrastructure;
 
 namespace SlidFinance.WebApi.IntegrationTests
 {

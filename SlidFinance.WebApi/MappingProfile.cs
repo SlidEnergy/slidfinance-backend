@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using SlidFinance.App;
 using SlidFinance.Domain;
-using SlidFinance.Infrastucture;
+using SlidFinance.Infrastructure;
 using System.Linq;
 
 namespace SlidFinance.WebApi
