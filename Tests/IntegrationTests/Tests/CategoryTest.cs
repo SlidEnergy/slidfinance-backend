@@ -15,7 +15,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var category2 = new Category("Category #2", 0, _user);
 			await _dal.Categories.Add(category2);
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/categories/");
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/categories/", _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -27,7 +27,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task AddCategory_ShouldReturnContent()
 		{
-			var request = CreateAuthJsonRequest("POST", "/api/v1/categories/", new Dto.Category() { Title = "Category #1" });
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/categories/", _accessToken, new Dto.Category() { Title = "Category #1" });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var category = new Category("Category #1", 0, _user);
 			await _dal.Categories.Add(category);
 
-			var request = CreateAuthJsonRequest("PUT", "/api/v1/categories/" + category.Id, new Dto.Category
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/categories/" + category.Id, _accessToken, new Dto.Category
 			{
 				Id = category.Id,
 				Title = "Category #2"
@@ -62,7 +62,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var category = new Category("Category #1", 0, _user);
 			await _dal.Categories.Add(category);
 
-			var request = CreateAuthJsonRequest("DELETE", "/api/v1/categories/" + category.Id);
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/categories/" + category.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);

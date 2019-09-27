@@ -27,7 +27,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 				await _dal.Transactions.Add(new Transaction() { Account = account, Category = category, Amount = 1, Approved = true,
 					BankCategory = "Bank category #2", Description = "Description #2", Mcc = 2, DateTime = DateTime.Today });
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/rules/generated");
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/rules/generated", _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -50,7 +50,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var rule2 = new Rule(account, "Bank category #2", category, "Description #2", 5001, 1);
 			await _dal.Rules.Add(rule2);
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/rules/");
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/rules/", _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -69,7 +69,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var category = new Category("Category #1", 0, _user);
 			await _dal.Categories.Add(category);
 
-			var request = CreateAuthJsonRequest("POST", "/api/v1/rules/", new Dto.Rule() { AccountId = account.Id,
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/rules/", _accessToken, new Dto.Rule() { AccountId = account.Id,
 				BankCategory = "Bank category #1", CategoryId = category.Id, Description = "Description #1", Mcc = 5000 });
 			var response = await SendRequest(request);
 
@@ -91,7 +91,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 1000, 0);
 			await _dal.Rules.Add(rule);
 
-			var request = CreateAuthJsonRequest("PUT", "/api/v1/rules/" + rule.Id, new Dto.Rule
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/rules/" + rule.Id, _accessToken, new Dto.Rule
 			{
 				Id = rule.Id,
 				AccountId = account.Id,
@@ -121,7 +121,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule);
 
-			var request = CreateAuthJsonRequest("DELETE", "/api/v1/rules/" + rule.Id);
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/rules/" + rule.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);

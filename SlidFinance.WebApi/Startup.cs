@@ -201,11 +201,11 @@ namespace SlidFinance.WebApi
 			services.AddScoped<AccountsService>();
 			services.AddScoped<BanksService>();
 			services.AddScoped<RulesService>();
-			services.AddScoped<UsersService>();
+			services.AddScoped<IUsersService, UsersService>();
 			services.AddScoped<CategoriesService>();
-			services.AddScoped<TokenService>();
+			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<TransactionsService>();
-			services.AddScoped<ImportService>();
+			services.AddScoped<IImportService, ImportService>();
 		}
 
 		private void ConfigurePolicies(IServiceCollection services)

@@ -13,9 +13,9 @@ namespace SlidFinance.WebApi
     public class UsersController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly UsersService _usersService;
+        private readonly IUsersService _usersService;
 
-        public UsersController(IMapper mapper, UsersService usersService)
+        public UsersController(IMapper mapper, IUsersService usersService)
         {
             _mapper = mapper;
             _usersService = usersService;
@@ -46,7 +46,7 @@ namespace SlidFinance.WebApi
 
             var user = _mapper.Map<ApplicationUser>(model);
 
-            var result = await _usersService.Register(user, model.Password);
+            var result = await _usersService.CreateAccount(user, model.Password);
 
             if (!result.Succeeded) {
                 foreach (var e in result.Errors)
@@ -60,17 +60,17 @@ namespace SlidFinance.WebApi
             return Created("", _mapper.Map<Dto.User>(user));
         }
 
-        [HttpPost("login")]
+        [HttpPost("token")]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult<TokenInfo>> Login(LoginBindingModel userData)
+        public async Task<ActionResult<TokenInfo>> GetToken(LoginBindingModel userData)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
             try
             {
-                var tokens = await _usersService.Login(userData.Email, userData.Password);
+                var tokens = await _usersService.CheckCredentialsAndGetToken(userData.Email, userData.Password);
 
                 return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
             }

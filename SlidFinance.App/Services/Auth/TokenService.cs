@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-	public class TokenService
-    {
+	public class TokenService : ITokenService
+	{
         private readonly IRefreshTokensRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
@@ -37,7 +37,19 @@ namespace SlidFinance.App
             return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
         }
 
-		public async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
+		public async Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode)
+		{
+			var refreshToken = _tokenGenerator.GenerateRefreshToken();
+			await AddRefreshToken(refreshToken, user);
+
+			return new TokensCortage()
+			{
+				Token = _tokenGenerator.GenerateAccessToken(user, accessMode),
+				RefreshToken = refreshToken
+			};
+		}
+
+		private async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
 		{
 			var token = new RefreshToken("any", refreshToken, user);
 			await _repository.Add(token);
@@ -71,5 +83,5 @@ namespace SlidFinance.App
 
             return principal;
         }
-    }
+	}
 }

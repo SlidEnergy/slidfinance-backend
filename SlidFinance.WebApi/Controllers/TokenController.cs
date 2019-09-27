@@ -10,9 +10,9 @@ namespace SlidFinance.WebApi
     [ApiController]
     public sealed class TokenController : ControllerBase
     {
-        private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
-        public TokenController(TokenService tokenService)
+        public TokenController(ITokenService tokenService)
         {
             _tokenService = tokenService;
         }

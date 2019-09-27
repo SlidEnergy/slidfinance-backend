@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var tx2 = new Transaction() { Account = account, BankCategory = "Bank category #2", Description = "Description #2", DateTime = DateTime.Today };
 			await _dal.Transactions.Add(tx2);
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/transactions/");
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/transactions/", _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -39,7 +39,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
 
-			var request = CreateAuthJsonRequest("POST", "/api/v1/transactions/", new Dto.Transaction() { AccountId = account.Id,
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/transactions/", _accessToken, new Dto.Transaction() { AccountId = account.Id,
 				BankCategory = "Bank category #1", Description = "Description #1", Mcc = 5000, DateTime = DateTime.Today });
 			var response = await SendRequest(request);
 
@@ -59,7 +59,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var tx = new Transaction() { Account = account, BankCategory = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today };
 			await _dal.Transactions.Add(tx);
 
-			var request = CreateAuthJsonRequest("PATCH", "/api/v1/transactions/" + account.Id, new[] { new { op = "replace", path = "/description", value = "Description #2" } });
+			var request = HttpRequestBuilder.CreateJsonRequest("PATCH", "/api/v1/transactions/" + account.Id, _accessToken,
+				new[] { new { op = "replace", path = "/description", value = "Description #2" } });
 
 			var response = await SendRequest(request);
 
@@ -79,7 +80,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var tx = new Transaction() { Account = account, BankCategory = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today };
 			await _dal.Transactions.Add(tx);
 
-			var request = CreateAuthJsonRequest("DELETE", "/api/v1/transactions/" + tx.Id);
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/transactions/" + tx.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
