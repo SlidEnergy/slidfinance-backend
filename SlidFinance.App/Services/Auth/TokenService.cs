@@ -24,17 +24,18 @@ namespace SlidFinance.App
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
-			var savedToken = await _repository.GetByUserId(userId);
+			var savedToken = await _repository.Find(userId, refreshToken);
 
-            if (savedToken == null || savedToken.Token != refreshToken)
+            if (savedToken == null)
                 throw new SecurityTokenException("Invalid refresh token");
 
             var newToken = _tokenGenerator.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
 
-            await UpdateRefreshToken(userId, newRefreshToken);
+			savedToken.Update("any", newRefreshToken);
+			await _repository.Update(savedToken);
 
-            return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
+			return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
         }
 
 		public async Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode)
@@ -55,13 +56,6 @@ namespace SlidFinance.App
 			await _repository.Add(token);
 			return token;
 		}
-
-		private async Task UpdateRefreshToken(string userId, string refreshToken)
-        {
-            var token = await _repository.GetByUserId(userId);
-			token.Update("any", refreshToken);
-            await _repository.Update(token);
-        }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {

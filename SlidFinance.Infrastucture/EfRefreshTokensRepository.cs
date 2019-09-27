@@ -14,9 +14,9 @@ namespace SlidFinance.Infrastructure
             _dbContext = dbContext;
         }
 
-        public async Task<RefreshToken> GetByUserId(string userId)
+        public async Task<RefreshToken> Find(string userId, string token)
         {
-            return await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.User.Id == userId);
+            return await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.User.Id == userId && x.Token == token);
         }
 
 		public async Task<RefreshToken> Add(RefreshToken entity)

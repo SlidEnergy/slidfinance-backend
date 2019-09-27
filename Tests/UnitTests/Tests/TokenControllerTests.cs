@@ -29,7 +29,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_tokenService.Setup(x => x.RefreshToken(It.IsAny<string>(), It.IsAny<string>()))
 				.ReturnsAsync(new TokensCortage() { Token = token, RefreshToken = refreshToken });
 			
-			var result = await _controller.Refresh(token, refreshToken);
+			var result = await _controller.Refresh(new TokensCortage() { Token = token, RefreshToken = refreshToken });
 
 			_tokenService.Verify(x => x.RefreshToken(It.Is<string>(t => t == token), It.Is<string>(t => t == refreshToken)));
 		}

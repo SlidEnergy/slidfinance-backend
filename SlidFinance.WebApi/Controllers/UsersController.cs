@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidFinance.App;
 using SlidFinance.Domain;
@@ -24,7 +25,8 @@ namespace SlidFinance.WebApi
         [HttpGet("current")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<Dto.User>> GetCurrentUser()
+		[Authorize]
+		public async Task<ActionResult<Dto.User>> GetCurrentUser()
         {
             var userId = User.GetUserId();
 

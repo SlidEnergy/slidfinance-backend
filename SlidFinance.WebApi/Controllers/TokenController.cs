@@ -18,15 +18,15 @@ namespace SlidFinance.WebApi
         }
 
         [HttpPost("refresh")]
-        public async Task<ActionResult<TokenInfo>> Refresh(string token, string refreshToken)
+        public async Task<ActionResult<TokenInfo>> Refresh(TokensCortage tokens)
         {
             try
             {
-                var tokens = await _tokenService.RefreshToken(token, refreshToken);
+                var newTokens = await _tokenService.RefreshToken(tokens.Token, tokens.RefreshToken);
 
-				return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken };
+				return new TokenInfo() { Token = newTokens.Token, RefreshToken = newTokens.RefreshToken };
             }
-            catch (SecurityTokenException)
+            catch (SecurityTokenException exc)
             {
                 return BadRequest();
             }

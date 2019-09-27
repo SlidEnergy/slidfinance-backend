@@ -66,13 +66,13 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_tokenGenerator.Setup(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>())).Returns(newAccessToken);
 			_tokenGenerator.Setup(x => x.GenerateRefreshToken()).Returns(newRefreshToken);
-			_refreshTokens.Setup(x => x.GetByUserId(It.IsAny<string>())).ReturnsAsync(new RefreshToken("any", refreshToken, _user));
+			_refreshTokens.Setup(x => x.Find(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new RefreshToken("any", refreshToken, _user));
 
 			await _service.RefreshToken(token, refreshToken);
 
 			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>()));
 			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
-			_refreshTokens.Verify(x => x.GetByUserId(It.Is<string>(userId => userId == _user.Id)));
+			_refreshTokens.Verify(x => x.Find(It.Is<string>(userId => userId == _user.Id), It.Is<string>(t => t == refreshToken)));
 		}
 	}
 }

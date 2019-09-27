@@ -18,8 +18,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task RefreshToken_ShouldReturnTokens()
 		{
-			var queryParams = QueryBuilder.FromObject(new { token = _accessToken, refreshToken = _refreshToken });
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/token/refresh?" + queryParams, _accessToken);
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/token/refresh", _accessToken, 
+				new TokensCortage { Token = _accessToken, RefreshToken = _refreshToken });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
