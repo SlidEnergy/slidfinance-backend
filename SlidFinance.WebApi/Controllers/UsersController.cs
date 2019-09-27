@@ -62,7 +62,6 @@ namespace SlidFinance.WebApi
 
         [HttpPost("token")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
         public async Task<ActionResult<TokenInfo>> GetToken(LoginBindingModel userData)
         {
             if (!ModelState.IsValid)

@@ -69,7 +69,11 @@ namespace SlidFinance.WebApi
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
 			app.UseAuthentication();
-			app.UseHttpsRedirection();
+			
+			if (env.IsProduction())
+			{ 
+				app.UseHttpsRedirection();
+			}
 
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
 			app.UseSwagger(c =>
@@ -183,15 +187,20 @@ namespace SlidFinance.WebApi
 				{
 					Type = "oauth2",
 					Flow = "implicit",
-					TokenUrl = "/api/v1/tokens"
+					TokenUrl = "/api/v1/tokens",
+					Scopes = new Dictionary<string, string> {
+						{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
+						{ Policy.MustBeImportAccessMode, "Режим доступа: только импорт" }
+					}
 				});
 				c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
-				c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>> {
-					{ "Oauth2", Enumerable.Empty<string>() },
-					{ "Bearer", Enumerable.Empty<string>() },
-				});
+
+				c.DescribeAllEnumsAsStrings();
 
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
+				c.OperationFilter<SecurityRequirementsOperationFilter>();
+
+				c.SchemaFilter<EnumAsModelSchemaFilter>();
 			});
 		}
 

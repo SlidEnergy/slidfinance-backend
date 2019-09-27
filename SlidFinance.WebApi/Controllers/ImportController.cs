@@ -42,7 +42,6 @@ namespace SlidFinance.WebApi
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]
 		[HttpPost("token")]
 		[ProducesResponseType(200)]
-		[ProducesResponseType(401)]
 		public async Task<ActionResult<TokensCortage>> GetToken()
 		{
 			var userId = User.GetUserId();

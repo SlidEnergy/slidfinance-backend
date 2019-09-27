@@ -36,7 +36,6 @@ namespace SlidFinance.WebApi
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(401)]
         public async Task<ActionResult<Dto.BankAccount>> PatchAccount(int id, JsonPatchDocument<Dto.BankAccount> patchDoc)
         {
             if (patchDoc == null)
