@@ -6,7 +6,7 @@ namespace SlidFinance.App
 {
     public interface ITokenGenerator
     {
-        string GenerateAccessToken(ApplicationUser user);
+        string GenerateAccessToken(ApplicationUser user, AccessMode accessMode);
         string GenerateAccessToken(IEnumerable<Claim> claims);
         string GenerateRefreshToken();
     }

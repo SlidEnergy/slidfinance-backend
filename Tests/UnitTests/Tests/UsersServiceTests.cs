@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, authSettings);
-			_service = new UsersService(_manager.Object, tokenGenerator, tokenService);
+			_service = new UsersService(_manager.Object, tokenService);
 		}
 
         [Test]
@@ -32,7 +32,7 @@ namespace SlidFinance.WebApi.UnitTests
 
             var password = "Password1#";
 
-            var result = await _service.Register(_user, password);
+            var result = await _service.CreateAccount(_user, password);
 
             _manager.Verify(x => x.CreateAsync(
                 It.Is<ApplicationUser>(u=> u.UserName == _user.UserName && u.Email == _user.Email), 
@@ -47,7 +47,7 @@ namespace SlidFinance.WebApi.UnitTests
             _manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
             _manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
-            var result = await _service.Login(_user.Email, password);
+            var result = await _service.CheckCredentialsAndGetToken(_user.Email, password);
 
             _manager.Verify(x => x.CheckPasswordAsync(
               It.Is<ApplicationUser>(u => u.UserName == _user.UserName && u.Email == _user.Email),

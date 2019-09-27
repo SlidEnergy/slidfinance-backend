@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-    [Authorize]
+    [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class BanksController : ControllerBase

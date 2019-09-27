@@ -5,17 +5,15 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-	public class UsersService
-    {
+	public class UsersService : IUsersService
+	{
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ITokenGenerator _tokenGenerator;
-		private readonly TokenService _tokenService;
+		private readonly ITokenService _tokenService;
 
-		public UsersService(UserManager<ApplicationUser> userManager, ITokenGenerator tokenGenerator, TokenService tokenService)
+		public UsersService(UserManager<ApplicationUser> userManager, ITokenService tokenService)
         {
 			_tokenService = tokenService;
 			_userManager = userManager;
-            _tokenGenerator = tokenGenerator;
         }
 
         public async Task<ApplicationUser> GetById(string userId)
@@ -23,12 +21,12 @@ namespace SlidFinance.App
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<IdentityResult> Register(ApplicationUser user, string password)
+        public async Task<IdentityResult> CreateAccount(ApplicationUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
         }
 
-        public async Task<TokensCortage> Login(string email, string password)
+        public async Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password)
         {
             var user = await _userManager.FindByNameAsync(email);
 
@@ -40,14 +38,7 @@ namespace SlidFinance.App
             if (!checkResult)
                 throw new AuthenticationException();
 
-			var refreshToken = _tokenGenerator.GenerateRefreshToken();
-			await _tokenService.AddRefreshToken(refreshToken, user);
-
-            return new TokensCortage()
-            {
-                Token = _tokenGenerator.GenerateAccessToken(user),
-                RefreshToken = refreshToken
-            };
+			return await _tokenService.GenerateAccessAndRefreshTokens(user, AccessMode.All);
         }
-    }
+	}
 }

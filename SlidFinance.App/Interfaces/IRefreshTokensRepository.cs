@@ -5,7 +5,7 @@ namespace SlidFinance.App
 {
     public interface IRefreshTokensRepository
     {
-        Task<RefreshToken> GetByUserId(string userId);
+        Task<RefreshToken> Find(string userId, string token);
 
 		Task<RefreshToken> Add(RefreshToken entity);
 

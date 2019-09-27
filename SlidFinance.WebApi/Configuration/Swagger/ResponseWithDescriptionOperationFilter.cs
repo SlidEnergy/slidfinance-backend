@@ -12,7 +12,6 @@ namespace SlidFinance.WebApi
         private Dictionary<int, string> _codes = new Dictionary<int, string>()
         {
             { 400, "Неверный запрос." },
-            { 401, "Ошибка входа в систему." },
             { 500, "Необработанная ошибка сервера." },
         };
 

@@ -10,23 +10,23 @@ namespace SlidFinance.WebApi
     [ApiController]
     public sealed class TokenController : ControllerBase
     {
-        private readonly TokenService _tokenService;
+        private readonly ITokenService _tokenService;
 
-        public TokenController(TokenService tokenService)
+        public TokenController(ITokenService tokenService)
         {
             _tokenService = tokenService;
         }
 
         [HttpPost("refresh")]
-        public async Task<ActionResult<TokenInfo>> Refresh(string token, string refreshToken)
+        public async Task<ActionResult<TokenInfo>> Refresh(TokensCortage tokens)
         {
             try
             {
-                var tokens = await _tokenService.RefreshToken(token, refreshToken);
+                var newTokens = await _tokenService.RefreshToken(tokens.Token, tokens.RefreshToken);
 
-				return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken };
+				return new TokenInfo() { Token = newTokens.Token, RefreshToken = newTokens.RefreshToken };
             }
-            catch (SecurityTokenException)
+            catch (SecurityTokenException exc)
             {
                 return BadRequest();
             }

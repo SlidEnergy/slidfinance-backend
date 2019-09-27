@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-	public class TokenService
-    {
+	public class TokenService : ITokenService
+	{
         private readonly IRefreshTokensRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
@@ -24,32 +24,38 @@ namespace SlidFinance.App
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
-			var savedToken = await _repository.GetByUserId(userId);
+			var savedToken = await _repository.Find(userId, refreshToken);
 
-            if (savedToken == null || savedToken.Token != refreshToken)
+            if (savedToken == null)
                 throw new SecurityTokenException("Invalid refresh token");
 
             var newToken = _tokenGenerator.GenerateAccessToken(principal.Claims);
             var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
 
-            await UpdateRefreshToken(userId, newRefreshToken);
+			savedToken.Update("any", newRefreshToken);
+			await _repository.Update(savedToken);
 
-            return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
+			return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
         }
 
-		public async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
+		public async Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode)
+		{
+			var refreshToken = _tokenGenerator.GenerateRefreshToken();
+			await AddRefreshToken(refreshToken, user);
+
+			return new TokensCortage()
+			{
+				Token = _tokenGenerator.GenerateAccessToken(user, accessMode),
+				RefreshToken = refreshToken
+			};
+		}
+
+		private async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
 		{
 			var token = new RefreshToken("any", refreshToken, user);
 			await _repository.Add(token);
 			return token;
 		}
-
-		private async Task UpdateRefreshToken(string userId, string refreshToken)
-        {
-            var token = await _repository.GetByUserId(userId);
-			token.Update("any", refreshToken);
-            await _repository.Update(token);
-        }
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
@@ -71,5 +77,5 @@ namespace SlidFinance.App
 
             return principal;
         }
-    }
+	}
 }

@@ -37,7 +37,7 @@ namespace SlidFinance.App
 		/// <summary>
 		/// Формирует AccessToken для указанного пользователя.
 		/// </summary>
-		public string GenerateAccessToken(ApplicationUser user) => GenerateAccessToken(CreateClaims(user));
+		public string GenerateAccessToken(ApplicationUser user, AccessMode accessMode) => GenerateAccessToken(CreateClaims(user, accessMode));
 
 		/// <summary>
 		/// Формирует AccessToken с указанными Claims.
@@ -56,7 +56,7 @@ namespace SlidFinance.App
             return encodedToken;
         }
 
-        private IEnumerable<Claim> CreateClaims(ApplicationUser user)
+        private IEnumerable<Claim> CreateClaims(ApplicationUser user, AccessMode accessMode)
         {
             return new Claim[]
                 {
@@ -70,7 +70,10 @@ namespace SlidFinance.App
                     new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                     // _jwtOptions.IssuedAt
-                    new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64)
+                    new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64),
+
+					// Application
+					new Claim(nameof(AccessMode), accessMode.ToString())
                 };
         }
 

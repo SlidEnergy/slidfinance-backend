@@ -19,7 +19,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account2 = new BankAccount(bank, "Account #2", "Code #2", 200, 10);
 			await _dal.Accounts.Add(account2);
 
-			var request = CreateAuthJsonRequest("GET", "/api/v1/accounts/");
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/accounts/", _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -34,7 +34,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var bank = new Bank("Bank #1", _user);
 			await _dal.Banks.Add(bank);
 
-			var request = CreateAuthJsonRequest("POST", "/api/v1/accounts/", new Dto.BankAccount() { BankId = bank.Id, Balance = 100, Code = "Code #1",
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/accounts/", _accessToken, new Dto.BankAccount() { BankId = bank.Id, Balance = 100, Code = "Code #1",
 				Title = "Account #1", CreditLimit = 50 });
 			var response = await SendRequest(request);
 
@@ -52,7 +52,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
 
-			var request = CreateAuthJsonRequest("PATCH", "/api/v1/accounts/" + account.Id, new[] { new { op = "replace", path = "/title", value = "Account #2" } });
+			var request = HttpRequestBuilder.CreateJsonRequest("PATCH", "/api/v1/accounts/" + account.Id, _accessToken, new[] { new { op = "replace", path = "/title", value = "Account #2" } });
 
 			var response = await SendRequest(request);
 
@@ -70,7 +70,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
 
-			var request = CreateAuthJsonRequest("PUT", "/api/v1/accounts/" + account.Id, new Dto.BankAccount
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/accounts/" + account.Id, _accessToken, new Dto.BankAccount
 			{
 				Id = account.Id,
 				Balance = 200,
@@ -96,7 +96,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
 
-			var request = CreateAuthJsonRequest("DELETE", "/api/v1/accounts/" + account.Id);
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/accounts/" + account.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);

@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.UnitTests
 
             _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, authSettings);
-            var service = new UsersService(_manager.Object, tokenGenerator, tokenService);
+            var service = new UsersService(_manager.Object, tokenService);
 
 			_controller = new UsersController(_autoMapper.Create(_db), service);
 			_controller.AddControllerContext(_user);
@@ -49,7 +49,7 @@ namespace SlidFinance.WebApi.UnitTests
 
             var userBindingModel = new LoginBindingModel() { Email = _user.Email, Password = "Password #1" };
 
-            var result = await _controller.Login(userBindingModel);
+            var result = await _controller.GetToken(userBindingModel);
 
             Assert.NotNull(result.Value.Token);
             Assert.IsNotEmpty(result.Value.Token);

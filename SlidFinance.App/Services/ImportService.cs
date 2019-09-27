@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class ImportService
-    {
+    public class ImportService : IImportService
+	{
         private DataAccessLayer _dal;
 
         public ImportService(DataAccessLayer dal)

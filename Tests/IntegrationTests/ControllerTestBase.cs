@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
+using System;
 
 namespace SlidFinance.WebApi.IntegrationTests
 {
@@ -18,6 +19,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		protected WebApiApplicationFactory<Startup> _factory;
 		protected HttpClient _client;
 		protected string _accessToken;
+		protected string _refreshToken;
 		protected ApplicationDbContext _db;
 		protected UserManager<ApplicationUser> _manager;
 		protected ApplicationUser _user;
@@ -28,15 +30,21 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			_factory = new WebApiApplicationFactory<Startup>();
 			_client = _factory.CreateClient();
-			Assert.NotNull(_client);
+			if (_client == null)
+				throw new Exception("Клиент для web api не создан.");
 
 			var scope = _factory.Server.Host.Services.CreateScope();
-			Assert.NotNull(scope);
+
+			if (scope == null)
+				throw new Exception("Область видимости scope для сервисов не создана.");
 
 			_db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 			_manager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-			Assert.NotNull(_db);
-			Assert.NotNull(_manager);
+			if (_db == null)
+				throw new Exception("Контекст базы данных не получен");
+
+			if (_manager == null)
+				throw new Exception("Сервис для работы с пользователями не получен");
 			
 			_dal = new DataAccessLayer(
 				new EfBanksRepository(_db),
@@ -49,45 +57,38 @@ namespace SlidFinance.WebApi.IntegrationTests
 
 			_user = new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com" };
 			var result = await _manager.CreateAsync(_user, "Password123#");
-			Assert.IsTrue(result.Succeeded);
+			if (!result.Succeeded)
+				throw new Exception("Новый пользователь не создан");
+
 			await Login();
 		}
 
 		protected virtual async Task Login()
 		{
-			var request = CreateJsonRequest("POST", "/api/v1/users/login", 
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/users/token", null, 
 				new { Email = "test1@email.com", Password = "Password123#", ConfirmPassword = "Password123#" });
 			var response = await SendRequest(request);
 
-			Assert.IsTrue(response.IsSuccessStatusCode);
+			if (!response.IsSuccessStatusCode)
+				throw new Exception("Token для нового пользователя не получен");
+
 			var dict = await response.ToDictionary();
 
-			Assert.IsTrue(dict.ContainsKey("token"));
+			if (!dict.ContainsKey("token"))
+				throw new Exception("Ответ не содержит токен доступа");
+
 			_accessToken = (string)dict["token"];
-			Assert.IsTrue(_accessToken.Length > 32);
-		}
 
-		protected virtual HttpRequestMessage CreateAuthJsonRequest(string method, string url, object content = null)
-		{
-			var request = new HttpRequestMessage(new HttpMethod(method), url);
-			request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+			if (_accessToken.Length <= 32)
+				throw new Exception("Получен невалидный токен");
 
-			if (content != null)
-				request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+			if (!dict.ContainsKey("refreshToken"))
+				throw new Exception("Ответ не содержит токен восстановления сеанса");
 
-			return request;
-		}
+			_refreshToken = (string)dict["refreshToken"];
 
-		protected virtual HttpRequestMessage CreateJsonRequest(string method, string url, object content = null)
-		{
-			var request = new HttpRequestMessage(new HttpMethod(method), url);
-			request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-			if (content != null)
-				request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
-
-			return request;
+			if (_refreshToken.Length <= 32)
+				throw new Exception("Получен невалидный токен");
 		}
 
 		protected virtual Task<HttpResponseMessage> SendRequest(HttpRequestMessage request) => _client.SendAsync(request, CancellationToken.None);

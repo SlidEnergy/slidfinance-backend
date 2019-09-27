@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace SlidFinance.WebApi
 {
 	[Route("api/v1/[controller]")]
-    [Authorize]
+    [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [ApiController]
     public sealed class AccountsController : ControllerBase
     {
@@ -36,7 +36,6 @@ namespace SlidFinance.WebApi
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(401)]
         public async Task<ActionResult<Dto.BankAccount>> PatchAccount(int id, JsonPatchDocument<Dto.BankAccount> patchDoc)
         {
             if (patchDoc == null)
