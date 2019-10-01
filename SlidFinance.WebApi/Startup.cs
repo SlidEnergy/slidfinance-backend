@@ -186,11 +186,11 @@ namespace SlidFinance.WebApi
 				c.AddSecurityDefinition("Oauth2", new OAuth2Scheme
 				{
 					Type = "oauth2",
-					Flow = "implicit",
-					TokenUrl = "/api/v1/tokens",
+					Flow = "password",
+					TokenUrl = "/api/v1/users/token",
 					Scopes = new Dictionary<string, string> {
 						{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
-						{ Policy.MustBeImportAccessMode, "Режим доступа: только импорт" }
+						{ Policy.MustBeAllOrImportAccessMode, "Режим доступа: ко всем объектам или только импорт" }
 					}
 				});
 				c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
@@ -223,7 +223,7 @@ namespace SlidFinance.WebApi
 			{
 				// Добавляем политики на наличие нужной роли у учётной записи.
 				options.AddPolicy(Policy.MustBeAllAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString()));
-				options.AddPolicy(Policy.MustBeImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.Import.ToString()));
+				options.AddPolicy(Policy.MustBeAllOrImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Import.ToString()));
 			});
 		}
 	}

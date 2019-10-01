@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi
 			_usersService = usersService;
 		}
 
-		[Authorize(Policy = Policy.MustBeImportAccessMode)]
+		[Authorize(Policy = Policy.MustBeAllOrImportAccessMode)]
 		[HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
