@@ -27,5 +27,9 @@ namespace SlidFinance.Infrastructure
         public DbSet<Rule> Rules { get; set; }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+        public DbSet<Mcc> Mcc { get; set; }
+
+        public DbSet<Infrastucture.Models.Merchant> Merchants { get; set; }
     }
 }
