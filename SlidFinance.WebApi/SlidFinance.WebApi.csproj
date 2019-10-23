@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <Target Name="PrePublishTarget" AfterTargets="Publish">
-    <Exec Command="dotnet ef database update" />
+    <Exec Command="dotnet ef database update --verbose" />
   </Target>
 
 </Project>
