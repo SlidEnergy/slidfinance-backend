@@ -2,7 +2,7 @@
 {
     public interface IUniqueObject<T>
     {
-        T Id { get; set; }
+        T Id { get; }
     }
 
     public interface IUniqueObject : IUniqueObject<int>

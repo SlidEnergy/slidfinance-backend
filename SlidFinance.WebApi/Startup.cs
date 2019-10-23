@@ -173,6 +173,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
 			services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
 
 			services.AddScoped<DataAccessLayer>();
 		}
@@ -215,6 +216,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<TransactionsService>();
 			services.AddScoped<IImportService, ImportService>();
+			services.AddScoped<IMccService, MccService>();
 		}
 
 		private void ConfigurePolicies(IServiceCollection services)
