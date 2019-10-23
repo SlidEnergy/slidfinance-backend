@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
@@ -17,14 +18,14 @@ namespace SlidFinance.WebApi
 		/// <summary>
 		/// Применяет фильтр для переданного типа.
 		/// </summary>
-		public void Apply(Schema model, SchemaFilterContext context)
+		public void Apply(OpenApiSchema model, SchemaFilterContext context)
 		{
 			if (model.Properties== null)
 				return;
 
 			var enumProperties = model.Properties.Where(p => p.Value.Enum != null)
 				.Union(model.Properties.Where(p => p.Value.Items?.Enum != null)).ToList();
-			var enums = context.SystemType.GetMembers(BindingFlags.Public | BindingFlags.Instance)
+			var enums = context.ApiModel.Type.GetMembers(BindingFlags.Public | BindingFlags.Instance)
 				.Where(p => p.MemberType == MemberTypes.Field || p.MemberType == MemberTypes.Property)
 				.Select(m => {
 					Type propOrFieldType = m.MemberType == MemberTypes.Property ? ((PropertyInfo)m).PropertyType : ((FieldInfo)m).FieldType;
@@ -52,13 +53,14 @@ namespace SlidFinance.WebApi
 				});
 
 				if (enumType == null)
-					throw new Exception($"Property {enumProperty} not found in {context.SystemType.Name} Type.");
+					throw new Exception($"Property {enumProperty} not found in {context.ApiModel.Type.Name} Type.");
 
 				if (context.SchemaRegistry.Definitions.ContainsKey(enumType.Name) == false)
 					context.SchemaRegistry.Definitions.Add(enumType.Name, enumPropertyValue);
 
-				var schema = new Schema
+				var schema = new OpenApiSchema
 				{
+					Reference = new OpenApiReference { }
 					Ref = $"#/definitions/{enumType.Name}"
 				};
 				if (enumProperty.Value.Enum != null)

@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
@@ -13,7 +11,7 @@ namespace SlidFinance.WebApi
 	/// </summary>
 	public class SecurityRequirementsOperationFilter : IOperationFilter
 	{
-		public void Apply(Operation operation, OperationFilterContext context)
+		public void Apply(OpenApiOperation operation, OperationFilterContext context)
 		{
 			// Policy names map to scopes
 			var requiredScopes = context.MethodInfo
@@ -25,15 +23,31 @@ namespace SlidFinance.WebApi
 
 			if (requiredScopes.Any())
 			{
-				operation.Responses.Add("401", new Response { Description = "Ошибка авторизации" });
-				operation.Responses.Add("403", new Response { Description = "Доступ запрещен" });
+				operation.Responses.Add("401", new OpenApiResponse { Description = "Ошибка авторизации" });
+				operation.Responses.Add("403", new OpenApiResponse { Description = "Доступ запрещен" });
 
-				operation.Security = new List<IDictionary<string, IEnumerable<string>>>();
-				operation.Security.Add(new Dictionary<string, IEnumerable<string>>
+				var oAuthScheme = new OpenApiSecurityScheme
 				{
-					{ "Oauth2", requiredScopes.Where(x => x != null) },
-					{ "Bearer", requiredScopes.Where(x => x != null) }
-				});
+					Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Oauth2" }
+				};
+
+				var bearerScheme = new OpenApiSecurityScheme
+				{
+					Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+				};
+
+				operation.Security = new List<OpenApiSecurityRequirement> {
+
+					new OpenApiSecurityRequirement
+					{
+						[oAuthScheme] = requiredScopes.Where(x => x != null).ToList()
+					},
+					new OpenApiSecurityRequirement
+					{
+						[bearerScheme] = requiredScopes.Where(x => x != null).ToList()
+					}
+				};
+
 			}
 		}
 	}

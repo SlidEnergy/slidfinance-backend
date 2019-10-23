@@ -14,16 +14,17 @@ using System.Collections.Generic;
 using System.Linq;
 using SlidFinance.App;
 using SlidFinance.Domain;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 
 namespace SlidFinance.WebApi
 {
 	public class Startup
 	{
 		public IConfiguration Configuration { get; }
-		private IHostingEnvironment CurrentEnvironment { get; }
+		private IWebHostEnvironment CurrentEnvironment { get; }
 
-		public Startup(IConfiguration configuration, IHostingEnvironment env)
+		public Startup(IConfiguration configuration, IWebHostEnvironment env)
 		{
 			Configuration = configuration;
 			CurrentEnvironment = env;
@@ -37,7 +38,7 @@ namespace SlidFinance.WebApi
 			ConfigureAutoMapper(services);
 
 			services.AddCors();
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
 				.AddJsonOptions(options =>
 				{
 					options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
@@ -55,7 +56,7 @@ namespace SlidFinance.WebApi
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
 			{
@@ -67,16 +68,19 @@ namespace SlidFinance.WebApi
 				app.UseHsts();
 			}
 
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+
+			app.UseRouting();
 			app.UseCors(x => x
 			   .AllowAnyOrigin()
 			   .AllowAnyMethod()
 			   .AllowAnyHeader());
 			//.AllowCredentials());
 
-			app.UseDefaultFiles();
-			app.UseStaticFiles();
 			app.UseAuthentication();
-			
+			app.UseAuthorization();
+
 			if (env.IsProduction())
 			{ 
 				app.UseHttpsRedirection();
@@ -95,7 +99,9 @@ namespace SlidFinance.WebApi
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 			});
 
-			app.UseMvc();
+			app.UseEndpoints(endpoints => {
+				endpoints.MapControllers();
+			});
 		}
 
 		private void ConfigureAuthorization(IServiceCollection services)
@@ -172,20 +178,20 @@ namespace SlidFinance.WebApi
 			// Register the Swagger generator, defining 1 or more Swagger documents
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info { Title = "SlidFinance", Version = "v1" });
-				c.AddSecurityDefinition("Oauth2", new OAuth2Scheme
-				{
-					Type = "oauth2",
-					Flow = "password",
-					TokenUrl = "/api/v1/users/token",
-					Scopes = new Dictionary<string, string> {
-						{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
-						{ Policy.MustBeAllOrImportAccessMode, "Режим доступа: ко всем объектам или только импорт" }
-					}
-				});
-				c.AddSecurityDefinition("Bearer", new ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
+				c.SwaggerDoc("v1",  new OpenApiInfo { Title = "SlidFinance", Version = "v1" });
+				//c.AddSecurityDefinition("Oauth2", new OAuth2Scheme
+				//{
+				//	Type = "oauth2",
+				//	Flow = "password",
+				//	TokenUrl = "/api/v1/users/token",
+				//	Scopes = new Dictionary<string, string> {
+				//		{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
+				//		{ Policy.MustBeAllOrImportAccessMode, "Режим доступа: ко всем объектам или только импорт" }
+				//	}
+				//});
+				//c.AddSecurityDefinition("Bearer", new OpenApi ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
 
-				c.DescribeAllEnumsAsStrings();
+				//c.DescribeAllEnumsAsStrings();
 
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
 				c.OperationFilter<SecurityRequirementsOperationFilter>();
