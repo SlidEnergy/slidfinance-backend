@@ -18,6 +18,8 @@ namespace SlidFinance.App
 
 		public IRefreshTokensRepository RefreshTokens { get; }
 
+		public IRepository<Mcc, int> Mcc { get; }
+
 		public DataAccessLayer(
             IRepositoryWithAccessCheck<Bank> banks, 
             IRepositoryWithAccessCheck<Category> categories,
@@ -25,7 +27,8 @@ namespace SlidFinance.App
             IRepositoryWithAccessCheck<BankAccount> bankAccounts,
             IRepositoryWithAccessCheck<Rule> rules,
             IRepositoryWithAccessCheck<Transaction> transactions,
-			IRefreshTokensRepository refreshTokens)
+			IRefreshTokensRepository refreshTokens,
+			IRepository<Mcc, int> mcc)
         {
             Banks = banks;
             Categories = categories;
@@ -34,6 +37,7 @@ namespace SlidFinance.App
             Rules = rules;
             Transactions = transactions;
 			RefreshTokens = refreshTokens;
+			Mcc = mcc;
         }
     }
 }

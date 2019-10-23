@@ -23,8 +23,9 @@ namespace SlidFinance.WebApi.UnitTests
         protected Mock<IRepositoryWithAccessCheck<Rule>> _rules;
         protected Mock<IRepositoryWithAccessCheck<Transaction>> _transactions;
 		protected Mock<IRefreshTokensRepository> _refreshTokens;
+		protected Mock<IRepository<Mcc, int>> _mcc;
 
-        [SetUp]
+		[SetUp]
         public async Task SetupBase()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
@@ -37,7 +38,8 @@ namespace SlidFinance.WebApi.UnitTests
                 new EfBankAccountsRepository(_db),
                 new EfRulesRepository(_db),
                 new EfTransactionsRepository(_db),
-				new EfRefreshTokensRepository(_db));
+				new EfRefreshTokensRepository(_db),
+				new EfRepository<Mcc, int>(_db));
 
             _banks = new Mock<IRepositoryWithAccessCheck<Bank>>();
             _categories = new Mock<IRepositoryWithAccessCheck<Category>>();
@@ -46,9 +48,10 @@ namespace SlidFinance.WebApi.UnitTests
             _rules = new Mock<IRepositoryWithAccessCheck<Rule>>();
             _transactions = new Mock<IRepositoryWithAccessCheck<Transaction>>();
 			_refreshTokens = new Mock<IRefreshTokensRepository>();
+			_mcc = new Mock<IRepository<Mcc, int>>();
 
 			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 
-				_refreshTokens.Object);
+				_refreshTokens.Object, _mcc.Object);
 
             _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com" });
         }

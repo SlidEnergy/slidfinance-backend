@@ -53,7 +53,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 				new EfBankAccountsRepository(_db),
 				new EfRulesRepository(_db),
 				new EfTransactionsRepository(_db),
-				new EfRefreshTokensRepository(_db));
+				new EfRefreshTokensRepository(_db),
+				new EfRepository<Mcc, int>(_db));
 
 			_user = new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com" };
 			var result = await _manager.CreateAsync(_user, "Password123#");
