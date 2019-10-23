@@ -20,11 +20,11 @@ namespace SlidFinance.WebApi
         }
 
         [HttpGet]
-        public async Task<ActionResult<Mcc[]>> GetList()
+        public async Task<ActionResult<Dto.Mcc[]>> GetList()
         {
             var mcc = await this._mccService.GetList();
 
-            return _mapper.Map<Mcc[]>(mcc);
+            return _mapper.Map<Dto.Mcc[]>(mcc);
         }
     }
 }
