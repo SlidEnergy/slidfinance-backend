@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SlidFinance.Infrastructure;
 
 namespace SlidFinance.WebApi
 {
-    public class Program
+	public class Program
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+			// TODO: создавать роль администратора и пользователя с данной ролью по умолчанию
+			// https://www.locktar.nl/programming/net-core/seed-database-users-roles-dotnet-core-2-0-ef/
+
+			CreateWebHostBuilder(args).Build().Run();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
