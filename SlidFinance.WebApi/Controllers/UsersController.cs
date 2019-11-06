@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using SlidFinance.WebApi.Dto;
+using System.Collections.Generic;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
@@ -22,7 +23,17 @@ namespace SlidFinance.WebApi
             _usersService = usersService;
         }
 
-        [HttpGet("current")]
+		[HttpGet]
+		[ProducesResponseType(200)]
+		[Authorize(Policy = Policy.MustBeAdmin)]
+		public async Task<ActionResult<IEnumerable<Dto.User>>> GetList()
+		{
+			var users = await _usersService.GetListAsync();
+
+			return _mapper.Map<Dto.User[]>(users);
+		}
+
+		[HttpGet("current")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
 		[Authorize]

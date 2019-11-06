@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SlidFinance.App;
 using SlidFinance.Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace SlidFinance.WebApi
 {
@@ -148,6 +149,8 @@ namespace SlidFinance.WebApi
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
 			services.AddIdentityCore<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
+
+			services.AddScoped<RoleManager<IdentityRole>>();
 		}
 
 		private void ConfigureAutoMapper(IServiceCollection services)
@@ -226,6 +229,7 @@ namespace SlidFinance.WebApi
 				// Добавляем политики на наличие нужной роли у учётной записи.
 				options.AddPolicy(Policy.MustBeAllAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString()));
 				options.AddPolicy(Policy.MustBeAllOrImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Import.ToString()));
+				options.AddPolicy(Policy.MustBeAdmin, policy => policy.RequireUserName("slidenergy@gmail.com"));
 			});
 		}
 	}

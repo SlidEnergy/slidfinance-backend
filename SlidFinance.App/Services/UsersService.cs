@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SlidFinance.Domain;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
@@ -16,7 +19,12 @@ namespace SlidFinance.App
 			_userManager = userManager;
         }
 
-        public async Task<ApplicationUser> GetById(string userId)
+		public async Task<List<ApplicationUser>> GetListAsync()
+		{
+			return await _userManager.Users.ToListAsync();
+		}
+
+		public async Task<ApplicationUser> GetById(string userId)
         {
             return await _userManager.FindByIdAsync(userId);
         }
