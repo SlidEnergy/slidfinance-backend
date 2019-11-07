@@ -16,9 +16,9 @@ namespace SlidFinance.WebApi
     public class TransactionsController : ControllerBase
     {
         private readonly IMapper _mapper;
-        TransactionsService _service;
+        ITransactionsService _service;
 
-        public TransactionsController(IMapper mapper, TransactionsService service)
+        public TransactionsController(IMapper mapper, ITransactionsService service)
         {
             _mapper = mapper;
             _service = service;

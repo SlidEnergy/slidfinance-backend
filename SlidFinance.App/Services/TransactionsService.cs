@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class TransactionsService
-    {
+    public class TransactionsService : ITransactionsService
+	{
         private DataAccessLayer _dal;
 
         public TransactionsService(DataAccessLayer dal)

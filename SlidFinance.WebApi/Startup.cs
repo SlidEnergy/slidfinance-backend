@@ -217,7 +217,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<IUsersService, UsersService>();
 			services.AddScoped<CategoriesService>();
 			services.AddScoped<ITokenService, TokenService>();
-			services.AddScoped<TransactionsService>();
+			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IImportService, ImportService>();
 			services.AddScoped<IMccService, MccService>();
 		}

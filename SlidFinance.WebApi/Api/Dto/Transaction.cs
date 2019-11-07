@@ -15,8 +15,10 @@ namespace SlidFinance.WebApi.Dto
         public int? CategoryId { get; set; }
 
         public string Description { get; set; }
+		
+		public string UserDescription { get; set; }
 
-        public int? Mcc { get; set; }
+		public int? Mcc { get; set; }
 
         public string BankCategory { get; set; }
 

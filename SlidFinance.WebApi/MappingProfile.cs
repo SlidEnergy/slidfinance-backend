@@ -29,6 +29,8 @@ namespace SlidFinance.WebApi
 					opt => opt.MapFrom(src => src.BankCategory ?? ""))
 				.ForMember(dest => dest.Description,
 					opt => opt.MapFrom(src => src.Description ?? ""))
+				.ForMember(dest => dest.UserDescription,
+					opt => opt.MapFrom(src => src.UserDescription ?? ""))
 				.ForMember(dest => dest.Category,
 					opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
 				.ForMember(dest => dest.Account,
