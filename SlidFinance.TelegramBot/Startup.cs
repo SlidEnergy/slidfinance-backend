@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -77,7 +78,7 @@ namespace SlidFinance.TelegramBot
 			}
 
 			//services.AddSingleton<BotSettings>(x => botSettings);
-			services.AddSingleton<IBotService>(x => new BotService(botSettings));
+			services.AddSingleton<IBotService>(x => new BotService(botSettings, new MemoryCache(new MemoryCacheOptions())));
 			//	services.AddSingleton<IBotService>(x => {
 			//	var service = new BotService(botSettings);
 			//	service.InitAsync().GetAwaiter().GetResult();

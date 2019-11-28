@@ -13,4 +13,9 @@
     <PackageReference Include="Telegram.Bot" Version="15.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SlidFinance.App\SlidFinance.App.csproj" />
+    <ProjectReference Include="..\SlidFinance.Infrastucture\SlidFinance.Infrastucture.csproj" />
+  </ItemGroup>
+
 </Project>
