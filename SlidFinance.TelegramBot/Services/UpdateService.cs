@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SlidFinance.TelegramBot.Models.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +13,13 @@ namespace SlidFinance.TelegramBot
 	{
 		private readonly IBotService _botService;
 		private readonly ILogger<UpdateService> _logger;
+		private CommandList _commandList;
 
-		public UpdateService(IBotService botService, ILogger<UpdateService> logger)
+		public UpdateService(IBotService botService, CommandList commandList, ILogger<UpdateService> logger)
 		{
 			_botService = botService;
 			_logger = logger;
+			_commandList = commandList;
 		}
 
 		public async Task EchoAsync(Update update)
@@ -32,7 +35,7 @@ namespace SlidFinance.TelegramBot
 
 			if (message.Type == MessageType.Text)
 			{
-				foreach (var command in _botService.Commands)
+				foreach (var command in _commandList.Commands)
 				{
 					if (command.Contains(message))
 					{

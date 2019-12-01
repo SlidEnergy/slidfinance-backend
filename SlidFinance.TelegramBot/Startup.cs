@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SlidFinance.TelegramBot.Models;
+using SlidFinance.TelegramBot.Models.Commands;
 
 namespace SlidFinance.TelegramBot
 {
@@ -52,8 +53,6 @@ namespace SlidFinance.TelegramBot
 
 			//Bot Configurations
 			//Bot.GetBotClientAsync().GetAwaiter().GetResult();
-
-
 		}
 
 		private void ConfigureBot(IServiceCollection services)
@@ -78,13 +77,20 @@ namespace SlidFinance.TelegramBot
 			}
 
 			//services.AddSingleton<BotSettings>(x => botSettings);
-			services.AddSingleton<IBotService>(x => new BotService(botSettings, new MemoryCache(new MemoryCacheOptions())));
+			services.AddSingleton<IBotService>(x => new BotService(botSettings));
 			//	services.AddSingleton<IBotService>(x => {
 			//	var service = new BotService(botSettings);
 			//	service.InitAsync().GetAwaiter().GetResult();
 			//	return service;
 			//});
 			services.AddSingleton<IUpdateService, UpdateService>();
+
+			services.AddScoped<CommandList>();
+			services.AddScoped<GetCategoryStatisticCommand>();
+			services.AddScoped<StartCommand>();
+			services.AddScoped<WhichToPayCommand>();
+
+			services.AddScoped<IMemoryCache>(x => new MemoryCache(new MemoryCacheOptions()));
 		}
 	}
 }

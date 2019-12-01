@@ -14,7 +14,10 @@ namespace SlidFinance.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-        }
+
+			modelBuilder.Entity<UserTelegramRelation>()
+			.HasKey(key => new { key.UserId, key.TelegramChatId });
+		}
 
         public DbSet<Transaction> Transactions { get; set; }
 

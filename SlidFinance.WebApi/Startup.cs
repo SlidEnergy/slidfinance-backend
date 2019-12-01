@@ -220,6 +220,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IImportService, ImportService>();
 			services.AddScoped<IMccService, MccService>();
+			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 		}
 
 		private void ConfigurePolicies(IServiceCollection services)
