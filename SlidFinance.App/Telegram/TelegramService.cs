@@ -44,7 +44,7 @@ namespace SlidFinance.App
 				{
 					byte[] hashValue = hmac.ComputeHash(Encoding.UTF8.GetBytes(dataCheckString));
 
-					if (BitConverter.ToString(hashValue).Replace("-", "") == telegramUser.Hash)
+					if (BitConverter.ToString(hashValue).Replace("-", "").ToLower() == telegramUser.Hash)
 						return true;
 				}
 			}
