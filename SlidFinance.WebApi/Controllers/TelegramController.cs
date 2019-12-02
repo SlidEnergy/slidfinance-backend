@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.Controllers
 {
-	[Route("api/[controller]")]
 	[Authorize(Policy = Policy.MustBeAllAccessMode)]
+	[Route("api/v1/[controller]")]
 	[ApiController]
     public class TelegramController : ControllerBase
     {
