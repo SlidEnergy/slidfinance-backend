@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,8 @@ namespace SlidFinance.TelegramBot
 			services.AddIdentityCore<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
+			ConfigureDataAccess(services);
+
 			services.AddSlidFinanceCore();
 
 			ConfigureBot(services);
@@ -63,6 +66,26 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
+		}
+
+		private void ConfigureDataAccess(IServiceCollection services)
+		{
+			services.AddEntityFrameworkNpgsql()
+				.AddDbContext<ApplicationDbContext>(options => options
+					.UseLazyLoadingProxies()
+					.UseNpgsql(ConnectionStringFactory.Get()))
+				.BuildServiceProvider();
+
+			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
+			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
+			services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
+
+			services.AddScoped<DataAccessLayer>();
 		}
 
 		private void ConfigureBot(IServiceCollection services)
@@ -88,7 +111,7 @@ namespace SlidFinance.TelegramBot
 
 			services.AddSingleton<TelegramBotSettings>(x => botSettings);
 			services.AddSingleton<IBotService>(x => new BotService(botSettings));
-			services.AddSingleton<IUpdateService, UpdateService>();
+			services.AddScoped<IUpdateService, UpdateService>();
 
 			services.AddScoped<CommandList>();
 			services.AddScoped<GetCategoryStatisticCommand>();

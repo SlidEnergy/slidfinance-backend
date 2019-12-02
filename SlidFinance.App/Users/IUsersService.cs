@@ -7,7 +7,6 @@ namespace SlidFinance.App
 {
 	public interface IUsersService
 	{
-		Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password);
 		Task<IdentityResult> CreateAccount(ApplicationUser user, string password);
 		Task<ApplicationUser> GetById(string userId);
 		Task<List<ApplicationUser>> GetListAsync();

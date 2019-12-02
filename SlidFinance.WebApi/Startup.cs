@@ -211,6 +211,7 @@ namespace SlidFinance.WebApi
 
 		private void ConfigureApplicationServices(IServiceCollection services)
 		{
+			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<IImportService, ImportService>();

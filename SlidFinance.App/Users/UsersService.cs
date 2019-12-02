@@ -11,12 +11,10 @@ namespace SlidFinance.App
 	public class UsersService : IUsersService
 	{
         private readonly UserManager<ApplicationUser> _userManager;
-		private readonly ITokenService _tokenService;
 		private readonly DataAccessLayer _dal;
 
-		public UsersService(UserManager<ApplicationUser> userManager, ITokenService tokenService, DataAccessLayer dal)
+		public UsersService(UserManager<ApplicationUser> userManager, DataAccessLayer dal)
         {
-			_tokenService = tokenService;
 			_userManager = userManager;
 			_dal = dal;
         }
@@ -41,21 +39,6 @@ namespace SlidFinance.App
 		public async Task<IdentityResult> CreateAccount(ApplicationUser user, string password)
         {
             return await _userManager.CreateAsync(user, password);
-        }
-
-        public async Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password)
-        {
-            var user = await _userManager.FindByNameAsync(email);
-
-            if (user == null)
-                throw new AuthenticationException();
-
-            var checkResult = await _userManager.CheckPasswordAsync(user, password);
-
-            if (!checkResult)
-                throw new AuthenticationException();
-
-			return await _tokenService.GenerateAccessAndRefreshTokens(user, AccessMode.All);
         }
 	}
 }
