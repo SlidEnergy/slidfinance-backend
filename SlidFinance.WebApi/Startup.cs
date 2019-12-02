@@ -212,17 +212,11 @@ namespace SlidFinance.WebApi
 		private void ConfigureApplicationServices(IServiceCollection services)
 		{
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
-			services.AddScoped<AccountsService>();
-			services.AddScoped<BanksService>();
-			services.AddScoped<RulesService>();
-			services.AddScoped<IUsersService, UsersService>();
-			services.AddScoped<CategoriesService>();
 			services.AddScoped<ITokenService, TokenService>();
-			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IImportService, ImportService>();
-			services.AddScoped<IMccService, MccService>();
-			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 			services.AddScoped<ITelegramService, TelegramService>();
+
+			services.AddSlidFinanceCore();
 		}
 
 		private void ConfigurePolicies(IServiceCollection services)

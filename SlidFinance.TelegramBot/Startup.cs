@@ -11,6 +11,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SlidFinance.App;
+using SlidFinance.Domain;
+using SlidFinance.Infrastructure;
 using SlidFinance.TelegramBot.Models;
 using SlidFinance.TelegramBot.Models.Commands;
 
@@ -30,6 +33,16 @@ namespace SlidFinance.TelegramBot
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+
+			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
+			services.AddIdentityCore<ApplicationUser>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
+
+			services.AddSlidFinanceCore();
+
 			ConfigureBot(services);
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -50,9 +63,6 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
-
-			//Bot Configurations
-			//Bot.GetBotClientAsync().GetAwaiter().GetResult();
 		}
 
 		private void ConfigureBot(IServiceCollection services)
@@ -76,7 +86,7 @@ namespace SlidFinance.TelegramBot
 				};
 			}
 
-			//services.AddSingleton<BotSettings>(x => botSettings);
+			services.AddSingleton<TelegramBotSettings>(x => botSettings);
 			services.AddSingleton<IBotService>(x => new BotService(botSettings));
 			services.AddSingleton<IUpdateService, UpdateService>();
 
