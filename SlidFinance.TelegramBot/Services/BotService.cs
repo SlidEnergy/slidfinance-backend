@@ -9,7 +9,7 @@ namespace SlidFinance.TelegramBot
 {
 	public class BotService : IBotService
 	{
-		private BotSettings _settings;
+		private TelegramBotSettings _settings;
 
 		private List<Command> commandsList;
 
@@ -17,22 +17,22 @@ namespace SlidFinance.TelegramBot
 
 		public TelegramBotClient Client { get; private set; }
 
-		public BotService(BotSettings settings) 
+		public BotService(TelegramBotSettings settings) 
 		{
 			_settings = settings;
 		}
 
 		public async Task InitAsync()
 		{
-			if(_settings != null && !string.IsNullOrEmpty(_settings.Key) && !string.IsNullOrEmpty(_settings.Url))
+			if(_settings != null && !string.IsNullOrEmpty(_settings.Token) && !string.IsNullOrEmpty(_settings.Url))
 				Client = await CreateBotClientAsync(_settings);
 		}
 
-		private async Task<TelegramBotClient> CreateBotClientAsync(BotSettings settings)
+		private async Task<TelegramBotClient> CreateBotClientAsync(TelegramBotSettings settings)
 		{
 			var client = string.IsNullOrEmpty(settings.Socks5Host)
-				? new TelegramBotClient(settings.Key)
-				: new TelegramBotClient(settings.Key, new HttpToSocks5Proxy(settings.Socks5Host, settings.Socks5Port));
+				? new TelegramBotClient(settings.Token)
+				: new TelegramBotClient(settings.Token, new HttpToSocks5Proxy(settings.Socks5Host, settings.Socks5Port));
 			await client.SetWebhookAsync(settings.Url + "/api/update");
 			return client;
 		}

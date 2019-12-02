@@ -57,32 +57,27 @@ namespace SlidFinance.TelegramBot
 
 		private void ConfigureBot(IServiceCollection services)
 		{
-			BotSettings botSettings;
+			TelegramBotSettings botSettings;
 
 			if (CurrentEnvironment.IsDevelopment())
 			{
 				botSettings = Configuration
 					.GetSection("Security")
-					.GetSection("Bot")
-					.Get<BotSettings>();
+					.GetSection("TelegramBot")
+					.Get<TelegramBotSettings>();
 			}
 			else
 			{
-				botSettings = new BotSettings
+				botSettings = new TelegramBotSettings
 				{
 					Name = Environment.GetEnvironmentVariable("BOT_NAME"),
 					Url = Environment.GetEnvironmentVariable("BOT_URL"),
-					Key = Environment.GetEnvironmentVariable("BOT_KEY")
+					Token = Environment.GetEnvironmentVariable("BOT_TOKEN")
 				};
 			}
 
 			//services.AddSingleton<BotSettings>(x => botSettings);
 			services.AddSingleton<IBotService>(x => new BotService(botSettings));
-			//	services.AddSingleton<IBotService>(x => {
-			//	var service = new BotService(botSettings);
-			//	service.InitAsync().GetAwaiter().GetResult();
-			//	return service;
-			//});
 			services.AddSingleton<IUpdateService, UpdateService>();
 
 			services.AddScoped<CommandList>();
