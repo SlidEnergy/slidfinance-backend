@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SlidFinance.WebApi.Dto
+namespace SlidFinance.App
 {
     public class MonthStatistic
     {

@@ -6,11 +6,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SlidFinance.App;
+using SlidFinance.Domain;
+using SlidFinance.Infrastructure;
 using SlidFinance.TelegramBot.Models;
+using SlidFinance.TelegramBot.Models.Commands;
 
 namespace SlidFinance.TelegramBot
 {
@@ -28,6 +34,18 @@ namespace SlidFinance.TelegramBot
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+
+			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
+			services.AddIdentityCore<ApplicationUser>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
+
+			ConfigureDataAccess(services);
+
+			services.AddSlidFinanceCore();
+
 			ConfigureBot(services);
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -48,42 +66,59 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
+		}
 
-			//Bot Configurations
-			//Bot.GetBotClientAsync().GetAwaiter().GetResult();
+		private void ConfigureDataAccess(IServiceCollection services)
+		{
+			services.AddEntityFrameworkNpgsql()
+				.AddDbContext<ApplicationDbContext>(options => options
+					.UseLazyLoadingProxies()
+					.UseNpgsql(ConnectionStringFactory.Get()))
+				.BuildServiceProvider();
 
+			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
+			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
+			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
+			services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
 
+			services.AddScoped<DataAccessLayer>();
 		}
 
 		private void ConfigureBot(IServiceCollection services)
 		{
-			BotSettings botSettings;
+			TelegramBotSettings botSettings;
 
 			if (CurrentEnvironment.IsDevelopment())
 			{
 				botSettings = Configuration
 					.GetSection("Security")
-					.GetSection("Bot")
-					.Get<BotSettings>();
+					.GetSection("TelegramBot")
+					.Get<TelegramBotSettings>();
 			}
 			else
 			{
-				botSettings = new BotSettings
+				botSettings = new TelegramBotSettings
 				{
 					Name = Environment.GetEnvironmentVariable("BOT_NAME"),
 					Url = Environment.GetEnvironmentVariable("BOT_URL"),
-					Key = Environment.GetEnvironmentVariable("BOT_KEY")
+					Token = Environment.GetEnvironmentVariable("BOT_TOKEN")
 				};
 			}
 
-			//services.AddSingleton<BotSettings>(x => botSettings);
+			services.AddSingleton<TelegramBotSettings>(x => botSettings);
 			services.AddSingleton<IBotService>(x => new BotService(botSettings));
-			//	services.AddSingleton<IBotService>(x => {
-			//	var service = new BotService(botSettings);
-			//	service.InitAsync().GetAwaiter().GetResult();
-			//	return service;
-			//});
-			services.AddSingleton<IUpdateService, UpdateService>();
+			services.AddScoped<IUpdateService, UpdateService>();
+
+			services.AddScoped<CommandList>();
+			services.AddScoped<GetCategoryStatisticCommand>();
+			services.AddScoped<StartCommand>();
+			services.AddScoped<WhichToPayCommand>();
+
+			services.AddScoped<IMemoryCache>(x => new MemoryCache(new MemoryCacheOptions()));
 		}
 	}
 }

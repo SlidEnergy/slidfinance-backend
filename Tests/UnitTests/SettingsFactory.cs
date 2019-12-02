@@ -16,5 +16,14 @@ namespace SlidFinance.WebApi.UnitTests
 				LifetimeMinutes = 60
 			};
 		}
+
+		public static TelegramBotSettings CreateTelegramBot()
+		{
+			return new TelegramBotSettings()
+			{
+				Name = "SlidTestBot",
+				Token = "1062716492:AAE74DajBXwMfMkquCyoFG1PcFJcUgQ4zW0"
+			};
+		}
 	}
 }

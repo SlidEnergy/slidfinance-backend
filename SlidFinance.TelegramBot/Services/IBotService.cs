@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SlidFinance.TelegramBot.Models.Commands;
+﻿using System.Threading.Tasks;
 using Telegram.Bot;
 
 namespace SlidFinance.TelegramBot
@@ -8,7 +6,6 @@ namespace SlidFinance.TelegramBot
 	public interface IBotService
 	{
 		TelegramBotClient Client { get; }
-		IReadOnlyList<Command> Commands { get; }
 		Task InitAsync();
 	}
 }

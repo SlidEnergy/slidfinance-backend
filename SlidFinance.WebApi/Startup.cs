@@ -43,6 +43,7 @@ namespace SlidFinance.WebApi
 
 			ConfigureSwagger(services);
 
+			ConfigureTelegramBot(services);
 			ConfigureApplicationServices(services);
 
 			ConfigurePolicies(services);
@@ -210,16 +211,13 @@ namespace SlidFinance.WebApi
 
 		private void ConfigureApplicationServices(IServiceCollection services)
 		{
+			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
-			services.AddScoped<AccountsService>();
-			services.AddScoped<BanksService>();
-			services.AddScoped<RulesService>();
-			services.AddScoped<IUsersService, UsersService>();
-			services.AddScoped<CategoriesService>();
 			services.AddScoped<ITokenService, TokenService>();
-			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IImportService, ImportService>();
-			services.AddScoped<IMccService, MccService>();
+			services.AddScoped<ITelegramService, TelegramService>();
+
+			services.AddSlidFinanceCore();
 		}
 
 		private void ConfigurePolicies(IServiceCollection services)
@@ -231,6 +229,29 @@ namespace SlidFinance.WebApi
 				options.AddPolicy(Policy.MustBeAllOrImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Import.ToString()));
 				options.AddPolicy(Policy.MustBeAdmin, policy => policy.RequireUserName("slidenergy@gmail.com"));
 			});
+		}
+
+		private void ConfigureTelegramBot(IServiceCollection services)
+		{
+			TelegramBotSettings botSettings;
+
+			if (CurrentEnvironment.IsDevelopment())
+			{
+				botSettings = Configuration
+					.GetSection("Security")
+					.GetSection("TelegramBot")
+					.Get<TelegramBotSettings>();
+			}
+			else
+			{
+				botSettings = new TelegramBotSettings
+				{
+					Name = Environment.GetEnvironmentVariable("TELEGRAM_BOT_NAME"),
+					Token = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN")
+				};
+			}
+
+			services.AddSingleton<TelegramBotSettings>(x => botSettings);
 		}
 	}
 }
