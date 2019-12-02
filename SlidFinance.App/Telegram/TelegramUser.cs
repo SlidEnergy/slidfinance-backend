@@ -10,8 +10,6 @@
 
         public string Last_name { get; set; }
 
-        public string Photo_url { get; set; }
-
 		public long Auth_date { get; set; }
 
 		public string Hash { get; set; }

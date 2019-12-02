@@ -33,8 +33,8 @@ namespace SlidFinance.App
 
 		private bool ValidateTelegramInput(TelegramUser telegramUser)
 		{
-			var dataCheckString = string.Format("auth_date={0}\nfirst_name={1}\nid={2}\nusername={3}", 
-				telegramUser.Auth_date, telegramUser.First_name, telegramUser.Id, telegramUser.Username);
+			var dataCheckString = string.Format("auth_date={0}\nfirst_name={1}\nid={2}\nlast_name={3}\nusername={4}", 
+				telegramUser.Auth_date, telegramUser.First_name, telegramUser.Id, telegramUser.Last_name, telegramUser.Username);
 
 			using (var sha256 = SHA256.Create())
 			{
