@@ -43,6 +43,7 @@ namespace SlidFinance.WebApi
 
 			ConfigureSwagger(services);
 
+			ConfigureTelegramBot(services);
 			ConfigureApplicationServices(services);
 
 			ConfigurePolicies(services);
