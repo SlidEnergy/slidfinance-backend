@@ -9,11 +9,11 @@ namespace SlidFinance.App
 {
 	public class TokenService : ITokenService
 	{
-        private readonly IRefreshTokensRepository _repository;
+        private readonly IAuthTokenRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
 
-		public TokenService(IRefreshTokensRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings)
+		public TokenService(IAuthTokenRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings)
         {
             _repository = repository;
             _tokenGenerator = tokenGenerator;
@@ -24,7 +24,7 @@ namespace SlidFinance.App
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
-			var savedToken = await _repository.Find(userId, refreshToken);
+			var savedToken = await _repository.FindRefreshToken(userId, refreshToken);
 
             if (savedToken == null)
                 throw new SecurityTokenException("Invalid refresh token");
@@ -50,9 +50,9 @@ namespace SlidFinance.App
 			};
 		}
 
-		private async Task<RefreshToken> AddRefreshToken(string refreshToken, ApplicationUser user)
+		private async Task<AuthToken> AddRefreshToken(string refreshToken, ApplicationUser user)
 		{
-			var token = new RefreshToken("any", refreshToken, user);
+			var token = new AuthToken("any", refreshToken, user, AuthTokenType.RefreshToken);
 			await _repository.Add(token);
 			return token;
 		}

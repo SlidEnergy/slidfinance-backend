@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Remove="Migrations\20191017050424_AddMccAndMerchant.cs" />
     <Compile Remove="Migrations\20191017050424_AddMccAndMerchant.Designer.cs" />
+    <Compile Remove="Migrations\20191202233724_AddAuthTokenTable.cs" />
   </ItemGroup>
 
   <ItemGroup>

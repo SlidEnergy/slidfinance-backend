@@ -176,7 +176,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
-			services.AddScoped<IRefreshTokensRepository, EfRefreshTokensRepository>();
+			services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
 			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
 
 			services.AddScoped<DataAccessLayer>();
