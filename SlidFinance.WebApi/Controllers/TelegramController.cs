@@ -20,8 +20,7 @@ namespace SlidFinance.WebApi.Controllers
 		}
 
 		[HttpPost]
-		[ProducesResponseType(200)]
-		public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> Connect(TelegramUser user)
+		public async Task<ActionResult> Connect(TelegramUser user)
 		{
 			var userId = User.GetUserId();
 
