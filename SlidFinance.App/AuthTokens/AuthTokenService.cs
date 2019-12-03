@@ -7,11 +7,11 @@ namespace SlidFinance.App
 	public class AuthTokenService : IAuthTokenService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly IAuthTokensRepository _repository;
+		private readonly DataAccessLayer _dal;
 
-		public AuthTokenService(UserManager<ApplicationUser> userManager, IAuthTokensRepository repository)
+		public AuthTokenService(UserManager<ApplicationUser> userManager, DataAccessLayer dal)
 		{
-			_repository = repository;
+			_dal = dal;
 			_userManager = userManager;	
 		}
 
@@ -19,23 +19,23 @@ namespace SlidFinance.App
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
-			var existToken = await _repository.FindAnyToken(token);
+			var existToken = await _dal.AuthTokens.FindAnyToken(token);
 
 			if (existToken == null || existToken.Type != AuthTokenType.TelegramChatId || existToken.UserId != user.Id)
 			{
-				await _repository.Add(new AuthToken("any", token, user, type));
+				await _dal.AuthTokens.Add(new AuthToken("any", token, user, type));
 			}
 		}
 
 		public async Task<AuthToken> FindAnyToken(string token)
 		{
-			return await _repository.FindAnyToken(token);
+			return await _dal.AuthTokens.FindAnyToken(token);
 		}
 
 		public async Task<AuthToken> UpdateToken(AuthToken oldToken, string newToken)
 		{
 			oldToken.Update("any", newToken);
-			await _repository.Update(oldToken);
+			await _dal.AuthTokens.Update(oldToken);
 
 			return oldToken;
 		}

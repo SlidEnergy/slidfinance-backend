@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidFinance.App;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-    [Authorize(Policy = Policy.MustBeAllAccessMode)]
+	[Authorize(Policy = Policy.MustBeAllAccessMode)]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class RulesController : ControllerBase
