@@ -11,10 +11,6 @@ namespace SlidFinance.TelegramBot
 	{
 		private TelegramBotSettings _settings;
 
-		private List<Command> commandsList;
-
-		public IReadOnlyList<Command> Commands => commandsList.AsReadOnly();
-
 		public TelegramBotClient Client { get; private set; }
 
 		public BotService(TelegramBotSettings settings) 
