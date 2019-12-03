@@ -1,24 +1,21 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using SlidFinance.App;
 using SlidFinance.Domain;
-using SlidFinance.WebApi;
 using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SlidFinance.App
+namespace SlidFinance.WebApi
 {
 	public class TelegramService : ITelegramService
 	{
-        private readonly UserManager<ApplicationUser> _userManager;
+		private ITokenService _tokenService;
 		private TelegramBotSettings _telegramSettings;
-		private DataAccessLayer _dal;
 
-		public TelegramService(UserManager<ApplicationUser> userManager, TelegramBotSettings telegramSettings, DataAccessLayer dal)
+		public TelegramService(ITokenService tokenService, TelegramBotSettings telegramSettings)
         {
-			_userManager = userManager;
+			_tokenService = tokenService;
 			_telegramSettings = telegramSettings;
-			_dal = dal;
 		}
 
 		public async Task ConnectTelegramUser(string userId, TelegramUser telegramUser)
@@ -28,14 +25,7 @@ namespace SlidFinance.App
 				throw new ArgumentException("Данные телеграм пользователя не прошли проверку.", nameof(telegramUser));
 			}
 
-			var user = await _userManager.FindByIdAsync(userId);
-
-			var token = await _dal.AuthTokens.FindAnyToken(telegramUser.Id.ToString());
-
-			if (token == null || token.Type != AuthTokenType.TelegramChatId || token.UserId != user.Id)
-			{
-				await _dal.AuthTokens.Add(new AuthToken("any", telegramUser.Id.ToString(), user, AuthTokenType.TelegramChatId));
-			}
+			await _tokenService.AddToken(userId, telegramUser.Id.ToString(), AuthTokenType.TelegramChatId);
 		}
 
 		private bool ValidateTelegramInput(TelegramUser telegramUser)

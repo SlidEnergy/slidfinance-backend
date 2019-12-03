@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using SlidFinance.App;
@@ -10,27 +9,22 @@ namespace SlidFinance.WebApi.UnitTests
 	public class TelegramServiceTests : TestsBase
 	{
 		private TelegramService _service;
-		Mock<UserManager<ApplicationUser>> _manager;
-		private Mock<AuthService> _authService;
+		private Mock<ITokenService> _tokenService;
 
 		[SetUp]
         public void Setup()
         {
-			var store = new Mock<IUserStore<ApplicationUser>>();
-
-			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			var botSettings = SettingsFactory.CreateTelegramBot();
+			_tokenService = new Mock<ITokenService>();
 
-			_service = new TelegramService(_manager.Object, botSettings, _mockedDal);
+			_service = new TelegramService(_tokenService.Object, botSettings);
 
 		}
 
 		[Test]
-		public async Task ValidateTelegramData_ShouldBeTrue()
+		public async Task ValidateTelegramData_ShouldNotBeException()
 		{
-			_manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(_user);
-			_authTokens.Setup(x => x.FindAnyToken(It.IsAny<string>())).ReturnsAsync(new AuthToken());
-			_authTokens.Setup(x => x.Add(It.IsAny<AuthToken>())).ReturnsAsync(new AuthToken());
+			_tokenService.Setup(x => x.AddToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<AuthTokenType>())).Returns(Task.CompletedTask);
 
 			var telegramUser = new TelegramUser()
 			{
@@ -44,9 +38,10 @@ namespace SlidFinance.WebApi.UnitTests
 
 			await _service.ConnectTelegramUser(_user.Id, telegramUser);
 
-			_manager.Verify(x => x.FindByIdAsync(It.Is<string>(id => id == _user.Id)));
-			_authTokens.Verify(x => x.FindAnyToken((It.Is<string>(token => token == telegramUser.Id.ToString()))));
-			_authTokens.Verify(x => x.Add((It.Is<AuthToken>(token => token.User == _user && token.Token == telegramUser.Id.ToString()))));
+			_tokenService.Verify(x => x.AddToken(
+				It.Is<string>(u => u == _user.Id), 
+				It.Is<string>(t => t == telegramUser.Id.ToString()), 
+				It.Is<AuthTokenType>(t=>t == AuthTokenType.TelegramChatId)));
 		}
 	}
 }

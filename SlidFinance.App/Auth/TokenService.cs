@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using SlidFinance.Domain;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,12 +13,14 @@ namespace SlidFinance.App
         private readonly IAuthTokenRepository _repository;
         private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public TokenService(IAuthTokenRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings)
+		public TokenService(IAuthTokenRepository repository, ITokenGenerator tokenGenerator, AuthSettings authSettings, UserManager<ApplicationUser> userManager)
         {
             _repository = repository;
             _tokenGenerator = tokenGenerator;
 			_authSettings = authSettings;
+			_userManager = userManager;
 		}
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
@@ -77,5 +80,17 @@ namespace SlidFinance.App
 
             return principal;
         }
+
+		public async Task AddToken(string userId, string token, AuthTokenType type)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+
+			var existToken = await _repository.FindAnyToken(token);
+
+			if (existToken == null || existToken.Type != AuthTokenType.TelegramChatId || existToken.UserId != user.Id)
+			{
+				await _repository.Add(new AuthToken("any", token, user, type));
+			}
+		}
 	}
 }

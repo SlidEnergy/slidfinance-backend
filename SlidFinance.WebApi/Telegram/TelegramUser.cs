@@ -1,4 +1,4 @@
-﻿namespace SlidFinance.App
+﻿namespace SlidFinance.WebApi
 {
     public class TelegramUser
     {
