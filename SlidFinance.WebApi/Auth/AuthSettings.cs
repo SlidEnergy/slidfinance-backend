@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace SlidFinance.App
+namespace SlidFinance.WebApi
 {
 	/// <summary>
 	/// Параметры для генерации JWT-токена.

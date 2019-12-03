@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SlidFinance.App
+﻿namespace SlidFinance.WebApi
 {
 	/// <summary>
 	/// Режим доступа

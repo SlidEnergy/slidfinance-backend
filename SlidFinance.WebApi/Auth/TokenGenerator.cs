@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using SlidFinance.App;
 using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 
-namespace SlidFinance.App
+namespace SlidFinance.WebApi
 {
 	/// <summary>
 	/// Формирует AccessToken и RefreshToken, необходимые для авторизации.

@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
+using SlidFinance.App;
 using SlidFinance.Domain;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace SlidFinance.App
+namespace SlidFinance.WebApi
 {
 	public class TokenService : ITokenService
 	{

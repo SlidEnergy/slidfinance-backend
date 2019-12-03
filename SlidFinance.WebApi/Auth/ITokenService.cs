@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using SlidFinance.App;
 using SlidFinance.Domain;
 
-namespace SlidFinance.App
+namespace SlidFinance.WebApi
 {
 	public interface ITokenService
 	{
