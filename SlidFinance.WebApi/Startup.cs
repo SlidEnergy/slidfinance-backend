@@ -39,7 +39,7 @@ namespace SlidFinance.WebApi
 			services.AddCors();
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			services.AddSlidFinanceInfrastructure(ConnectionStringFactory.Get());
+			ConfigureInfrastructure(services);
 
 			ConfigureSwagger(services);
 
@@ -187,6 +187,19 @@ namespace SlidFinance.WebApi
 
 				c.SchemaFilter<EnumAsModelSchemaFilter>();
 			});
+		}
+
+		private void ConfigureInfrastructure(IServiceCollection services)
+		{
+			string connectionString = "";
+
+			if (CurrentEnvironment.IsProduction())
+				connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+			else
+				connectionString = Configuration.GetConnectionString(Environment.MachineName) ??
+					Configuration.GetConnectionString("DefaultConnection");
+
+			services.AddSlidFinanceInfrastructure(connectionString);
 		}
 
 		private void ConfigureApplicationServices(IServiceCollection services)
