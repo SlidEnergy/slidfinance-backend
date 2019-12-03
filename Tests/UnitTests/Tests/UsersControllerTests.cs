@@ -10,52 +10,42 @@ namespace SlidFinance.WebApi.UnitTests
 {
     public class UsersControllerTests : TestsBase
     {
-        Mock<UserManager<ApplicationUser>> _manager;
 		private UsersController _controller;
+		private Mock<IUsersService> _service;
+		private Mock<IAuthService> _authService;
 
-		[SetUp]
+	   [SetUp]
         public void Setup()
         {
-			var authSettings = SettingsFactory.CreateAuth();
-			var tokenGenerator = new TokenGenerator(authSettings);
-            var store = new Mock<IUserStore<ApplicationUser>>();
+			_service = new Mock<IUsersService>();
+			_authService = new Mock<IAuthService>();
 
-            _manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.AuthTokens, tokenGenerator, authSettings, _manager.Object);
-            var service = new UsersService(_manager.Object, _mockedDal);
-
-			var authService = new AuthService(_manager.Object, tokenService);
-
-			_controller = new UsersController(_autoMapper.Create(_db), service, authService);
+			_controller = new UsersController(_autoMapper.Create(_db), _service.Object, _authService.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
         public async Task GetCurrentUser_ShouldReturnUser()
         {
-            _manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
+            _service.Setup(x => x.GetById(It.IsAny<string>())).Returns(Task.FromResult(_user));
 
             var result = await _controller.GetCurrentUser();
 
             Assert.IsInstanceOf<ActionResult<Dto.User>>(result);
 
-            Assert.AreEqual(_user.Id, result.Value.Id);
-            Assert.AreEqual(_user.Email, result.Value.Email);
+			_service.Verify(x => x.GetById(It.Is<string>(u => u == _user.Id)));
         }
 
         [Test]
         public async Task Login_ShouldReturnTokenAndEmail()
         {
-            _manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
-            _manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
+			_authService.Setup(x => x.CheckCredentialsAndGetToken(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new TokensCortage());
 
             var userBindingModel = new LoginBindingModel() { Email = _user.Email, Password = "Password #1" };
 
             var result = await _controller.GetToken(userBindingModel);
 
-            Assert.NotNull(result.Value.Token);
-            Assert.IsNotEmpty(result.Value.Token);
-            Assert.AreEqual(_user.Email, result.Value.Email);
+			_authService.Verify(x => x.CheckCredentialsAndGetToken(It.Is<string>(e => e == userBindingModel.Email), It.Is<string>(p => p == userBindingModel.Password)));
         }
 
 		[Test]
@@ -64,14 +54,16 @@ namespace SlidFinance.WebApi.UnitTests
 			var password = "Password #2";
 			var email = "test2@email.com";
 
-			_manager.Setup(x => x.CreateAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
+			_service.Setup(x => x.CreateAccount(It.IsAny<ApplicationUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 
 			var registerBindingModel = new RegisterBindingModel() { Email = email, Password = password, ConfirmPassword = password };
 
 			var result = await _controller.Register(registerBindingModel);
 
 			Assert.NotNull(((CreatedResult)result.Result).Value);
-			Assert.AreEqual(email, ((Dto.User)((CreatedResult)result.Result).Value).Email);
+
+			_service.Verify(x => x.CreateAccount(It.Is<ApplicationUser>(u => u.Email == registerBindingModel.Email && u.UserName == registerBindingModel.Email),
+				It.Is<string>(p => p == registerBindingModel.Password)));
 		}
 	}
 }

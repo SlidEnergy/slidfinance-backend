@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Moq;
-using SlidFinance.App;
 using NUnit.Framework;
-using System.Threading.Tasks;
+using SlidFinance.App;
 using SlidFinance.Domain;
+using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -13,6 +12,7 @@ namespace SlidFinance.WebApi.UnitTests
 		UsersService _service;
 		Mock<UserManager<ApplicationUser>> _manager;
 		AuthService _authService;
+		Mock<ITokenService> _tokenService;
 
 		[SetUp]
         public void Setup()
@@ -22,9 +22,9 @@ namespace SlidFinance.WebApi.UnitTests
 			var store = new Mock<IUserStore<ApplicationUser>>();
 
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.AuthTokens, tokenGenerator, authSettings, _manager.Object);
+			_tokenService = new Mock<ITokenService>();
 			_service = new UsersService(_manager.Object, _mockedDal);
-			_authService = new AuthService(_manager.Object, tokenService);
+			_authService = new AuthService(_manager.Object, _tokenService.Object);
 		}
 
         [Test]

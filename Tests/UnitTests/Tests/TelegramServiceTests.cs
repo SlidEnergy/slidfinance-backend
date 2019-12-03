@@ -9,13 +9,13 @@ namespace SlidFinance.WebApi.UnitTests
 	public class TelegramServiceTests : TestsBase
 	{
 		private TelegramService _service;
-		private Mock<ITokenService> _tokenService;
+		private Mock<IAuthTokenService> _tokenService;
 
 		[SetUp]
         public void Setup()
         {
 			var botSettings = SettingsFactory.CreateTelegramBot();
-			_tokenService = new Mock<ITokenService>();
+			_tokenService = new Mock<IAuthTokenService>();
 
 			_service = new TelegramService(_tokenService.Object, botSettings);
 

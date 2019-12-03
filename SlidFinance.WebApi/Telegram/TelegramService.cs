@@ -9,12 +9,12 @@ namespace SlidFinance.WebApi
 {
 	public class TelegramService : ITelegramService
 	{
-		private ITokenService _tokenService;
+		private IAuthTokenService _authTokenService;
 		private TelegramBotSettings _telegramSettings;
 
-		public TelegramService(ITokenService tokenService, TelegramBotSettings telegramSettings)
+		public TelegramService(IAuthTokenService tokenService, TelegramBotSettings telegramSettings)
         {
-			_tokenService = tokenService;
+			_authTokenService = tokenService;
 			_telegramSettings = telegramSettings;
 		}
 
@@ -25,7 +25,7 @@ namespace SlidFinance.WebApi
 				throw new ArgumentException("Данные телеграм пользователя не прошли проверку.", nameof(telegramUser));
 			}
 
-			await _tokenService.AddToken(userId, telegramUser.Id.ToString(), AuthTokenType.TelegramChatId);
+			await _authTokenService.AddToken(userId, telegramUser.Id.ToString(), AuthTokenType.TelegramChatId);
 		}
 
 		private bool ValidateTelegramInput(TelegramUser telegramUser)
