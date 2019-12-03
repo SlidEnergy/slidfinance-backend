@@ -31,9 +31,12 @@ namespace SlidFinance.App
 
 		public async Task<ApplicationUser> GetByTelegramChatIdAsync(long chatId)
 		{
-			var users = await _dal.Users.GetList();
+			var token = await _dal.AuthTokens.FindAnyToken(chatId.ToString());
 
-			return users.FirstOrDefault(x => x.Telegram != null && x.Telegram.TelegramChatId == chatId);
+			if (token != null && token.Type == AuthTokenType.TelegramChatId)
+				return token.User;
+
+			return null;
 		}
 
 		public async Task<IdentityResult> CreateAccount(ApplicationUser user, string password)

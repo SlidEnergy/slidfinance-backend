@@ -7,6 +7,8 @@ namespace SlidFinance.App
     {
         Task<AuthToken> FindRefreshToken(string userId, string token);
 
+		Task<AuthToken> FindAnyToken(string token);
+
 		Task<AuthToken> Add(AuthToken entity);
 
 		Task<AuthToken> Update(AuthToken entity);

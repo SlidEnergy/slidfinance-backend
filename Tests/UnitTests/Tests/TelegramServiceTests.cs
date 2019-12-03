@@ -11,6 +11,7 @@ namespace SlidFinance.WebApi.UnitTests
 	{
 		private TelegramService _service;
 		Mock<UserManager<ApplicationUser>> _manager;
+		private Mock<AuthService> _authService;
 
 		[SetUp]
         public void Setup()
@@ -19,15 +20,17 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			var botSettings = SettingsFactory.CreateTelegramBot();
-			
-			_service = new TelegramService(_manager.Object, botSettings);
-        }
+
+			_service = new TelegramService(_manager.Object, botSettings, _mockedDal);
+
+		}
 
 		[Test]
 		public async Task ValidateTelegramData_ShouldBeTrue()
 		{
 			_manager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(_user);
-			_manager.Setup(x => x.UpdateAsync(It.IsAny<ApplicationUser>())).ReturnsAsync(new IdentityResult());
+			_authTokens.Setup(x => x.FindAnyToken(It.IsAny<string>())).ReturnsAsync(new AuthToken());
+			_authTokens.Setup(x => x.Add(It.IsAny<AuthToken>())).ReturnsAsync(new AuthToken());
 
 			var telegramUser = new TelegramUser()
 			{
@@ -42,7 +45,8 @@ namespace SlidFinance.WebApi.UnitTests
 			await _service.ConnectTelegramUser(_user.Id, telegramUser);
 
 			_manager.Verify(x => x.FindByIdAsync(It.Is<string>(id => id == _user.Id)));
-			_manager.Verify(x => x.UpdateAsync(It.Is<ApplicationUser>(user => user.Id == _user.Id)));
+			_authTokens.Verify(x => x.FindAnyToken((It.Is<string>(token => token == telegramUser.Id.ToString()))));
+			_authTokens.Verify(x => x.Add((It.Is<AuthToken>(token => token.User == _user && token.Token == telegramUser.Id.ToString()))));
 		}
 	}
 }

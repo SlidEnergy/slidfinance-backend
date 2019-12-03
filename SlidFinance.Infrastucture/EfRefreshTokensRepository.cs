@@ -19,6 +19,11 @@ namespace SlidFinance.Infrastructure
             return await _dbContext.AuthTokens.FirstOrDefaultAsync(x => x.User.Id == userId && x.Token == token && x.Type == AuthTokenType.RefreshToken);
         }
 
+		public async Task<AuthToken> FindAnyToken(string token)
+		{
+			return await _dbContext.AuthTokens.FirstOrDefaultAsync(x => x.Token == token);
+		}
+
 		public async Task<AuthToken> Add(AuthToken entity)
 		{
 			_dbContext.Set<AuthToken>().Add(entity);

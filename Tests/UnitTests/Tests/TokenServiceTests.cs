@@ -20,7 +20,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var authSettings = SettingsFactory.CreateAuth();
 			_tokenGenerator = new Mock<ITokenGenerator>();
 			
-			_service = new TokenService(_mockedDal.RefreshTokens, _tokenGenerator.Object, authSettings);
+			_service = new TokenService(_mockedDal.AuthTokens, _tokenGenerator.Object, authSettings);
         }
 
 		[Test]
@@ -33,13 +33,13 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_tokenGenerator.Setup(x => x.GenerateAccessToken(It.IsAny<ApplicationUser>(), It.IsAny<AccessMode>())).Returns(accessToken);
 			_tokenGenerator.Setup(x => x.GenerateRefreshToken()).Returns(refreshToken);
-			_refreshTokens.Setup(x => x.Add(It.IsAny<AuthToken>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
+			_authTokens.Setup(x => x.Add(It.IsAny<AuthToken>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
 
 			await _service.GenerateAccessAndRefreshTokens(_user, accessMode);
 
 			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.Is<ApplicationUser>(user => user.Id == _user.Id), It.Is<AccessMode>(mode => mode == accessMode)));
 			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
-			_refreshTokens.Verify(x => x.Add(It.Is<AuthToken>(token => token.Token == refreshToken && token.User.Id == _user.Id && token.Type == AuthTokenType.RefreshToken)));
+			_authTokens.Verify(x => x.Add(It.Is<AuthToken>(token => token.Token == refreshToken && token.User.Id == _user.Id && token.Type == AuthTokenType.RefreshToken)));
 		}
 
 
@@ -59,13 +59,13 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_tokenGenerator.Setup(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>())).Returns(newAccessToken);
 			_tokenGenerator.Setup(x => x.GenerateRefreshToken()).Returns(newRefreshToken);
-			_refreshTokens.Setup(x => x.FindRefreshToken(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
+			_authTokens.Setup(x => x.FindRefreshToken(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
 
 			await _service.RefreshToken(token, refreshToken);
 
 			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>()));
 			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
-			_refreshTokens.Verify(x => x.FindRefreshToken(It.Is<string>(userId => userId == _user.Id), It.Is<string>(t => t == refreshToken)));
+			_authTokens.Verify(x => x.FindRefreshToken(It.Is<string>(userId => userId == _user.Id), It.Is<string>(t => t == refreshToken)));
 		}
 	}
 }

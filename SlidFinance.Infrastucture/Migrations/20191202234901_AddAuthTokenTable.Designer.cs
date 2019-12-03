@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SlidFinance.Infrastructure;
@@ -9,9 +10,10 @@ using SlidFinance.Infrastructure;
 namespace SlidFinance.WebApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191202234901_AddAuthTokenTable")]
+    partial class AddAuthTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,6 +349,20 @@ namespace SlidFinance.WebApi.Migrations
                     b.ToTable("Transactions");
                 });
 
+            modelBuilder.Entity("SlidFinance.Domain.UserTelegramRelation", b =>
+                {
+                    b.Property<string>("UserId");
+
+                    b.Property<long?>("TelegramChatId");
+
+                    b.HasKey("UserId", "TelegramChatId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserTelegramRelation");
+                });
+
             modelBuilder.Entity("SlidFinance.Infrastucture.Models.Merchant", b =>
                 {
                     b.Property<int>("Id")
@@ -470,6 +486,14 @@ namespace SlidFinance.WebApi.Migrations
                     b.HasOne("SlidFinance.Domain.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId");
+                });
+
+            modelBuilder.Entity("SlidFinance.Domain.UserTelegramRelation", b =>
+                {
+                    b.HasOne("SlidFinance.Domain.ApplicationUser", "User")
+                        .WithOne("Telegram")
+                        .HasForeignKey("SlidFinance.Domain.UserTelegramRelation", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("SlidFinance.Infrastucture.Models.Merchant", b =>

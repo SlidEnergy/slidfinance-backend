@@ -12,11 +12,13 @@ namespace SlidFinance.App
 	{
         private readonly UserManager<ApplicationUser> _userManager;
 		private TelegramBotSettings _telegramSettings;
+		private DataAccessLayer _dal;
 
-		public TelegramService(UserManager<ApplicationUser> userManager, TelegramBotSettings telegramSettings)
+		public TelegramService(UserManager<ApplicationUser> userManager, TelegramBotSettings telegramSettings, DataAccessLayer dal)
         {
 			_userManager = userManager;
 			_telegramSettings = telegramSettings;
+			_dal = dal;
 		}
 
 		public async Task ConnectTelegramUser(string userId, TelegramUser telegramUser)
@@ -27,8 +29,13 @@ namespace SlidFinance.App
 			}
 
 			var user = await _userManager.FindByIdAsync(userId);
-			user.Telegram = new UserTelegramRelation() { TelegramChatId = telegramUser.Id, UserId = user.Id };
-			await _userManager.UpdateAsync(user);
+
+			var token = await _dal.AuthTokens.FindAnyToken(telegramUser.Id.ToString());
+
+			if (token == null || token.Type != AuthTokenType.TelegramChatId || token.UserId != user.Id)
+			{
+				await _dal.AuthTokens.Add(new AuthToken("any", telegramUser.Id.ToString(), user, AuthTokenType.TelegramChatId));
+			}
 		}
 
 		private bool ValidateTelegramInput(TelegramUser telegramUser)

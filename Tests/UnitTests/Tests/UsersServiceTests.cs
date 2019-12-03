@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var store = new Mock<IUserStore<ApplicationUser>>();
 
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
-			var tokenService = new TokenService(_mockedDal.RefreshTokens, tokenGenerator, authSettings);
+			var tokenService = new TokenService(_mockedDal.AuthTokens, tokenGenerator, authSettings);
 			_service = new UsersService(_manager.Object, _mockedDal);
 			_authService = new AuthService(_manager.Object, tokenService);
 		}

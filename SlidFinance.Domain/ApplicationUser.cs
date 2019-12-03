@@ -8,8 +8,6 @@ namespace SlidFinance.Domain
 {
     public class ApplicationUser : IdentityUser, IUniqueObject<string>
     {
-		public virtual UserTelegramRelation Telegram { get; set; }
-
         [Required]
         public virtual ICollection<Bank> Banks { get; set; } = new List<Bank>();
 
