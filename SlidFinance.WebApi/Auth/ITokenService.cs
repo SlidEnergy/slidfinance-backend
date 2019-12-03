@@ -8,5 +8,6 @@ namespace SlidFinance.WebApi
 	{
 		Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode);
 		Task<TokensCortage> RefreshToken(string token, string refreshToken);
+		Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password);
 	}
 }

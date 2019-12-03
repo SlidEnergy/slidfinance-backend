@@ -7,9 +7,9 @@ namespace SlidFinance.App
 	public class AuthTokenService : IAuthTokenService
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly IAuthTokenRepository _repository;
+		private readonly IAuthTokensRepository _repository;
 
-		public AuthTokenService(UserManager<ApplicationUser> userManager, IAuthTokenRepository repository)
+		public AuthTokenService(UserManager<ApplicationUser> userManager, IAuthTokensRepository repository)
 		{
 			_repository = repository;
 			_userManager = userManager;	

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.Infrastructure
 {
-    public class EfAuthTokenRepository: EfRepository<AuthToken, int>, IAuthTokenRepository
+    public class EfAuthTokensRepository: EfRepository<AuthToken, int>, IAuthTokensRepository
 	{
-        public EfAuthTokenRepository(ApplicationDbContext dbContext) : base(dbContext) { }
+        public EfAuthTokensRepository(ApplicationDbContext dbContext) : base(dbContext) { }
 
 		public async Task<AuthToken> FindAnyToken(string token)
 		{

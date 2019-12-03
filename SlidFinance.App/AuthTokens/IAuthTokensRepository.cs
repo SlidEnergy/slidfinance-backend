@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public interface IAuthTokenRepository: IRepository<AuthToken, int>
+    public interface IAuthTokensRepository: IRepository<AuthToken, int>
 	{
 		Task<AuthToken> FindAnyToken(string token);
     }

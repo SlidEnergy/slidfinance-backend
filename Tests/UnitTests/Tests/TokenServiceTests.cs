@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			_authTokenService = new Mock<IAuthTokenService>();
-			_service = new TokenService(_tokenGenerator.Object, authSettings, _authTokenService.Object);
+			_service = new TokenService(_tokenGenerator.Object, authSettings, _authTokenService.Object, _manager.Object);
         }
 
 		[Test]
@@ -72,6 +72,21 @@ namespace SlidFinance.WebApi.UnitTests
 			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>()));
 			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
 			_authTokenService.Verify(x => x.FindAnyToken(It.Is<string>(t => t == refreshToken)));
+		}
+
+		[Test]
+		public async Task Login_ShouldBeCallAddMethodWithRightArguments()
+		{
+			var password = "Password1#";
+
+			_manager.Setup(x => x.CheckPasswordAsync(It.IsAny<ApplicationUser>(), It.IsAny<string>())).Returns(Task.FromResult(true));
+			_manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).Returns(Task.FromResult(_user));
+
+			var result = await _service.CheckCredentialsAndGetToken(_user.Email, password);
+
+			_manager.Verify(x => x.CheckPasswordAsync(
+			  It.Is<ApplicationUser>(u => u.UserName == _user.UserName && u.Email == _user.Email),
+			  It.Is<string>(p => p == password)), Times.Exactly(1));
 		}
 	}
 }

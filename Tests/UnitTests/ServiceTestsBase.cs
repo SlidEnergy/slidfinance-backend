@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.UnitTests
         protected Mock<IRepositoryWithAccessCheck<BankAccount>> _accounts;
         protected Mock<IRepositoryWithAccessCheck<Rule>> _rules;
         protected Mock<IRepositoryWithAccessCheck<Transaction>> _transactions;
-		protected Mock<IAuthTokenRepository> _authTokens;
+		protected Mock<IAuthTokensRepository> _authTokens;
 		protected Mock<IRepository<Mcc, int>> _mcc;
 
 		[SetUp]
@@ -38,7 +38,7 @@ namespace SlidFinance.WebApi.UnitTests
                 new EfBankAccountsRepository(_db),
                 new EfRulesRepository(_db),
                 new EfTransactionsRepository(_db),
-				new EfAuthTokenRepository(_db),
+				new EfAuthTokensRepository(_db),
 				new EfRepository<Mcc, int>(_db));
 
             _banks = new Mock<IRepositoryWithAccessCheck<Bank>>();
@@ -47,7 +47,7 @@ namespace SlidFinance.WebApi.UnitTests
             _accounts = new Mock<IRepositoryWithAccessCheck<BankAccount>>();
             _rules = new Mock<IRepositoryWithAccessCheck<Rule>>();
             _transactions = new Mock<IRepositoryWithAccessCheck<Transaction>>();
-			_authTokens = new Mock<IAuthTokenRepository>();
+			_authTokens = new Mock<IAuthTokensRepository>();
 			_mcc = new Mock<IRepository<Mcc, int>>();
 
 			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 

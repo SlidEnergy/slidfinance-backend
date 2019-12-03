@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.UnitTests
 {
-	public class AuthServiceTests : TestsBase
+	public class AuthTokenServiceTests : TestsBase
 	{
 		private AuthTokenService _service;
 		Mock<ITokenGenerator> _tokenGenerator;

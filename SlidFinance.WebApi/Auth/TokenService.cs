@@ -1,8 +1,10 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -13,12 +15,14 @@ namespace SlidFinance.WebApi
         private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
 		private IAuthTokenService _authTokenService;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public TokenService(ITokenGenerator tokenGenerator, AuthSettings authSettings, IAuthTokenService authTokenService)
+		public TokenService(ITokenGenerator tokenGenerator, AuthSettings authSettings, IAuthTokenService authTokenService, UserManager<ApplicationUser> userManager)
         {
             _tokenGenerator = tokenGenerator;
 			_authSettings = authSettings;
 			_authTokenService = authTokenService;
+			_userManager = userManager;
 		}
 
         public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
@@ -70,5 +74,20 @@ namespace SlidFinance.WebApi
 
             return principal;
         }
+
+		public async Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password)
+		{
+			var user = await _userManager.FindByNameAsync(email);
+
+			if (user == null)
+				throw new AuthenticationException();
+
+			var checkResult = await _userManager.CheckPasswordAsync(user, password);
+
+			if (!checkResult)
+				throw new AuthenticationException();
+
+			return await GenerateAccessAndRefreshTokens(user, AccessMode.All);
+		}
 	}
 }

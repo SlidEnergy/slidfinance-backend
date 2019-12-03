@@ -21,7 +21,7 @@ namespace SlidFinance.Infrastructure
 			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
-			services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
+			services.AddScoped<IAuthTokensRepository, EfAuthTokensRepository>();
 			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
 
 			services.AddScoped<DataAccessLayer>();

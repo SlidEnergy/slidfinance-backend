@@ -16,13 +16,13 @@ namespace SlidFinance.WebApi
     {
         private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
-		private readonly IAuthService _authService;
+		private readonly ITokenService _tokenService;
 
-        public UsersController(IMapper mapper, IUsersService usersService, IAuthService authService)
+        public UsersController(IMapper mapper, IUsersService usersService, ITokenService tokenService)
         {
             _mapper = mapper;
             _usersService = usersService;
-			_authService = authService;
+			_tokenService = tokenService;
 		}
 
 		[HttpGet]
@@ -84,7 +84,7 @@ namespace SlidFinance.WebApi
 
             try
             {
-                var tokens = await _authService.CheckCredentialsAndGetToken(userData.Email, userData.Password);
+                var tokens = await _tokenService.CheckCredentialsAndGetToken(userData.Email, userData.Password);
 
                 return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
             }

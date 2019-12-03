@@ -12,13 +12,13 @@ namespace SlidFinance.WebApi.UnitTests
     {
 		private UsersController _controller;
 		private Mock<IUsersService> _service;
-		private Mock<IAuthService> _authService;
+		private Mock<ITokenService> _authService;
 
 	   [SetUp]
         public void Setup()
         {
 			_service = new Mock<IUsersService>();
-			_authService = new Mock<IAuthService>();
+			_authService = new Mock<ITokenService>();
 
 			_controller = new UsersController(_autoMapper.Create(_db), _service.Object, _authService.Object);
 			_controller.AddControllerContext(_user);

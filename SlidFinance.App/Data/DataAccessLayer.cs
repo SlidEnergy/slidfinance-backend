@@ -16,7 +16,7 @@ namespace SlidFinance.App
 
 		public IRepository<ApplicationUser, string> Users { get; }
 
-		public IAuthTokenRepository AuthTokens { get; }
+		public IAuthTokensRepository AuthTokens { get; }
 
 		public IRepository<Mcc, int> Mcc { get; }
 
@@ -27,7 +27,7 @@ namespace SlidFinance.App
             IRepositoryWithAccessCheck<BankAccount> bankAccounts,
             IRepositoryWithAccessCheck<Rule> rules,
             IRepositoryWithAccessCheck<Transaction> transactions,
-			IAuthTokenRepository authTokens,
+			IAuthTokensRepository authTokens,
 			IRepository<Mcc, int> mcc)
         {
             Banks = banks;

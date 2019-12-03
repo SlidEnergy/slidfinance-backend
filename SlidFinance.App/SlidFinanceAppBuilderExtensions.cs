@@ -19,6 +19,7 @@ namespace SlidFinance.App
 			services.AddScoped<IMccService, MccService>();
 			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 			services.AddScoped<IAuthTokenService, AuthTokenService>();
+			services.AddScoped<IImportService, ImportService>();
 
 			return services;
 		}
