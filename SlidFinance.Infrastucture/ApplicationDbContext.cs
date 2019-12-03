@@ -4,8 +4,8 @@ using SlidFinance.Domain;
 
 namespace SlidFinance.Infrastructure
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplicationDbContext
+	{
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -30,6 +30,6 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Mcc> Mcc { get; set; }
 
-        public DbSet<Infrastucture.Models.Merchant> Merchants { get; set; }
+        public DbSet<IMerchant> Merchants { get; set; }
     }
 }
