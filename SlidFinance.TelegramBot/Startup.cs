@@ -34,7 +34,6 @@ namespace SlidFinance.TelegramBot
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-
 			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
@@ -42,8 +41,7 @@ namespace SlidFinance.TelegramBot
 			services.AddIdentityCore<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-			ConfigureDataAccess(services);
-
+			services.AddSlidFinanceInfrastructure(ConnectionStringFactory.Get());
 			services.AddSlidFinanceCore();
 
 			ConfigureBot(services);
@@ -66,26 +64,6 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
-		}
-
-		private void ConfigureDataAccess(IServiceCollection services)
-		{
-			services.AddEntityFrameworkNpgsql()
-				.AddDbContext<ApplicationDbContext>(options => options
-					.UseLazyLoadingProxies()
-					.UseNpgsql(ConnectionStringFactory.Get()))
-				.BuildServiceProvider();
-
-			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
-			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
-			services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
-			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
-
-			services.AddScoped<DataAccessLayer>();
 		}
 
 		private void ConfigureBot(IServiceCollection services)

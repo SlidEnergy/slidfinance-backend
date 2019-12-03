@@ -39,7 +39,7 @@ namespace SlidFinance.WebApi
 			services.AddCors();
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-			ConfigureDataAccess(services);
+			services.AddSlidFinanceInfrastructure(ConnectionStringFactory.Get());
 
 			ConfigureSwagger(services);
 
@@ -160,26 +160,6 @@ namespace SlidFinance.WebApi
 			{
 				cfg.AddProfile(new MappingProfile(provider.GetService<ApplicationDbContext>()));
 			}).CreateMapper());
-		}
-
-		private void ConfigureDataAccess(IServiceCollection services)
-		{
-			services.AddEntityFrameworkNpgsql()
-				.AddDbContext<ApplicationDbContext>(options => options
-					.UseLazyLoadingProxies()
-					.UseNpgsql(ConnectionStringFactory.Get()))
-				.BuildServiceProvider();
-
-			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
-			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
-			services.AddScoped<IAuthTokenRepository, EfAuthTokenRepository>();
-			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
-
-			services.AddScoped<DataAccessLayer>();
 		}
 
 		private void ConfigureSwagger(IServiceCollection services)
