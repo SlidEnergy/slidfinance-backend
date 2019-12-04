@@ -123,6 +123,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Categories.Add(category);
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule);
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category.Id });
+			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/rules/" + rule.Id, _accessToken);
 			var response = await SendRequest(request);

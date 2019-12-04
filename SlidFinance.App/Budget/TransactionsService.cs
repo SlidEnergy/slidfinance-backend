@@ -32,9 +32,12 @@ namespace SlidFinance.App
             return transactions;
         }
 
-        public async Task<List<Transaction>> GetListWithAccessCheckAsync(string userId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<List<Transaction>> GetListWithAccessCheckAsync(string userId, int? accountId = null, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
-			if(categoryId.HasValue)
+			if (accountId.HasValue)
+				ArgumentValidator.ValidateId(accountId.Value);
+
+			if (categoryId.HasValue)
 				ArgumentValidator.ValidateId(categoryId.Value);
 
 			if(startDate.HasValue && endDate.HasValue)
@@ -47,8 +50,11 @@ namespace SlidFinance.App
 				.Join(_context.Transactions, a => a.AccountId, t => t.AccountId, (a, t) => t)
 				.ToListAsync();
 
+			if (accountId != null)
+				transactions = transactions.Where(t => t.AccountId == accountId).ToList();
+
 			if (categoryId != null) 
-				transactions = transactions.Where(t => t.Category != null && t.Category.Id == categoryId).ToList();
+				transactions = transactions.Where(t => t.CategoryId == categoryId).ToList();
 
 			if(startDate.HasValue && endDate.HasValue)
 				transactions = transactions.Where(t => t.DateTime >= startDate && t.DateTime <= endDate).ToList();

@@ -10,7 +10,7 @@ namespace SlidFinance.App
 		Task<Transaction> AddTransaction(string userId, Transaction transaction);
 		Task DeleteTransaction(string userId, int transactionId);
 		Task<Transaction> GetById(string userId, int id);
-		Task<List<Transaction>> GetListWithAccessCheckAsync(string userId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null);
+		Task<List<Transaction>> GetListWithAccessCheckAsync(string userId, int? accountId = null, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null);
 		Task<Transaction> PatchTransaction(string userId, Transaction transaction);
 	}
 }

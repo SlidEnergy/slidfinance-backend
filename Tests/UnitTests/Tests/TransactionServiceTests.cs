@@ -81,7 +81,7 @@ namespace SlidFinance.WebApi.UnitTests
 		[Test]
 		public void GetTransactionsWithInvalidPeriod_ShouldThrowArgumentOutOfRangeException()
 		{
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetListWithAccessCheckAsync(_user.Id, null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetListWithAccessCheckAsync(_user.Id, null, null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
 		}
 	}
 }

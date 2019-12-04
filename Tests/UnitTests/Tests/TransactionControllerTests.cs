@@ -49,13 +49,13 @@ namespace SlidFinance.WebApi.UnitTests
 				Category = category
 			});
 
-			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>()))
+			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>()))
 				.ReturnsAsync(new List<Transaction>() { t1, t2 });
 
-			var result = await _controller.GetList(category.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
+			var result = await _controller.GetList(null, category.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
 
-			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id), It.Is<int?>(c => c == category.Id), 
-				It.IsAny<DateTime?>(), It.IsAny<DateTime?>()));
+			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id), It.Is<int?>(c => c == null), 
+				It.Is<int?>(c => c == category.Id), It.IsAny<DateTime?>(), It.IsAny<DateTime?>()));
 		}
 
 		[Test]
