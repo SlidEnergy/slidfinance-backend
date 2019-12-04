@@ -40,6 +40,8 @@ namespace SlidFinance.App
             var order = categories.Any() ? categories.Max(x => x.Order) + 1 : 0;
 
             var category = await _dal.Categories.Add(new Category() { Title = title, Order = order, User = user });
+			_context.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = user.TrusteeId, CategoryId = category.Id });
+			await _context.SaveChangesAsync();
 
             return category;
         }

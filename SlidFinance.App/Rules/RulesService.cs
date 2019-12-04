@@ -21,11 +21,12 @@ namespace SlidFinance.App
         {
 			var user = await _context.Users.FindAsync(userId);
 
-			var rules = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
-				.Join(_context.Rules, a => a.Id, t => t.AccountId, (a, t) => t).ToListAsync();
+			var rules = await _context.TrusteeCategories
+				.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Categories, t => t.CategoryId, c => c.Id, (t, c) => c)
+				.Join(_context.Rules, c => c.Id, r => r.AccountId, (c, r) => r).ToListAsync();
 
-            return rules;
+            return rules.Distinct().ToList();
         }
 
         public async Task<Rule> AddRule(string userId, int? accountId, string bankCategory, int? categoryId, string description, int? mcc)

@@ -1,8 +1,7 @@
-﻿using SlidFinance.App;
-using NUnit.Framework;
+﻿using NUnit.Framework;
+using SlidFinance.Domain;
 using System;
 using System.Threading.Tasks;
-using SlidFinance.Domain;
 
 namespace SlidFinance.WebApi.IntegrationTests
 {
@@ -47,6 +46,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _db.SaveChangesAsync();
 			var category = new Category("Category #1", 0, _user);
 			await _dal.Categories.Add(category);
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category.Id });
+			await _db.SaveChangesAsync();
 			var rule1 = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule1);
 			var rule2 = new Rule(account, "Bank category #2", category, "Description #2", 5001, 1);
