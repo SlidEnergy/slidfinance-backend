@@ -23,8 +23,8 @@ namespace SlidFinance.App
 
 			var rules = await _context.TrusteeCategories
 				.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Categories, t => t.CategoryId, c => c.Id, (t, c) => c)
-				.Join(_context.Rules, c => c.Id, r => r.AccountId, (c, r) => r).ToListAsync();
+				.Join(_context.Rules, c => c.CategoryId, r => r.CategoryId, (c, r) => r)
+				.ToListAsync();
 
             return rules.Distinct().ToList();
         }
@@ -114,9 +114,13 @@ namespace SlidFinance.App
 
         public async Task DeleteRule(string userId, int bankId)
         {
+			var user = await _context.Users.FindAsync(userId);
+
             var rule = await _dal.Rules.GetById(bankId);
 
-            rule.IsBelongsTo(userId);
+			var trustee = await _context.TrusteeCategories.FirstOrDefaultAsync(x => x.TrusteeId == user.TrusteeId && x.CategoryId == rule.CategoryId);
+			if (trustee == null)
+				throw new EntityAccessDeniedException();
 
             await _dal.Rules.Delete(rule);
         }

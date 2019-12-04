@@ -23,9 +23,8 @@ namespace SlidFinance.App
 			var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=> x.Id == userId);
 
 			var categories = await _context.TrusteeCategories
-				.AsNoTracking()
 				.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Categories.AsNoTracking(), t => t.CategoryId, c => c.Id, (t, c) => c)
+				.Join(_context.Categories, t => t.CategoryId, c => c.Id, (t, c) => c)
 				.ToListAsync();
 
 			return categories.OrderBy(x => x.Order).ToList();

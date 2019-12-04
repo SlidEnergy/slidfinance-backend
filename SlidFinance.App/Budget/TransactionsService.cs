@@ -42,9 +42,10 @@ namespace SlidFinance.App
 
 			var user = await _context.Users.FindAsync(userId);
 
-			var transactions = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
-				.Join(_context.Transactions, a => a.Id, t => t.AccountId, (a, t) => t).ToListAsync();
+			var transactions = await _context.TrusteeAccounts
+				.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Transactions, a => a.AccountId, t => t.AccountId, (a, t) => t)
+				.ToListAsync();
 
 			if (categoryId != null) 
 				transactions = transactions.Where(t => t.Category != null && t.Category.Id == categoryId).ToList();
