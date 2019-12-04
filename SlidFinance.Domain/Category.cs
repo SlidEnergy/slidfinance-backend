@@ -13,7 +13,7 @@ namespace SlidFinance.Domain
 
         public virtual ApplicationUser User { get; set; }
 
-        public Category() { }
+		public Category() { }
 
         public Category(string title, int order, ApplicationUser user)
         {

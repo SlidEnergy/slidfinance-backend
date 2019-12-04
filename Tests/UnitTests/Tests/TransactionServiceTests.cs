@@ -15,21 +15,27 @@ namespace SlidFinance.WebApi.UnitTests
 		[SetUp]
         public void Setup()
         {
-			_service = new TransactionsService(_mockedDal);
+			_service = new TransactionsService(_mockedDal, _db);
 		}
 
 		[Test]
 		public async Task GetTransactions_ShouldReturnList()
 		{
-			var transaction = new Transaction()
-				{ DateTime = DateTime.Now, Amount = 10, Description = "Description #1", UserDescription = "User description #1" };
+			var bank = new Bank("Bank #1", _user);
+			_db.Banks.Add(bank);
+			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
+			_db.Accounts.Add(account);
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account.Id });
+			var t1 = new Transaction() { Account = account, BankCategory = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today };
+			await _dal.Transactions.Add(t1);
+			var t2 = new Transaction() { Account = account, BankCategory = "Bank category #2", Description = "Description #2", DateTime = DateTime.Today };
+			await _dal.Transactions.Add(t2);
 
-			_users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-			_transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Transaction> { transaction });
+			await _db.SaveChangesAsync();
 
-			await _service.GetList(_user.Id);
+			var list = await _service.GetListWithAccessCheckAsync(_user.Id);
 
-			_transactions.Verify(x => x.GetListWithAccessCheck(It.Is<string>(u => u == _user.Id)));
+			Assert.AreEqual(2, list.Count);
 		}
 
 		[Test]
@@ -64,6 +70,18 @@ namespace SlidFinance.WebApi.UnitTests
 			await _service.PatchTransaction(_user.Id, transaction);
 
 			_transactions.Verify(x => x.Update(It.Is<Transaction>(t => t.UserDescription == transaction.UserDescription)));
+		}
+
+		[Test]
+		public void GetTransactionsWithInvalidArguments_ShouldThrowArgumentOutOfRangeException()
+		{
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetListWithAccessCheckAsync(_user.Id, -1));
+		}
+
+		[Test]
+		public void GetTransactionsWithInvalidPeriod_ShouldThrowArgumentOutOfRangeException()
+		{
+			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _service.GetListWithAccessCheckAsync(_user.Id, null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
 		}
 	}
 }

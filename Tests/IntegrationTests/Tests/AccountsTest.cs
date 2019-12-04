@@ -19,6 +19,10 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account2 = new BankAccount(bank, "Account #2", "Code #2", 200, 10);
 			await _dal.Accounts.Add(account2);
 
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account1.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account2.Id });
+			await _db.SaveChangesAsync();
+
 			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/accounts/", _accessToken);
 			var response = await SendRequest(request);
 

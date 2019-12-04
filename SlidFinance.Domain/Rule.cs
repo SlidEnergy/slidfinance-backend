@@ -8,11 +8,13 @@ namespace SlidFinance.Domain
 
         public int Order { get; set; }
 
+		public int CategoryId { get; set; }
         [Required]
         public virtual Category Category { get; set; }
 
         public string Description { get; set; }
 
+		public int? AccountId { get; set; }
         public virtual BankAccount Account { get; set; }
 
         public int? Mcc { get; set; }

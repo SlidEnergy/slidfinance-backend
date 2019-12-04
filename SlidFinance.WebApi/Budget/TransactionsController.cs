@@ -36,7 +36,7 @@ namespace SlidFinance.WebApi
 
 			var userId = User.GetUserId();
 
-            var transactions = await _service.GetList(userId, categoryId, startDate, endDate);
+            var transactions = await _service.GetListWithAccessCheckAsync(userId, categoryId, startDate, endDate);
 
             return _mapper.Map<Dto.Transaction[]>(transactions);
         }

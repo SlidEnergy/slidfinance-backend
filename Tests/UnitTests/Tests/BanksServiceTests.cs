@@ -15,7 +15,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new BanksService(_mockedDal);
+            _service = new BanksService(_mockedDal, _db);
         }
 
         [Test]
@@ -51,34 +51,37 @@ namespace SlidFinance.WebApi.UnitTests
         }
 
         [Test]
-        public async Task GetBanks_ShouldCallGetListMethodWithRightArguments()
-        {
-            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
-
-            var result = await _service.GetList(_user.Id);
-
-            _banks.Verify(x => x.GetListWithAccessCheck(
-                    It.Is<string>(c => c == _user.Id)),
-                Times.Exactly(1));
-        }
-
-        [Test]
         public async Task GetBanks_ShouldReturnList()
         {
-            await _dal.Banks.Add(new Bank()
-            {
-                Title = "Bank #1",
-                User = _user
-            });
-            await _dal.Banks.Add(new Bank()
-            {
-                Title = "Bank #2",
-                User = _user
-            });
+			var bank1 = new Bank()
+			{
+				Title = "Bank #1",
+				User = _user
+			};
+			_db.Banks.Add(bank1);
+			var bank2 = new Bank()
+			{
+				Title = "Bank #2",
+				User = _user
+			};
+			_db.Banks.Add(bank2);
+			var account1 = new BankAccount()
+			{
+				Title = "Account #1",
+				Bank = bank1
+			};
+			_db.Accounts.Add(account1);
+			var account2 = new BankAccount()
+			{
+				Title = "Account #2",
+				Bank = bank2
+			};
+			_db.Accounts.Add(account2);
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account1.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account2.Id });
+			await _db.SaveChangesAsync();
 
-            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
-
-            var result = await _service.GetList(_user.Id);
+            var result = await _service.GetListWithAccessCheckAsync(_user.Id);
             
             Assert.AreEqual(2, result.Count);
         }
@@ -86,25 +89,32 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task GetBanks_ShouldBeCorrectBalance()
         {
-            await _dal.Banks.Add(new Bank()
-            {
-                Title = "Bank #1",
-                User = _user
-            });
-            await _dal.Banks.Add(new Bank()
-            {
-                Title = "Bank #2",
-                User = _user,
-                Accounts = new List<BankAccount>() {
-                    new BankAccount { Title = "Account #1", Balance = 100},
-                    new BankAccount { Title = "Account #2", Balance = 200},
-                    new BankAccount { Title = "Account #3", Balance = 300},
-                }
-            });
+			
+			var bank1 = new Bank()
+			{
+				Title = "Bank #1",
+				User = _user
+			};
+			var account4 = new BankAccount { Title = "Account #1", Balance = 0, Bank = bank1 };
+			_db.Accounts.Add(account4);
+			var bank2 = new Bank()
+			{
+				Title = "Bank #2",
+				User = _user
+			};
+			var account1 = new BankAccount { Title = "Account #1", Balance = 100, Bank = bank2 };
+			var account2 = new BankAccount { Title = "Account #2", Balance = 200, Bank = bank2 };
+			var account3 = new BankAccount { Title = "Account #3", Balance = 300, Bank = bank2 };
+			_db.Accounts.Add(account1);
+			_db.Accounts.Add(account2);
+			_db.Accounts.Add(account3);
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account1.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account2.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account3.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account4.Id });
+			await _db.SaveChangesAsync();
 
-            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
-
-            var result = await _service.GetList(_user.Id);
+            var result = await _service.GetListWithAccessCheckAsync(_user.Id);
 
             Assert.AreEqual(0, result[0].OwnFunds);
             Assert.AreEqual(600, result[1].OwnFunds);

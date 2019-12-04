@@ -8,6 +8,11 @@ namespace SlidFinance.Domain
 {
     public class ApplicationUser : IdentityUser, IUniqueObject<string>
     {
+		public int TrusteeId { get; set; }
+
+		[Required]
+		public virtual Trustee Trustee { get; set; }
+
         [Required]
         public virtual ICollection<Bank> Banks { get; set; } = new List<Bank>();
 

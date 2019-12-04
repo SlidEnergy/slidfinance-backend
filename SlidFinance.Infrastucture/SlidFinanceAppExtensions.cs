@@ -15,6 +15,8 @@ namespace SlidFinance.Infrastructure
 								.UseNpgsql(connectionString))
 							.BuildServiceProvider();
 
+			services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
+
 			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
 			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
 			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();

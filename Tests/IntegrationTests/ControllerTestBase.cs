@@ -56,7 +56,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 				new EfAuthTokensRepository(_db),
 				new EfRepository<Mcc, int>(_db));
 
-			_user = new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com" };
+			_user = new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com", Trustee = new Trustee() };
 			var result = await _manager.CreateAsync(_user, "Password123#");
 			if (!result.Succeeded)
 				throw new Exception("Новый пользователь не создан");

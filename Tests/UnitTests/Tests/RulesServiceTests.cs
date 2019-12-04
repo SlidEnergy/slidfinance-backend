@@ -13,7 +13,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new RulesService(_mockedDal);
+            _service = new RulesService(_mockedDal, _db);
         }
 
         [Test]

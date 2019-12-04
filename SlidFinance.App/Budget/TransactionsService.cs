@@ -1,4 +1,5 @@
-﻿using SlidFinance.App.Utils;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.App.Utils;
 using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,12 @@ namespace SlidFinance.App
     public class TransactionsService : ITransactionsService
 	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public TransactionsService(DataAccessLayer dal)
+		public TransactionsService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
+			_context = context;
         }
 
         public async Task<Transaction> GetById(string userId, int id)
@@ -29,7 +32,7 @@ namespace SlidFinance.App
             return transactions;
         }
 
-        public async Task<List<Transaction>> GetList(string userId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<List<Transaction>> GetListWithAccessCheckAsync(string userId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
 			if(categoryId.HasValue)
 				ArgumentValidator.ValidateId(categoryId.Value);
@@ -37,7 +40,11 @@ namespace SlidFinance.App
 			if(startDate.HasValue && endDate.HasValue)
 				ArgumentValidator.ValidatePeriodAllowEqual(startDate.Value, endDate.Value);
 
-            var transactions = await _dal.Transactions.GetListWithAccessCheck(userId);
+			var user = await _context.Users.FindAsync(userId);
+
+			var transactions = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
+				.Join(_context.Transactions, a => a.Id, t => t.AccountId, (a, t) => t).ToListAsync();
 
 			if (categoryId != null) 
 				transactions = transactions.Where(t => t.Category != null && t.Category.Id == categoryId).ToList();

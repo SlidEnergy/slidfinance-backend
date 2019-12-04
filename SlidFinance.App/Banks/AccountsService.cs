@@ -1,18 +1,21 @@
-﻿using SlidFinance.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class AccountsService
-    {
+    public class AccountsService : IAccountsService
+	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public AccountsService(DataAccessLayer dal)
+		public AccountsService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
-        }
+			_context = context;
+		}
 
         public async Task<BankAccount> GetById(string userId, int id)
         {
@@ -27,23 +30,29 @@ namespace SlidFinance.App
             return account;
         }
 
-        public async Task<List<BankAccount>> GetList(string userId, int? bankId)
+        public async Task<List<BankAccount>> GetListWithAccessCheck(string userId, int? bankId)
         {
-            var accounts = await _dal.Accounts.GetListWithAccessCheck(userId);
+			var user = await _context.Users.FindAsync(userId);
 
-            return accounts.Where(x => bankId == null || x.Bank.Id == bankId).ToList();
+			var accounts = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a).ToListAsync();
+
+			if (bankId.HasValue)
+				accounts = accounts.Where(x => x.Bank.Id == bankId).ToList();
+
+            return accounts;
         }
 
         public async Task<BankAccount> AddAccount(string userId, int bankId, string title, string code, float balance, float creditLimit)
         {
-            var user = await _dal.Users.GetById(userId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-            var bank = await _dal.Banks.GetById(bankId);
+            var bank = await _context.Banks.FindAsync(bankId);
 
-            if (!bank.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
-
-            var account = await _dal.Accounts.Add(new BankAccount(bank, title, code, balance, creditLimit));
+			var account = new BankAccount(bank, title, code, balance, creditLimit);
+			_context.Accounts.Add(account);
+			_context.TrusteeAccounts.Add(new TrusteeAccount() { Account = account, TrusteeId = user.TrusteeId });
+			await _context.SaveChangesAsync();
 
             return account;
         }

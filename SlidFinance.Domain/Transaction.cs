@@ -11,6 +11,7 @@ namespace SlidFinance.Domain
 
         public float Amount { get; set; }
 
+		public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [Required]
@@ -19,6 +20,7 @@ namespace SlidFinance.Domain
 		[Required]
 		public string UserDescription { get; set; }
 
+		public int AccountId { get; set; }
 		[Required]
         public virtual BankAccount Account { get; set; }
 

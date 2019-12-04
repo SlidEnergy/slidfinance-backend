@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SlidFinance.Domain
 {
     public class Merchant : IUniqueObject
-    {
+	{
         public int Id => _model.Id;
 
         public string Address

@@ -18,6 +18,7 @@ namespace SlidFinance.Domain
         [Required]
         public string Title { get; set; }
 
+		public int BankId { get; set; }
         [Required]
         public virtual Bank Bank { get; set; }
 

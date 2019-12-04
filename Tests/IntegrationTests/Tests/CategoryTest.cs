@@ -14,6 +14,9 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Categories.Add(category1);
 			var category2 = new Category("Category #2", 0, _user);
 			await _dal.Categories.Add(category2);
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category1.Id });
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category2.Id });
+			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/categories/", _accessToken);
 			var response = await SendRequest(request);

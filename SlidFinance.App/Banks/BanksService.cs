@@ -1,24 +1,32 @@
-﻿using SlidFinance.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class BanksService
-    {
+	public class BanksService : IBanksService
+	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public BanksService(DataAccessLayer dal)
+		public BanksService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
-        }
+			_context = context;
+		}
 
-        public async Task<List<Bank>> GetList(string userId)
+		public async Task<List<Bank>> GetListWithAccessCheckAsync(string userId)
         {
-            var banks = await _dal.Banks.GetListWithAccessCheck(userId);
+			var user = await _context.Users.FindAsync(userId);
 
-            return banks.OrderBy(x => x.Title).ToList();
+			var banks = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
+				.Join(_context.Banks, a => a.BankId, b => b.Id, (a, b) => b)
+				.ToListAsync();
+
+			return banks.Distinct().OrderBy(x => x.Title).ToList();
         }
 
         public async Task<Bank> AddBank(string userId, string title)

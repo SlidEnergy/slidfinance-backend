@@ -1,24 +1,31 @@
-﻿using SlidFinance.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class RulesService
-    {
-        private DataAccessLayer _dal;
+    public class RulesService : IRulesService
+	{
+		private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public RulesService(DataAccessLayer dal)
-        {
+		public RulesService(DataAccessLayer dal, IApplicationDbContext context)
+		{
             _dal = dal;
-        }
+			_context = context;
+		}
 
-        public async Task<List<Rule>> GetList(string userId)
+        public async Task<List<Rule>> GetListWithAccessCheckAsync(string userId)
         {
-            var rules = await _dal.Rules.GetListWithAccessCheck(userId);
+			var user = await _context.Users.FindAsync(userId);
 
-            return rules.ToList();
+			var rules = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
+				.Join(_context.Rules, a => a.Id, t => t.AccountId, (a, t) => t).ToListAsync();
+
+            return rules;
         }
 
         public async Task<Rule> AddRule(string userId, int? accountId, string bankCategory, int? categoryId, string description, int? mcc)

@@ -18,7 +18,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new CategoriesService(_mockedDal);
+            _service = new CategoriesService(_mockedDal, _db);
         }
 
         [Test]
@@ -110,34 +110,25 @@ namespace SlidFinance.WebApi.UnitTests
         }
 
         [Test]
-        public async Task GetCategories_ShouldBeCallGetListMethodWithRightArguments()
-        {
-            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
-
-            var result = await _service.GetList(_user.Id);
-
-            _categories.Verify(x => x.GetListWithAccessCheck(
-                    It.Is<string>(c => c == _user.Id)),
-                Times.Exactly(1));
-        }
-
-        [Test]
         public async Task GetCategories_ShouldBeListReturned()
         {
-            await _dal.Categories.Add(new Category()
-            {
-                Title = "Category #1",
-                User = _user
-            });
-            await _dal.Categories.Add(new Category()
-            {
-                Title = "Category #2",
-                User = _user
-            });
+			var category1 = new Category()
+			{
+				Title = "Category #1",
+				User = _user
+			};
+			_db.Categories.Add(category1);
+			var category2 = new Category()
+			{
+				Title = "Category #2",
+				User = _user
+			};
+			_db.Categories.Add(category2);
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category1.Id });
+			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category2.Id });
+			await _db.SaveChangesAsync();
 
-            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
-
-            var result = await _service.GetList(_user.Id);
+            var result = await _service.GetListWithAccessCheckAsync(_user.Id);
 
             Assert.AreEqual(2, result.Count());
         }
@@ -147,7 +138,7 @@ namespace SlidFinance.WebApi.UnitTests
         {
             _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
 
-            var result = await _service.GetList(_user.Id);
+            var result = await _service.GetListWithAccessCheckAsync(_user.Id);
 
             Assert.AreEqual(0, result.Count());
         }

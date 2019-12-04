@@ -1,4 +1,5 @@
-﻿using SlidFinance.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,20 +7,28 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class CategoriesService
-    {
+    public class CategoriesService : ICategoriesService
+	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public CategoriesService(DataAccessLayer dal)
+		public CategoriesService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
-        }
+			_context = context;
+		}
 
-        public async Task<List<Category>> GetList(string userId)
+        public async Task<List<Category>> GetListWithAccessCheckAsync(string userId)
         {
-            var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+			var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=> x.Id == userId);
 
-            return categories.OrderBy(x => x.Order).ToList();
+			var categories = await _context.TrusteeCategories
+				.AsNoTracking()
+				.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(_context.Categories.AsNoTracking(), t => t.CategoryId, c => c.Id, (t, c) => c)
+				.ToListAsync();
+
+			return categories.OrderBy(x => x.Order).ToList();
         }
 
         public async Task<Category> AddCategory(string userId, string title)

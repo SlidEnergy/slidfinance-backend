@@ -16,108 +16,46 @@ namespace SlidFinance.WebApi.UnitTests
 	public class TransactionControllerTests : TestsBase
     {
 		private TransactionsController _controller;
+		private Mock<ITransactionsService> _service;
 
 		[SetUp]
         public void Setup()
         {
-            var service = new TransactionsService(_mockedDal);
-			_controller = new TransactionsController(_autoMapper.Create(_db), service);
+            _service = new Mock<ITransactionsService>();
+			_controller = new TransactionsController(_autoMapper.Create(_db), _service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
-        [Test]
-        public async Task GetTransactions_ShouldReturnList()
-        {
-            var bank = await _dal.Banks.Add(new Bank() {Title = "Bank #1", User = _user});
-            var account = await _dal.Accounts.Add(new BankAccount() { Transactions = new List<Transaction>(), Bank = bank });
-            await _dal.Transactions.Add(new Transaction()
-            {
-                DateTime = DateTime.Now,
-                Amount = 10,
-                Description = "Description #1",
-                Account = account
-            });
-            await _dal.Transactions.Add(new Transaction()
-            {
-                DateTime = DateTime.Now,
-                Amount = 5,
-                Description = "Description #2",
-                Account = account
-            });
-
-            _transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Transactions.GetListWithAccessCheck(_user.Id));
-
-            var result = await _controller.GetList();
-
-            Assert.AreEqual(2, result.Value.Count());
-        }
-
 		[Test]
-		public async Task GetTransactionsForCategoryAndPeriod_ShouldReturnFilteredList()
+		public async Task GetTransactionsForCategoryAndPeriod_ShouldReturnList()
 		{
-			var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-			var account = await _dal.Accounts.Add(new BankAccount() { Transactions = new List<Transaction>(), Bank = bank });
-			var category1 = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
-			var category2 = await _dal.Categories.Add(new Category() { Title = "Category #2", User = _user });
-			await _dal.Transactions.Add(new Transaction()
+			var bank = new Bank() { Title = "Bank #1", User = _user };
+			var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank };
+			var category = new Category() { Title = "Category #1", User = _user };
+			var t1 = new Transaction()
 			{
 				DateTime = new DateTime(2019, 6, 1),
 				Amount = 10,
 				Description = "Description #1",
 				Account = account,
-				Category = category1
-			});
-			var transaction = await _dal.Transactions.Add(new Transaction()
+				Category = category
+			};
+			var t2 = await _dal.Transactions.Add(new Transaction()
 			{
 				DateTime = new DateTime(2019, 6, 2),
 				Amount = 5,
 				Description = "Description #2",
 				Account = account,
-				Category = category1
-			});
-			await _dal.Transactions.Add(new Transaction()
-			{
-				DateTime = new DateTime(2019, 6, 3),
-				Amount = 10,
-				Description = "Description #1",
-				Account = account,
-				Category = category2
-			});
-			await _dal.Transactions.Add(new Transaction()
-			{
-				DateTime = new DateTime(2019, 6, 4),
-				Amount = 5,
-				Description = "Description #2",
-				Account = account,
-				Category = null
-			});
-			await _dal.Transactions.Add(new Transaction()
-			{
-				DateTime = new DateTime(2019, 6, 5),
-				Amount = 5,
-				Description = "Description #2",
-				Account = account,
-				Category = category1
+				Category = category
 			});
 
-			_transactions.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Transactions.GetListWithAccessCheck(_user.Id));
+			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<DateTime?>(), It.IsAny<DateTime?>()))
+				.ReturnsAsync(new List<Transaction>() { t1, t2 });
 
-			var result = await _controller.GetList(category1.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
+			var result = await _controller.GetList(category.Id, new DateTime(2019, 6, 2), new DateTime(2019, 6, 4));
 
-			Assert.AreEqual(1, result.Value.Count());
-			Assert.AreEqual(transaction.Id, result.Value.ToArray()[0].Id);
-		}
-
-		[Test]
-		public void GetTransactionsWithInvalidArguments_ShouldThrowArgumentOutOfRangeException()
-		{
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _controller.GetList(-1));
-		}
-
-		[Test]
-		public void GetTransactionsWithInvalidPeriod_ShouldThrowArgumentOutOfRangeException()
-		{
-			Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _controller.GetList(null, new DateTime(2019, 6, 4), new DateTime(2019, 6, 1)));
+			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id), It.Is<int?>(c => c == category.Id), 
+				It.IsAny<DateTime?>(), It.IsAny<DateTime?>()));
 		}
 
 		[Test]
@@ -138,14 +76,12 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 111
             };
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
-            _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
+			_service.Setup(x => x.AddTransaction(It.IsAny<string>(), It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
 
             var result = await _controller.Add(transaction);
 
-            _transactions.Verify(x => x.Add(It.Is<Transaction>(t => 
+			_service.Verify(x => x.AddTransaction(It.Is<string>(u => u == _user.Id),
+				It.Is<Transaction>(t => 
                 t.DateTime == transaction.DateTime &&
                 t.Amount == transaction.Amount &&
                 t.Description == transaction.Description &&
@@ -162,15 +98,12 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = await _dal.Banks.Add(new Bank() {Title = "Bank #1", User = _user});
             var account = await _dal.Accounts.Add(new BankAccount() {Transactions = new List<Transaction>(), Bank = bank});
-            var transaction = await _dal.Transactions.Add(new Transaction()
+			var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
+			var transaction = await _dal.Transactions.Add(new Transaction()
                 {DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account});
-            var category = await _dal.Categories.Add(new Category() {Title = "Category #1", User = _user});
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
-            _transactions.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(transaction);
-            _transactions.Setup(x => x.Update(It.IsAny<Transaction>())).ReturnsAsync(transaction);
+			_service.Setup(x => x.GetById(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(transaction);
+			_service.Setup(x => x.PatchTransaction(It.IsAny<string>(), It.IsAny<Transaction>())).ReturnsAsync(transaction);
 
             var result = await _controller.Patch(transaction.Id,
                 new JsonPatchDocument<Dto.Transaction>(new List<Operation<Dto.Transaction>>()
@@ -179,8 +112,9 @@ namespace SlidFinance.WebApi.UnitTests
                     },
                     new CamelCasePropertyNamesContractResolver()));
 
-            Assert.AreEqual(category.Id, result.Value.CategoryId);
-        }
+			_service.Verify(x => x.GetById(It.Is<string>(u => u == _user.Id), It.Is<int>(t => t == transaction.Id)));
+			_service.Verify(x => x.PatchTransaction(It.Is<string>(u => u == _user.Id), It.Is<Transaction>(t => t.CategoryId == category.Id)));
+		}
 
         [Test]
         public async Task PatchTransactionNullCategory_ShouldClearCategory()
@@ -191,20 +125,18 @@ namespace SlidFinance.WebApi.UnitTests
             var transaction = await _dal.Transactions.Add(new Transaction()
             { DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account, Category = category });
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
-            _transactions.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(transaction);
-            _transactions.Setup(x => x.Update(It.IsAny<Transaction>())).ReturnsAsync(transaction);
+			_service.Setup(x => x.GetById(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(transaction);
+			_service.Setup(x => x.PatchTransaction(It.IsAny<string>(), It.IsAny<Transaction>())).ReturnsAsync(transaction);
 
-            var result = await _controller.Patch(transaction.Id,
-                new JsonPatchDocument<Dto.Transaction>(new List<Operation<Dto.Transaction>>()
-                    {
-                        new Operation<Dto.Transaction>("replace", "/categoryId", null)
-                    }, 
-                    new CamelCasePropertyNamesContractResolver()));
+			var result = await _controller.Patch(transaction.Id,
+				new JsonPatchDocument<Dto.Transaction>(new List<Operation<Dto.Transaction>>()
+					{
+						new Operation<Dto.Transaction>("replace", "/categoryId", null)
+					},
+					new CamelCasePropertyNamesContractResolver()));
 
-            Assert.IsNull(result.Value.CategoryId);
+			_service.Verify(x => x.GetById(It.Is<string>(u => u == _user.Id), It.Is<int>(t => t == transaction.Id)));
+			_service.Verify(x => x.PatchTransaction(It.Is<string>(u => u == _user.Id), It.Is<Transaction>(t => t.CategoryId == null)));
         }
     }
 }

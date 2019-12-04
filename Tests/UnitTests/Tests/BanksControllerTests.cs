@@ -11,12 +11,13 @@ namespace SlidFinance.WebApi.UnitTests
     public class BanksControllerTests : TestsBase
     {
 		private BanksController _controller;
+		private Mock<IBanksService> _service;
 
 		[SetUp]
         public void Setup()
         {
-            var service = new BanksService(_mockedDal);
-			_controller = new BanksController(_autoMapper.Create(_db), service);
+            _service = new Mock<IBanksService>();
+			_controller = new BanksController(_autoMapper.Create(_db), _service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
@@ -34,21 +35,11 @@ namespace SlidFinance.WebApi.UnitTests
                 User = _user
             });
 
-            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
+            _service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
 
             var result = await _controller.GetList();
 
-            Assert.AreEqual(2, result.Value.Count());
-        }
-
-        [Test]
-        public async Task GetEmptyBanksList_ShouldBeEmptyListReturned()
-        {
-            _banks.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
-
-            var result = await _controller.GetList();
-
-            Assert.AreEqual(0, result.Value.Count());
-        }
+			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id)));
+		}
     }
 }

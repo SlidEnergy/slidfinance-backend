@@ -43,6 +43,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
+			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account.Id });
+			await _db.SaveChangesAsync();
 			var category = new Category("Category #1", 0, _user);
 			await _dal.Categories.Add(category);
 			var rule1 = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);

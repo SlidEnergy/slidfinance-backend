@@ -13,9 +13,9 @@ namespace SlidFinance.WebApi
     public class BanksController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly BanksService _banksService;
+        private readonly IBanksService _banksService;
 
-        public BanksController(IMapper mapper, BanksService banksService)
+        public BanksController(IMapper mapper, IBanksService banksService)
         {
             _mapper = mapper;
             _banksService = banksService;
@@ -27,7 +27,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var banks = await _banksService.GetList(userId);
+            var banks = await _banksService.GetListWithAccessCheckAsync(userId);
             return _mapper.Map<Dto.Bank[]>(banks);
         }
 

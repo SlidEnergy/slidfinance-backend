@@ -14,7 +14,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new AccountsService(_mockedDal);
+            _service = new AccountsService(_mockedDal, _db);
         }
 
         [Test]

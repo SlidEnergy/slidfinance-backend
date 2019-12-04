@@ -13,9 +13,9 @@ namespace SlidFinance.WebApi
     public class CategoriesController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly CategoriesService _categoriesService;
+        private readonly ICategoriesService _categoriesService;
 
-        public CategoriesController(IMapper mapper, CategoriesService categoriesService)
+        public CategoriesController(IMapper mapper, ICategoriesService categoriesService)
         {
             _mapper = mapper;
             _categoriesService = categoriesService;
@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var categories = await _categoriesService.GetList(userId);
+            var categories = await _categoriesService.GetListWithAccessCheckAsync(userId);
             return _mapper.Map<Dto.Category[]>(categories);
         }
 

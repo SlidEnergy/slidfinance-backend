@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SlidFinance.Infrastucture.Models
+namespace SlidFinance.Models
 {
     public class Merchant: IMerchant
     {
