@@ -15,16 +15,18 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new ImportService(_mockedDal);
+            _service = new ImportService(_mockedDal, _db);
         }
 
         [Test]
         public async Task ImportWithExistsRule_ShouldCallMethodWithRightCategory()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
-            var rule = await _dal.Rules.Add(new Rule() { Category = category, Account = account });
+			var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+			var account = await _db.CreateAccount(_user);
+			var category = await _db.CreateCategory(_user);
+            var rule = new Rule() { Category = category, Account = account };
+			_db.Rules.Add(rule);
 
             var transaction = new Transaction()
             {
@@ -36,11 +38,9 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 111
             };
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<BankAccount>() { account });
+			await _db.SaveChangesAsync();
+
             _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Rule>() { rule });
 
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction });
 
@@ -51,10 +51,11 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task Import_ShouldCallAddMethodTwice()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
-            var transaction1 = new Transaction()
+			var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+			var account = await _db.CreateAccount(_user);
+			var category = await _db.CreateCategory(_user);
+			var transaction1 = new Transaction()
             {
                 DateTime = DateTime.Now,
                 Amount = 10,
@@ -73,11 +74,7 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 111
             };
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<BankAccount>() { account });
             _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Rule>());
 
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction1, transaction2 });
 
@@ -88,9 +85,10 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task ImportDublicates_ShouldNotImported()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
+            var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+			var account = await _db.CreateAccount(_user);
+            var category = _db.CreateCategory(_user);
 
             var transaction = new Transaction()
             {
@@ -102,14 +100,12 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 111
             };
 
-            await _dal.Transactions.Add(new Transaction() { DateTime = transaction.DateTime, Amount = transaction.Amount, Description = transaction.Description,
+            _db.Transactions.Add(new Transaction() { DateTime = transaction.DateTime, Amount = transaction.Amount, Description = transaction.Description,
                 Account = account });
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
-            _accounts.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<BankAccount>() { account });
+			await _db.SaveChangesAsync();
+
             _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Rule>());
 
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction });
 

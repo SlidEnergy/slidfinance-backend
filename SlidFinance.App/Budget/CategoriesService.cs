@@ -20,26 +20,21 @@ namespace SlidFinance.App
 
         public async Task<List<Category>> GetListWithAccessCheckAsync(string userId)
         {
-			var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x=> x.Id == userId);
-
-			var categories = await _context.TrusteeCategories
-				.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Categories, t => t.CategoryId, c => c.Id, (t, c) => c)
-				.ToListAsync();
+			var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
 			return categories.OrderBy(x => x.Order).ToList();
         }
 
         public async Task<Category> AddCategory(string userId, string title)
         {
-            var user = await _dal.Users.GetById(userId);
+            var user = await _context.Users.FindAsync(userId);
 
-            var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+            var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
             var order = categories.Any() ? categories.Max(x => x.Order) + 1 : 0;
 
-            var category = await _dal.Categories.Add(new Category() { Title = title, Order = order, User = user });
-			_context.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = user.TrusteeId, CategoryId = category.Id });
+            var category = await _dal.Categories.Add(new Category() { Title = title, Order = order });
+			_context.TrusteeCategories.Add(new TrusteeCategory(user, category));
 			await _context.SaveChangesAsync();
 
             return category;
@@ -47,18 +42,16 @@ namespace SlidFinance.App
 
         public async Task DeleteCategory(string userId, int categoryId, int? moveCategoryId = null)
         {
-            var user = await _dal.Users.GetById(userId);
+            var category = await _context.GetCategorByIdWithAccessCheckAsync(userId, categoryId);
 
-            var category = await _dal.Categories.GetById(categoryId);
-
-            if(!category.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
+            if(category == null)
+                throw new EntityNotFoundException();
 
             // Перемещаем все транзакции в новую категорию, если она указана, или очищаем категорию
 
-            var allTransactions = await _dal.Transactions.GetListWithAccessCheck(userId);
+            var allTransactions = await _context.GetTransactionListWithAccessCheckAsync(userId);
 
-            var moveCategory = moveCategoryId == null ? null : await _dal.Categories.GetById(moveCategoryId.Value);
+            var moveCategory = moveCategoryId == null ? null : await _context.GetCategorByIdWithAccessCheckAsync(userId, moveCategoryId.Value);
 
             var categoryTransactions = allTransactions.Where(x => x.Category != null && x.Category.Id == categoryId).ToList();
 
@@ -68,23 +61,24 @@ namespace SlidFinance.App
                 await _dal.Transactions.Update(transaction);
             }
 
-            // Удаляем категорию
+			// Удаляем категорию
 
-            await _dal.Categories.Delete(category);
+			_context.Categories.Remove(category);
+			await _context.SaveChangesAsync();
 
             await ReorderAllCategories(userId);
         }
 
         public async Task<Category> EditCategory(string userId, int categoryId, string title, int order)
         {
-            var editCategory = await _dal.Categories.GetById(categoryId);
+            var editCategory = await _context.GetCategorByIdWithAccessCheckAsync(userId, categoryId);
 
-            if (!editCategory.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
+            if (editCategory == null)
+                throw new EntityNotFoundException();
 
             editCategory.Rename(title);
 
-            var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+            var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
             // Если порядок категории вышел за пределы, устанавливаем его последним
             if(order > categories.Count - 1)
@@ -96,37 +90,71 @@ namespace SlidFinance.App
                 await ReorderCategories(userId, editCategory, order);
             }
 
-            await _dal.Categories.Update(editCategory);
+			_context.Categories.Update(editCategory);
+			await _context.SaveChangesAsync();
 
             return editCategory;
         }
 
         private async Task ReorderAllCategories(string userId)
         {
-            var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+            var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
             int newOrder = 0;
 
             foreach (Category c in categories.OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
-                await _dal.Categories.Update(c);
+                _context.Categories.Update(c);
+				await _context.SaveChangesAsync();
                 newOrder++;
             }
         }
 
         private async Task ReorderCategories(string userId, Category category, int order)
         {
-            var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+            var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
             int newOrder = order + 1;
 
             foreach (Category c in categories.Where(x => x.Order >= order && x.Id != category.Id).OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
-                await _dal.Categories.Update(c);
-                newOrder++;
+				_context.Categories.Update(c);
+				await _context.SaveChangesAsync();
+				newOrder++;
             }
         }
-    }
+
+		public async Task<Category> GetByIdWithChecks(string userId, int id)
+		{
+			var category = await _dal.Categories.GetById(id);
+
+			if (category == null)
+				throw new EntityNotFoundException();
+
+			await CheckAccessAndThrowException(userId, category);
+
+			return category;
+		}
+
+		private async Task CheckAccessAndThrowException(string userId, Category category)
+		{
+			var user = await _context.Users.FindAsync(userId);
+
+			await CheckAccessAndThrowException(user, category);
+		}
+
+		private async Task CheckAccessAndThrowException(ApplicationUser user, Category category)
+		{
+			var trustee = await _context.TrusteeCategories
+				.Where(t => t.TrusteeId == user.TrusteeId)
+				.Join(_context.Categories, t => t.CategoryId, c => c.Id, (t, c) => c)
+				.Where(c => c.Id == category.Id)
+				.FirstOrDefaultAsync();
+
+			if (trustee == null)
+				throw new EntityAccessDeniedException();
+		}
+	}
 }

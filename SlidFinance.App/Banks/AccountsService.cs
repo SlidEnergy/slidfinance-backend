@@ -17,25 +17,11 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
-        public async Task<BankAccount> GetById(string userId, int id)
+		public Task<BankAccount> GetByIdWithAccessCheck(string userId, int id) => GetByIdWithChecks(userId, id);
+
+        public async Task<List<BankAccount>> GetListWithAccessCheckAsync(string userId, int? bankId = null)
         {
-            var account = await _dal.Accounts.GetById(id);
-
-            if (account == null)
-                throw new EntityNotFoundException();
-
-            if (!account.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
-
-            return account;
-        }
-
-        public async Task<List<BankAccount>> GetListWithAccessCheck(string userId, int? bankId)
-        {
-			var user = await _context.Users.FindAsync(userId);
-
-			var accounts = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a).ToListAsync();
+			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
 
 			if (bankId.HasValue)
 				accounts = accounts.Where(x => x.Bank.Id == bankId).ToList();
@@ -51,7 +37,7 @@ namespace SlidFinance.App
 
 			var account = new BankAccount(bank, title, code, balance, creditLimit);
 			_context.Accounts.Add(account);
-			_context.TrusteeAccounts.Add(new TrusteeAccount() { Account = account, TrusteeId = user.TrusteeId });
+			_context.TrusteeAccounts.Add(new TrusteeAccount(user, account));
 			await _context.SaveChangesAsync();
 
             return account;
@@ -59,12 +45,9 @@ namespace SlidFinance.App
 
         public async Task<BankAccount> EditAccount(string userId, int accountId, string title, string code, float balance, float creditLimit)
         {
-            var editAccount = await _dal.Accounts.GetById(accountId);
+            var editAccount = await GetByIdWithChecks(userId, accountId);
 
-            if (!editAccount.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
-
-            editAccount.Update(title, code, balance, creditLimit);
+			editAccount.Update(title, code, balance, creditLimit);
 
             await _dal.Accounts.Update(editAccount);
 
@@ -83,9 +66,6 @@ namespace SlidFinance.App
 
                 if (bank == null)
                     throw new EntityNotFoundException();
-
-                if (!bank.IsBelongsTo(userId))
-                    throw new EntityAccessDeniedException();
             }
 
             var newAccount = await _dal.Accounts.Update(account);
@@ -95,13 +75,40 @@ namespace SlidFinance.App
 
         public async Task DeleteAccount(string userId, int accountId)
         {
-            var user = await _dal.Users.GetById(userId);
+			var account = await GetByIdWithChecks(userId, accountId);
 
-            var account = await _dal.Accounts.GetById(accountId);
-
-            account.IsBelongsTo(userId);
-
-            await _dal.Accounts.Delete(account);
+			await _dal.Accounts.Delete(account);
         }
-    }
+
+		private async Task<BankAccount> GetByIdWithChecks(string userId, int id)
+		{
+			var account = await _dal.Accounts.GetById(id);
+
+			if (account == null)
+				throw new EntityNotFoundException();
+
+			await CheckAccessAndThrowException(userId, account);
+
+			return account;
+		}
+
+		private async Task CheckAccessAndThrowException(string userId, BankAccount account)
+		{
+			var user = await _context.Users.FindAsync(userId);
+
+			await CheckAccessAndThrowException(user, account);
+		}
+
+		private async Task CheckAccessAndThrowException(ApplicationUser user, BankAccount account)
+		{
+			var trustee = await _context.TrusteeAccounts
+				.Where(t => t.TrusteeId == user.TrusteeId)
+				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
+				.Where(a => a.Id == account.Id)
+				.FirstOrDefaultAsync();
+
+			if (trustee == null)
+				throw new EntityAccessDeniedException();
+		}
+	}
 }

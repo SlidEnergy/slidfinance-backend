@@ -6,9 +6,9 @@ namespace SlidFinance.App
 {
 	public interface IBanksService
 	{
-		Task<Bank> AddBank(string userId, string title);
-		Task DeleteBank(string userId, int bankId);
-		Task<Bank> EditBank(string userId, int bankId, string title);
-		Task<List<Bank>> GetListWithAccessCheckAsync(string userId);
+		Task<Bank> AddBank(string title);
+		Task DeleteBank(int bankId);
+		Task<Bank> EditBank(int bankId, string title);
+		Task<List<Bank>> GetLis();
 	}
 }

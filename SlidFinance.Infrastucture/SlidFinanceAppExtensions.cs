@@ -18,11 +18,11 @@ namespace SlidFinance.Infrastructure
 			services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
 
 			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
-			services.AddScoped<IRepositoryWithAccessCheck<Bank>, EfBanksRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Category>, EfCategoriesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<BankAccount>, EfBankAccountsRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Rule>, EfRulesRepository>();
-			services.AddScoped<IRepositoryWithAccessCheck<Transaction>, EfTransactionsRepository>();
+			services.AddScoped<IRepository<Bank, int>, EfRepository<Bank, int>>();
+			services.AddScoped<IRepository<Category, int>, EfRepository<Category, int>>();
+			services.AddScoped<IRepository<BankAccount, int>, EfRepository<BankAccount, int>>();
+			services.AddScoped<IRepository<Rule, int>, EfRepository<Rule, int>>();
+			services.AddScoped<IRepository<Transaction, int>, EfRepository<Transaction, int>>();
 			services.AddScoped<IAuthTokensRepository, EfAuthTokensRepository>();
 			services.AddScoped<IRepository<Mcc, int>, EfRepository<Mcc, int>>();
 

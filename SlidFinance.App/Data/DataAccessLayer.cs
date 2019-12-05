@@ -4,15 +4,15 @@ namespace SlidFinance.App
 {
 	public class DataAccessLayer
     {
-        public IRepositoryWithAccessCheck<Category> Categories { get; }
+        public IRepository<Category, int> Categories { get; }
 
-        public IRepositoryWithAccessCheck<Bank> Banks { get; }
+        public IRepository<Bank, int> Banks { get; }
 
-		public IRepositoryWithAccessCheck<BankAccount> Accounts { get; }
+		public IRepository<BankAccount, int> Accounts { get; }
 
-		public IRepositoryWithAccessCheck<Rule> Rules { get; }
+		public IRepository<Rule, int> Rules { get; }
 
-		public IRepositoryWithAccessCheck<Transaction> Transactions { get; }
+		public IRepository<Transaction, int> Transactions { get; }
 
 		public IRepository<ApplicationUser, string> Users { get; }
 
@@ -21,12 +21,12 @@ namespace SlidFinance.App
 		public IRepository<Mcc, int> Mcc { get; }
 
 		public DataAccessLayer(
-            IRepositoryWithAccessCheck<Bank> banks, 
-            IRepositoryWithAccessCheck<Category> categories,
+            IRepository<Bank, int> banks, 
+            IRepository<Category, int> categories,
             IRepository<ApplicationUser, string> users,
-            IRepositoryWithAccessCheck<BankAccount> bankAccounts,
-            IRepositoryWithAccessCheck<Rule> rules,
-            IRepositoryWithAccessCheck<Transaction> transactions,
+            IRepository<BankAccount, int> bankAccounts,
+            IRepository<Rule, int> rules,
+            IRepository<Transaction, int> transactions,
 			IAuthTokensRepository authTokens,
 			IRepository<Mcc, int> mcc)
         {

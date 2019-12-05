@@ -24,9 +24,9 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task GetRules_ShouldReturnList()
         {
-            var bank = new Bank() { Title = "Bank #1", User = _user };
+            var bank = new Bank() { Title = "Bank #1" };
             var account = new BankAccount() { Title = "Account #1", Bank = bank };
-            var category = new Category() {Title = "Category #1", User = _user};
+            var category = new Category() {Title = "Category #1"};
 
             var rule1 = new Rule()
             {

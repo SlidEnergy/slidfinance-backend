@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using SlidFinance.App;
-using SlidFinance.Infrastructure;
-using Newtonsoft.Json;
 using NUnit.Framework;
+using SlidFinance.App;
+using SlidFinance.Domain;
+using SlidFinance.Infrastructure;
+using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SlidFinance.Domain;
-using System;
 
 namespace SlidFinance.WebApi.IntegrationTests
 {
@@ -47,27 +44,34 @@ namespace SlidFinance.WebApi.IntegrationTests
 				throw new Exception("Сервис для работы с пользователями не получен");
 			
 			_dal = new DataAccessLayer(
-				new EfBanksRepository(_db),
-				new EfCategoriesRepository(_db),
+				new EfRepository<Bank, int>(_db),
+				new EfRepository<Category,int>(_db),
 				new EfRepository<ApplicationUser, string>(_db),
-				new EfBankAccountsRepository(_db),
-				new EfRulesRepository(_db),
-				new EfTransactionsRepository(_db),
+				new EfRepository<BankAccount, int>(_db),
+				new EfRepository<Rule, int>(_db),
+				new EfRepository<Transaction, int>(_db),
 				new EfAuthTokensRepository(_db),
 				new EfRepository<Mcc, int>(_db));
 
-			_user = new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com", Trustee = new Trustee() };
-			var result = await _manager.CreateAsync(_user, "Password123#");
+			_user = await CreateUser("test1@email.com", "Password123#");
+
+			await Login("test1@email.com", "Password123#");
+		}
+
+		protected virtual async Task<ApplicationUser> CreateUser(string email, string password)
+		{
+			var user = new ApplicationUser() { Email = email, UserName = email, Trustee = new Trustee() };
+			var result = await _manager.CreateAsync(user, password);
 			if (!result.Succeeded)
 				throw new Exception("Новый пользователь не создан");
 
-			await Login();
+			return user;
 		}
 
-		protected virtual async Task Login()
+		protected virtual async Task Login(string email, string password)
 		{
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/users/token", null, 
-				new { Email = "test1@email.com", Password = "Password123#", ConfirmPassword = "Password123#" });
+				new { Email = email, Password = password, ConfirmPassword = password });
 			var response = await SendRequest(request);
 
 			if (!response.IsSuccessStatusCode)

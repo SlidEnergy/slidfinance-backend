@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-    [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [Route("api/v1/[controller]")]
     [ApiController]
     public class BanksController : ControllerBase
@@ -23,39 +22,35 @@ namespace SlidFinance.WebApi
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Dto.Bank[]>> GetList()
+		[Authorize(Policy = Policy.MustBeAllAccessMode)]
+		public async Task<ActionResult<Dto.Bank[]>> GetList()
         {
-            var userId = User.GetUserId();
-
-            var banks = await _banksService.GetListWithAccessCheckAsync(userId);
+            var banks = await _banksService.GetLis();
             return _mapper.Map<Dto.Bank[]>(banks);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Dto.Bank>> Add(AddBankBindingModel bank)
+		[Authorize(Policy = Policy.MustBeAdmin)]
+		public async Task<ActionResult<Dto.Bank>> Add(AddBankBindingModel bank)
         {
-            var userId = User.GetUserId();
-
-            var newBank = await _banksService.AddBank(userId, bank.Title);
+            var newBank = await _banksService.AddBank(bank.Title);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Bank>(newBank));
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.Bank>> Update(int id, EditBankBindingModel bank)
+		[Authorize(Policy = Policy.MustBeAdmin)]
+		public async Task<ActionResult<Dto.Bank>> Update(int id, EditBankBindingModel bank)
         {
-            var userId = User.GetUserId();
-
-            var editedBank = await _banksService.EditBank(userId, id, bank.Title);
+            var editedBank = await _banksService.EditBank(id, bank.Title);
             return _mapper.Map<Dto.Bank>(editedBank);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
+		[Authorize(Policy = Policy.MustBeAdmin)]
+		public async Task<ActionResult> Delete(int id)
         {
-            var userId = User.GetUserId();
-
-            await _banksService.DeleteBank(userId, id);
+            await _banksService.DeleteBank(id);
 
             return NoContent();
         }

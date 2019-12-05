@@ -46,15 +46,9 @@ namespace SlidFinance.WebApi
 			   .ForMember(dest => dest.Transactions,
 				   opt => opt.Ignore());
 
-			CreateMap<Bank, Dto.Bank>()
-				.ForMember(dest => dest.AccountIds,
-					opt => opt.MapFrom(src => src.Accounts.Select(x => x.Id)));
+			CreateMap<Bank, Dto.Bank>();
 
-			CreateMap<ApplicationUser, Dto.User>()
-				.ForMember(dest => dest.BankIds,
-					opt => opt.MapFrom(src => src.Banks.Select(x => x.Id)))
-				.ForMember(dest => dest.CategoryIds,
-					opt => opt.MapFrom(src => src.Categories.Select(x => x.Id)));
+			CreateMap<ApplicationUser, Dto.User>();
 
 			CreateMap<Rule, Dto.Rule>()
 				.ForMember(dest => dest.CategoryId,

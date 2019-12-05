@@ -2,6 +2,7 @@ using Moq;
 using NUnit.Framework;
 using SlidFinance.App;
 using SlidFinance.Domain;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.UnitTests
@@ -19,9 +20,15 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task AddFirstRule_ShouldBeReturnRuleWithRightProperties()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
+            var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+            var account = new BankAccount() { Title = "Account #1", Bank = bank };
+			_db.Accounts.Add(account);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+            var category = new Category() { Title = "Category #1" };
+			_db.Categories.Add(category);
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
+			await _db.SaveChangesAsync();
 
             var rule = new Rule()
             {
@@ -32,30 +39,33 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 5555
             };
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
             _rules.Setup(x => x.Add(It.IsAny<Rule>())).ReturnsAsync((Rule x) => x);
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Rules.GetListWithAccessCheck(_user.Id));
 
             var newRule = await _service.AddRule(_user.Id, account.Id, rule.BankCategory, rule.Category.Id, rule.Description, rule.Mcc);
 
-            Assert.AreEqual(rule.Account.Id, newRule.Account.Id);
-            Assert.AreEqual(rule.Category.Id, newRule.Category.Id);
-            Assert.AreEqual(rule.BankCategory, newRule.BankCategory);
-            Assert.AreEqual(rule.Description, newRule.Description);
-            Assert.AreEqual(rule.Mcc, newRule.Mcc);
-            Assert.AreEqual(0, newRule.Order);
+			_rules.Verify(x => x.Add(It.Is<Rule>(r => r.Account.Id == rule.Account.Id &&
+				r.Category.Id == rule.Category.Id &&
+				r.BankCategory == rule.BankCategory && 
+				r.Description == rule.Description &&
+				r.Mcc == rule.Mcc &&
+				r.Order == 0)));
         }
 
         [Test]
         public async Task AddSecondRule_ShouldBeReturnRuleWithRightProperties()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1", User = _user });
-            await _dal.Rules.Add(new Rule() { Account = account });
-            var rule = new Rule()
+			var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+			var account = new BankAccount() { Title = "Account #1", Bank = bank };
+			_db.Accounts.Add(account);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			var category = new Category() { Title = "Category #1" };
+			_db.Categories.Add(category);
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
+			var rule = new Rule() { Account = account, Category = category };
+			_db.Rules.Add(rule);
+			await _db.SaveChangesAsync();
+			var newRule = new Rule()
             {
                 Account = account,
                 BankCategory = "Category #1",
@@ -64,20 +74,16 @@ namespace SlidFinance.WebApi.UnitTests
                 Mcc = 5555
             };
 
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _accounts.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(account);
-            _categories.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(category);
             _rules.Setup(x => x.Add(It.IsAny<Rule>())).ReturnsAsync((Rule x) => x);
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(await _dal.Rules.GetListWithAccessCheck(_user.Id));
 
-            var newRule = await _service.AddRule(_user.Id, account.Id, rule.BankCategory, rule.Category.Id, rule.Description, rule.Mcc);
+            var addedRule = await _service.AddRule(_user.Id, account.Id, newRule.BankCategory, newRule.Category.Id, newRule.Description, newRule.Mcc);
 
-            Assert.AreEqual(rule.Account.Id, newRule.Account.Id);
-            Assert.AreEqual(rule.Category.Id, newRule.Category.Id);
-            Assert.AreEqual(rule.BankCategory, newRule.BankCategory);
-            Assert.AreEqual(rule.Description, newRule.Description);
-            Assert.AreEqual(rule.Mcc, newRule.Mcc);
-            Assert.AreEqual(1, newRule.Order);
-        }
+			_rules.Verify(x => x.Add(It.Is<Rule>(r => r.Account.Id == newRule.Account.Id &&
+				  r.Category.Id == newRule.Category.Id &&
+				  r.BankCategory == newRule.BankCategory &&
+				  r.Description == newRule.Description &&
+				  r.Mcc == newRule.Mcc &&
+				  r.Order == 1)));
+		}
     }
 }

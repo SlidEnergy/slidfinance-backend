@@ -28,7 +28,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var accounts = await _service.GetListWithAccessCheck(userId, bankId);
+            var accounts = await _service.GetListWithAccessCheckAsync(userId, bankId);
 
             return _mapper.Map<Dto.BankAccount[]>(accounts);
         }
@@ -43,7 +43,7 @@ namespace SlidFinance.WebApi
 
             var userId = User.GetUserId();
 
-            var account = await _service.GetById(userId, id);
+            var account = await _service.GetByIdWithAccessCheck(userId, id);
 
             var dto = _mapper.Map<Dto.BankAccount>(account);
             patchDoc.ApplyTo(dto);

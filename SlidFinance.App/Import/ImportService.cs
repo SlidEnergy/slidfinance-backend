@@ -8,15 +8,16 @@ namespace SlidFinance.App
     public class ImportService : IImportService
 	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public ImportService(DataAccessLayer dal)
+		public ImportService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
-        }
+			_context = context;
+		}
 
         public async Task<int> Import(string userId, string accountCode, float? balance, Transaction[] transactions)
         {
-            var user = await _dal.Users.GetById(userId);
             var account = await GetAccount(userId, accountCode);
 
             if (balance.HasValue && balance.Value != 0)
@@ -25,7 +26,7 @@ namespace SlidFinance.App
                 await _dal.Accounts.Update(account);
             }
 
-            var rules = await _dal.Rules.GetListWithAccessCheck(userId);
+            var rules = await _context.GetRuleListWithAccessCheckAsync(userId);
 
             var count = 0;
 
@@ -58,7 +59,7 @@ namespace SlidFinance.App
 
         private async Task<BankAccount> GetAccount(string userId, string accountCode)
         {
-            var accounts = await _dal.Accounts.GetListWithAccessCheck(userId);
+            var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
 
             var account = accounts.FirstOrDefault(x => x.Code == accountCode);
 

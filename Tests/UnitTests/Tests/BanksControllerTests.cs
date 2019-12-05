@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
+using System.Collections.Generic;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -24,22 +25,20 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task GetBanks_ShouldReturnList()
         {
-            await _dal.Banks.Add(new Bank()
+            var bank1 = await _dal.Banks.Add(new Bank()
             {
                 Title = "Bank #1",
-                User = _user
             });
-            await _dal.Banks.Add(new Bank()
+			var bank2 = await _dal.Banks.Add(new Bank()
             {
                 Title = "Bank #2",
-                User = _user
             });
 
-            _service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(_user.Banks.ToList());
+            _service.Setup(x => x.GetLis()).ReturnsAsync(new List<Bank>() { bank1, bank2 });
 
             var result = await _controller.GetList();
 
-			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id)));
+			_service.Verify(x => x.GetLis());
 		}
     }
 }

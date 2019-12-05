@@ -11,9 +11,5 @@ namespace SlidFinance.WebApi.Dto
         public int Id { get; set; }
 
         public string Title { get; set; }
-
-        public int[] AccountIds { get; set; }
-
-        public float OwnFunds { get; set; }
     }
 }

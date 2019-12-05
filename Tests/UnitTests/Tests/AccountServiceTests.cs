@@ -20,7 +20,7 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task PatchAccount_ShouldSetBalance()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
+            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
             var account = await _dal.Accounts.Add(new BankAccount() { Code ="code_1", Bank = bank });
 
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
@@ -37,8 +37,8 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task PatchAccount_ShouldSetBank()
         {
-            var bank1 = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var bank2 = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
+            var bank1 = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
+            var bank2 = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
             var account = await _dal.Accounts.Add(new BankAccount() { Bank = bank1 });
             
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
@@ -55,7 +55,7 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task PatchAccount_ShouldCallUpdateMethod()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
+            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
             var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Transactions = new List<Transaction>(), Bank = bank, Code = "Code #1"});
 
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);

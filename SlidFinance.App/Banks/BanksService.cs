@@ -17,33 +17,23 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
-		public async Task<List<Bank>> GetListWithAccessCheckAsync(string userId)
+		public async Task<List<Bank>> GetLis()
         {
-			var user = await _context.Users.FindAsync(userId);
+			var banks = await _context.Banks.ToListAsync();
 
-			var banks = await _context.TrusteeAccounts.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
-				.Join(_context.Banks, a => a.BankId, b => b.Id, (a, b) => b)
-				.ToListAsync();
-
-			return banks.Distinct().OrderBy(x => x.Title).ToList();
+			return banks.OrderBy(x => x.Title).ToList();
         }
 
-        public async Task<Bank> AddBank(string userId, string title)
+        public async Task<Bank> AddBank(string title)
         {
-            var user = await _dal.Users.GetById(userId);
-
-            var bank = await _dal.Banks.Add(new Bank(title, user));
+            var bank = await _dal.Banks.Add(new Bank(title));
 
             return bank;
         }
 
-        public async Task<Bank> EditBank(string userId, int bankId, string title)
+        public async Task<Bank> EditBank(int bankId, string title)
         {
             var editBank = await _dal.Banks.GetById(bankId);
-
-            if (!editBank.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
 
             editBank.Rename(title);
 
@@ -52,13 +42,9 @@ namespace SlidFinance.App
             return editBank;
         }
 
-        public async Task DeleteBank(string userId, int bankId)
+        public async Task DeleteBank(int bankId)
         {
-            var user = await _dal.Users.GetById(userId);
-
             var bank = await _dal.Banks.GetById(bankId);
-
-            bank.IsBelongsTo(userId);
 
             await _dal.Banks.Delete(bank);
         }

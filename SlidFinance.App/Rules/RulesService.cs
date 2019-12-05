@@ -19,47 +19,31 @@ namespace SlidFinance.App
 
         public async Task<List<Rule>> GetListWithAccessCheckAsync(string userId)
         {
-			var user = await _context.Users.FindAsync(userId);
-
-			var rules = await _context.TrusteeCategories
-				.Where(x => x.TrusteeId == user.TrusteeId)
-				.Join(_context.Rules, c => c.CategoryId, r => r.CategoryId, (c, r) => r)
-				.ToListAsync();
+			var rules = await _context.GetRuleListWithAccessCheckAsync(userId);
 
             return rules.Distinct().ToList();
         }
 
         public async Task<Rule> AddRule(string userId, int? accountId, string bankCategory, int? categoryId, string description, int? mcc)
         {
-            var user = await _dal.Users.GetById(userId);
-
             BankAccount account = null;
 
             if (accountId.HasValue)
             {
-                account = await _dal.Accounts.GetById(accountId.Value);
-
-                if (account == null)
-                    throw new EntityNotFoundException();
-
-                if (!account.IsBelongsTo(userId))
-                    throw new EntityAccessDeniedException();
-            }
+				account = await _context.GetAccountByIdWithAccessCheck(userId, accountId.Value);
+			}
 
             Category category = null;
 
             if (categoryId.HasValue)
             {
-                category = await _dal.Categories.GetById(categoryId.Value);
+                category = await _context.GetCategorByIdWithAccessCheckAsync(userId, categoryId.Value);
 
                 if (category == null)
                     throw new EntityNotFoundException();
-
-                if (!category.IsBelongsTo(userId))
-                    throw new EntityAccessDeniedException();
             }
 
-            var rules = await _dal.Rules.GetListWithAccessCheck(userId);
+            var rules = await _context.GetRuleListWithAccessCheckAsync(userId);
 
             var order = rules.Any() ? rules.Max(x => x.Order) + 1 : 0;
 
@@ -70,35 +54,29 @@ namespace SlidFinance.App
 
         public async Task<Rule> EditRule(string userId, int ruleId, int? accountId, string bankCategory, int? categoryId, string description, int? mcc)
         {
-            var editRule = await _dal.Rules.GetById(ruleId);
+			var editRule = await _context.GetRuleByIdWithAccessCheckAsync(userId, ruleId);
 
-            if (!editRule.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
+			if (editRule == null)
+				throw new EntityNotFoundException();
 
-            BankAccount account = null;
+			BankAccount account = null;
 
             if (accountId.HasValue)
             {
-                account = await _dal.Accounts.GetById(accountId.Value);
+				account = await _context.GetAccountByIdWithAccessCheck(userId, accountId.Value);
 
-                if (account == null)
-                    throw new EntityNotFoundException();
-
-                if (!account.IsBelongsTo(userId))
-                    throw new EntityAccessDeniedException();
-            }
+				if (account == null)
+					throw new EntityNotFoundException();
+			}
 
             Category category = null;
 
             if (categoryId.HasValue)
             {
-                category = await _dal.Categories.GetById(categoryId.Value);
+                category = await _context.GetCategorByIdWithAccessCheckAsync(userId, categoryId.Value);
 
                 if (category == null)
                     throw new EntityNotFoundException();
-
-                if (!category.IsBelongsTo(userId))
-                    throw new EntityAccessDeniedException();
             }
 
             editRule.Account = account;
@@ -114,20 +92,17 @@ namespace SlidFinance.App
 
         public async Task DeleteRule(string userId, int bankId)
         {
-			var user = await _context.Users.FindAsync(userId);
+            var rule = await _context.GetRuleByIdWithAccessCheckAsync(userId, bankId);
 
-            var rule = await _dal.Rules.GetById(bankId);
-
-			var trustee = await _context.TrusteeCategories.FirstOrDefaultAsync(x => x.TrusteeId == user.TrusteeId && x.CategoryId == rule.CategoryId);
-			if (trustee == null)
-				throw new EntityAccessDeniedException();
+			if (rule == null)
+				throw new EntityNotFoundException();
 
             await _dal.Rules.Delete(rule);
         }
 
         public async Task<List<GeneratedRule>> GenerateRules(string userId)
         {
-            var transactions = await _dal.Transactions.GetListWithAccessCheck(userId);
+            var transactions = await _context.GetTransactionListWithAccessCheckAsync(userId);
 
             var generatedRules = transactions
                 .Where(x => x.Category != null)
@@ -143,44 +118,22 @@ namespace SlidFinance.App
                         .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
                     Count = x.Count()
                 })
-                .Where(x => x.Count >= 5);
+                .Where(x => x.Count >= 5).ToList();
 
-            var existRules = await _dal.Rules.GetListWithAccessCheck(userId);
+            var existRules = await _context.GetRuleListWithAccessCheckAsync(userId);
 
             var existGeneratedRules = existRules
                 .Select(x => new GeneratedRule
                 {
-                    AccountId = x.Account.Id,
+                    AccountId = x.AccountId,
                     BankCategory = x.BankCategory,
                     Description = x.Description,
                     Mcc = x.Mcc,
-                });
+                }).ToList();
 
             generatedRules = generatedRules.Except(existGeneratedRules, new RuleComparer()).ToList();
 
             return generatedRules.ToList();
         }
-    }
-
-    public class RuleComparer : IEqualityComparer<GeneratedRule>
-    {
-        bool IEqualityComparer<GeneratedRule>.Equals(GeneratedRule x, GeneratedRule y)
-        {
-            return ((x.AccountId == null || x.AccountId.Equals(y.AccountId)) &&
-                    (string.IsNullOrEmpty(x.BankCategory) || x.BankCategory.Equals(y.BankCategory)) &&
-                    (string.IsNullOrEmpty(x.Description) || x.Description.Equals(y.Description)) &&
-                    (x.Mcc == null || x.Mcc.Equals(y.Mcc)));
-        }
-
-        int IEqualityComparer<GeneratedRule>.GetHashCode(GeneratedRule obj)
-        {
-            if (obj == null)
-                return 0;
-
-            return (obj.BankCategory ?? "").GetHashCode() * 1000 +
-                   (obj.Description ?? "").GetHashCode() * 100 +
-                   ((obj.AccountId ?? 0) + 1) * 10 +
-                   obj.Mcc ?? 0;
-        }
-    }
+	}
 }

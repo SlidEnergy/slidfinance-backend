@@ -11,14 +11,17 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task GetGeneratedRules_ShouldReturnContent()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0, _user);
+			var category = new Category("Category #1", 0);
 			await _dal.Categories.Add(category);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
+			await _db.SaveChangesAsync();
 
-			for(int i = 0; i < 5; i++)
+			for (int i = 0; i < 5; i++)
 			await _dal.Transactions.Add(new Transaction() { Account = account, Category = category, Amount = 1, Approved = true,
 				BankCategory = "Bank category #1", Description = "Description #1", Mcc = 1000, DateTime = DateTime.Today });
 
@@ -38,15 +41,15 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task GetRuleList_ShouldReturnContent()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			_db.TrusteeAccounts.Add(new TrusteeAccount() { TrusteeId = _user.TrusteeId, AccountId = account.Id });
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			await _db.SaveChangesAsync();
-			var category = new Category("Category #1", 0, _user);
+			var category = new Category("Category #1", 0);
 			await _dal.Categories.Add(category);
-			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category.Id });
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();
 			var rule1 = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule1);
@@ -65,12 +68,15 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task AddRule_ShouldReturnContent()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0, _user);
+			var category = new Category("Category #1", 0);
 			await _dal.Categories.Add(category);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
+			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/rules/", _accessToken, new Dto.Rule() { AccountId = account.Id,
 				BankCategory = "Bank category #1", CategoryId = category.Id, Description = "Description #1", Mcc = 5000 });
@@ -85,14 +91,17 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task UpdateRule_ShouldReturnContent()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0, _user);
+			var category = new Category("Category #1", 0);
 			await _dal.Categories.Add(category);
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 1000, 0);
 			await _dal.Rules.Add(rule);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
+			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/rules/" + rule.Id, _accessToken, new Dto.Rule
 			{
@@ -115,15 +124,15 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task DeleteRule_ShouldNoContent()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0, _user);
+			var category = new Category("Category #1", 0);
 			await _dal.Categories.Add(category);
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule);
-			_db.TrusteeCategories.Add(new TrusteeCategory() { TrusteeId = _user.TrusteeId, CategoryId = category.Id });
+			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/rules/" + rule.Id, _accessToken);

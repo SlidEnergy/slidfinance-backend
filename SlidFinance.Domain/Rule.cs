@@ -32,7 +32,5 @@ namespace SlidFinance.Domain
             Mcc = mcc;
             Order = order;
         }
-
-        public bool IsBelongsTo(string userId) => Account.Bank.User.Id == userId;
     }
 }

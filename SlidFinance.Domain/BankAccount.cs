@@ -22,8 +22,8 @@ namespace SlidFinance.Domain
         [Required]
         public virtual Bank Bank { get; set; }
 
-        [Required]
-        public virtual ICollection<Transaction> Transactions { get; set; }
+		[Required]
+		public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
         public BankAccount() { }
 
@@ -43,7 +43,5 @@ namespace SlidFinance.Domain
             Balance = balance;
             CreditLimit = creditLimit;
         }
-
-        public bool IsBelongsTo(string userId) => Bank.User.Id == userId;
     }
 }
