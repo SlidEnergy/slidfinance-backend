@@ -7,6 +7,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using System.Collections.Generic;
 
 namespace SlidFinance.WebApi
 {
@@ -16,18 +17,16 @@ namespace SlidFinance.WebApi
     public class ImportController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IImportService _service;
+        private readonly IApiImportService _service;
 		private readonly ITokenService _tokenService;
 		private readonly IUsersService _usersService;
-		private readonly IMccService _mccService;
 
-		public ImportController(IMapper mapper, IImportService importService, ITokenService tokenService, IUsersService usersService, IMccService mccService)
+		public ImportController(IMapper mapper, IApiImportService importService, ITokenService tokenService, IUsersService usersService)
         {
             _mapper = mapper;
             _service = importService;
 			_tokenService = tokenService;
 			_usersService = usersService;
-			_mccService = mccService;
 		}
 
 		[Authorize(Policy = Policy.MustBeAllOrImportAccessMode)]
@@ -38,24 +37,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-			var mccList = await _mccService.GetListAsync();
-
-			foreach (var t in data.Transactions)
-			{
-				if (t.Mcc.HasValue)
-				{
-					var mcc = mccList.FirstOrDefault(x => x.Code == t.Mcc.Value.ToString("D4"));
-					if (mcc == null)
-					{
-						mcc = new Mcc() { Code = t.Mcc.Value.ToString("D4"), IsSystem = false };
-						await _mccService.AddAsync(mcc);
-					}
-				}
-			}
-
-            var count = await _service.Import(userId, data.Code, data.Balance, _mapper.Map<Transaction[]>(data.Transactions));
-
-            return count;
+			return await _service.Import(userId, data);
         }
 
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]

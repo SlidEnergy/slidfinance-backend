@@ -37,7 +37,7 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.Mcc,
 					opt => opt.MapFrom(src => src.Mcc == null ? null : context.Mcc.FirstOrDefault(m => m.Code == src.Mcc.Value.ToString("D4"))))
 				.ForMember(dest => dest.MccId,
-					opt => opt.Ignore())
+					opt => opt.MapFrom(src => src.Mcc == null ? null : (int?)context.Mcc.First(m => m.Code == src.Mcc.Value.ToString("D4")).Id))
 				.ForMember(dest => dest.Account,
 					opt => opt.MapFrom(src => context.Find<BankAccount>(src.AccountId)));
 

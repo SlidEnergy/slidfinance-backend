@@ -31,6 +31,9 @@ namespace SlidFinance.App
 
 				if (!existTransaction)
 				{
+					if(t.MccId.HasValue)
+						await AddMerchantIfNotExist(t);
+
 					t.Account = account;
 					t.Category = GetCategoryByRules(t, rules);
 					_context.Transactions.Add(t);
@@ -77,7 +80,10 @@ namespace SlidFinance.App
 
 		private async Task<Models.Merchant> AddMerchantIfNotExist(Transaction t)
 		{
-			var merchant = new Models.Merchant() { Name = t.Description };
+			if (!t.MccId.HasValue)
+				return null;
+
+			var merchant = new Models.Merchant() { Name = t.Description, MccId = t.MccId.Value };
 
 			_context.Merchants.Add(merchant);
 			await _context.SaveChangesAsync();
