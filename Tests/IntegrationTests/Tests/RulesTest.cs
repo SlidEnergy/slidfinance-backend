@@ -23,11 +23,11 @@ namespace SlidFinance.WebApi.IntegrationTests
 
 			for (int i = 0; i < 5; i++)
 			await _dal.Transactions.Add(new Transaction() { Account = account, Category = category, Amount = 1, Approved = true,
-				BankCategory = "Bank category #1", Description = "Description #1", Mcc = 1000, DateTime = DateTime.Today });
+				BankCategory = "Bank category #1", Description = "Description #1", MccId = 1000, DateTime = DateTime.Today });
 
 			for (int i = 0; i < 5; i++)
 				await _dal.Transactions.Add(new Transaction() { Account = account, Category = category, Amount = 1, Approved = true,
-					BankCategory = "Bank category #2", Description = "Description #2", Mcc = 2, DateTime = DateTime.Today });
+					BankCategory = "Bank category #2", Description = "Description #2", MccId = 2, DateTime = DateTime.Today });
 
 			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/rules/generated", _accessToken);
 			var response = await SendRequest(request);

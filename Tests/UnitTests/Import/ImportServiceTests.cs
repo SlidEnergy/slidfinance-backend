@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -15,7 +17,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new ImportService(_mockedDal, _db);
+            _service = new ImportService(_db);
         }
 
         [Test]
@@ -35,17 +37,17 @@ namespace SlidFinance.WebApi.UnitTests
                 Description = "Description #1",
                 BankCategory = "Bank category #1",
                 Approved = false,
-                Mcc = 111
+                MccId = 111
             };
 
 			await _db.SaveChangesAsync();
 
-            _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
-
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction });
 
-            _transactions.Verify(x => x.Add(It.Is<Transaction>(t=>t.Category.Id == category.Id && t.Account.Id == account.Id)), Times.Exactly(1));
+            var list = await _db.Transactions.Where(t => t.CategoryId == category.Id && t.AccountId == account.Id).ToListAsync();
+
             Assert.AreEqual(1, count);
+            Assert.AreEqual(1, list.Count);
         }
 
         [Test]
@@ -62,7 +64,7 @@ namespace SlidFinance.WebApi.UnitTests
                 Description = "Description #1",
                 BankCategory = "Bank category #1",
                 Approved = false,
-                Mcc = 111
+                MccId = 111
             };
             var transaction2 = new Transaction()
             {
@@ -71,15 +73,14 @@ namespace SlidFinance.WebApi.UnitTests
                 Description = "Description #2",
                 BankCategory = "Bank category #1",
                 Approved = false,
-                Mcc = 111
+                MccId = 111
             };
-
-            _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
 
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction1, transaction2 });
 
-            _transactions.Verify(x => x.Add(It.IsAny<Transaction>()), Times.Exactly(2));
+            var list = await _db.Transactions.Where(t => t.AccountId == account.Id).ToListAsync();
             Assert.AreEqual(2, count);
+            Assert.AreEqual(2, list.Count);
         }
 
         [Test]
@@ -97,7 +98,7 @@ namespace SlidFinance.WebApi.UnitTests
                 Description = "Description #1",
                 BankCategory = "Bank category #1",
                 Approved = false,
-                Mcc = 111
+                MccId = 111
             };
 
             _db.Transactions.Add(new Transaction() { DateTime = transaction.DateTime, Amount = transaction.Amount, Description = transaction.Description,
@@ -105,12 +106,11 @@ namespace SlidFinance.WebApi.UnitTests
 
 			await _db.SaveChangesAsync();
 
-            _transactions.Setup(x => x.Add(It.IsAny<Transaction>())).ReturnsAsync(new Transaction());
-
             var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction });
 
-            _transactions.Verify(x => x.Add(It.IsAny<Transaction>()), Times.Never);
+            var list = await _db.Transactions.Where(t => t.AccountId == account.Id).ToListAsync();
             Assert.AreEqual(0, count);
+            Assert.AreEqual(1, list.Count);
         }
     }
 }

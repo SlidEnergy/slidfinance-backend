@@ -11,7 +11,7 @@ namespace SlidFinance.App
 			return ((x.AccountId == null || x.AccountId.Equals(y.AccountId)) &&
 					(string.IsNullOrEmpty(x.BankCategory) || x.BankCategory.Equals(y.BankCategory)) &&
 					(string.IsNullOrEmpty(x.Description) || x.Description.Equals(y.Description)) &&
-					(x.Mcc == null || x.Mcc.Equals(y.Mcc)));
+					(x.MccId == null || x.MccId.Equals(y.MccId)));
 		}
 
 		int IEqualityComparer<GeneratedRule>.GetHashCode(GeneratedRule obj)
@@ -22,7 +22,7 @@ namespace SlidFinance.App
 			return (obj.BankCategory ?? "").GetHashCode() * 1000 +
 				   (obj.Description ?? "").GetHashCode() * 100 +
 				   ((obj.AccountId ?? 0) + 1) * 10 +
-				   obj.Mcc ?? 0;
+				   obj.MccId ?? 0;
 		}
 	}
 }

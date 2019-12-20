@@ -64,6 +64,10 @@ namespace SlidFinance.WebApi.UnitTests
             var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
             var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
             var category = await _dal.Categories.Add(new Category() { Title = "Category #1" });
+			var mcc = new Mcc() { Code = "0111" };
+			_db.Mcc.Add(mcc);
+			await _db.SaveChangesAsync();
+			
             var transaction = new Dto.Transaction()
             {
                 DateTime = DateTime.Now,
@@ -89,8 +93,8 @@ namespace SlidFinance.WebApi.UnitTests
                 t.Category.Id == transaction.CategoryId &&
                 t.BankCategory == transaction.BankCategory &&
                 t.Approved == transaction.Approved &&
-                t.Mcc == transaction.Mcc
-                )), Times.Once);
+                t.Mcc.Id == mcc.Id
+				)), Times.Once);
         }
 
         [Test]

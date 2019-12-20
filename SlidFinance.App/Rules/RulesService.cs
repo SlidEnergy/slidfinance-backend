@@ -106,13 +106,13 @@ namespace SlidFinance.App
 
             var generatedRules = transactions
                 .Where(x => x.Category != null)
-                .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.Mcc })
+                .GroupBy(x => new { AccountId = x.Account.Id, x.BankCategory, x.Description, x.MccId })
                 .Select(x => new GeneratedRule
                 {
                     AccountId = x.Key.AccountId,
                     BankCategory = x.Key.BankCategory,
                     Description = x.Key.Description,
-                    Mcc = x.Key.Mcc,
+                    MccId = x.Key.MccId,
                     Categories = x.Where(s => s.Category != null).Select(s => s.Category.Id)
                         .GroupBy(s => s)
                         .Select(s => new CategoryDistribution { CategoryId = s.Key, Count = s.Count() }).ToArray(),
@@ -128,7 +128,7 @@ namespace SlidFinance.App
                     AccountId = x.AccountId,
                     BankCategory = x.BankCategory,
                     Description = x.Description,
-                    Mcc = x.Mcc,
+                    MccId = x.Mcc,
                 }).ToList();
 
             generatedRules = generatedRules.Except(existGeneratedRules, new RuleComparer()).ToList();

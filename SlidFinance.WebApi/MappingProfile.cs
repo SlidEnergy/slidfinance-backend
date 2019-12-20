@@ -3,6 +3,7 @@ using SlidFinance.App;
 using SlidFinance.App.Utils;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
+using System;
 using System.Linq;
 
 namespace SlidFinance.WebApi
@@ -33,6 +34,10 @@ namespace SlidFinance.WebApi
 					opt => opt.MapFrom(src => src.UserDescription ?? ""))
 				.ForMember(dest => dest.Category,
 					opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
+				.ForMember(dest => dest.Mcc,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : context.Mcc.FirstOrDefault(m => m.Code == src.Mcc.Value.ToString("D4"))))
+				.ForMember(dest => dest.MccId,
+					opt => opt.Ignore())
 				.ForMember(dest => dest.Account,
 					opt => opt.MapFrom(src => context.Find<BankAccount>(src.AccountId)));
 

@@ -14,11 +14,18 @@ namespace SlidFinance.App
 			_dal = dal;
 		}
 
-		public async Task<List<Mcc>> GetList()
+		public async Task<List<Mcc>> GetListAsync()
 		{
 			var mcc = await _dal.Mcc.GetList();
 
 			return mcc.ToList();
+		}
+
+		public async Task<Mcc> AddAsync(Mcc mcc)
+		{
+			await _dal.Mcc.Add(mcc);
+
+			return mcc;
 		}
 	}
 }

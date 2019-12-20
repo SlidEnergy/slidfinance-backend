@@ -24,7 +24,9 @@ namespace SlidFinance.Domain
 		[Required]
         public virtual BankAccount Account { get; set; }
 
-        public int? Mcc { get; set; }
+        public int? MccId { get; set; }
+
+        public virtual Mcc Mcc { get; set; }
 
         [Required]
         public string BankCategory { get; set; }
