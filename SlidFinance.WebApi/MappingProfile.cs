@@ -51,8 +51,6 @@ namespace SlidFinance.WebApi
 			   .ForMember(dest => dest.Transactions,
 				   opt => opt.Ignore());
 
-			CreateMap<Bank, Dto.Bank>();
-
 			CreateMap<ApplicationUser, Dto.User>();
 
 			CreateMap<Rule, Dto.Rule>()

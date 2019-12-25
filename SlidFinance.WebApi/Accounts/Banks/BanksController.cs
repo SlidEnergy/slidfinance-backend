@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SlidFinance.App;
-using System.Collections.Generic;
+using SlidFinance.Domain;
 using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
@@ -23,27 +23,27 @@ namespace SlidFinance.WebApi
         [HttpGet]
         [ProducesResponseType(200)]
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]
-		public async Task<ActionResult<Dto.Bank[]>> GetList()
+		public async Task<ActionResult<Bank[]>> GetList()
         {
             var banks = await _banksService.GetLis();
-            return _mapper.Map<Dto.Bank[]>(banks);
+            return _mapper.Map<Bank[]>(banks);
         }
 
         [HttpPost]
 		[Authorize(Policy = Policy.MustBeAdmin)]
-		public async Task<ActionResult<Dto.Bank>> Add(AddBankBindingModel bank)
+		public async Task<ActionResult<Bank>> Add(Bank bank)
         {
             var newBank = await _banksService.AddBank(bank.Title);
 
-            return CreatedAtAction("GetList", _mapper.Map<Dto.Bank>(newBank));
+            return CreatedAtAction("GetList", _mapper.Map<Bank>(newBank));
         }
 
         [HttpPut("{id}")]
 		[Authorize(Policy = Policy.MustBeAdmin)]
-		public async Task<ActionResult<Dto.Bank>> Update(int id, EditBankBindingModel bank)
+		public async Task<ActionResult<Bank>> Update(int id, Bank bank)
         {
             var editedBank = await _banksService.EditBank(id, bank.Title);
-            return _mapper.Map<Dto.Bank>(editedBank);
+            return _mapper.Map<Bank>(editedBank);
         }
 
         [HttpDelete("{id}")]
