@@ -37,6 +37,12 @@ namespace SlidFinance.Domain
             set { _model.DisplayName = value; }
         }
 
+        public bool IsPublic
+        {
+            get { return _model.IsPublic; }
+            set { _model.IsPublic = value; }
+        }
+
         public DateTime Created => _model.Created;
 
         public DateTime Updated => _model.Updated;

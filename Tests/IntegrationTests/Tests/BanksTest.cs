@@ -37,7 +37,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var user = CreateUser("slidenergy@gmail.com", "Password123#");
 			await Login("slidenergy@gmail.com", "Password123#");
 
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/banks/", _accessToken, new Dto.Bank () {  Title = "Bank #1" });
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/banks/", _accessToken, new Bank () {  Title = "Bank #1" });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -55,7 +55,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/banks/" + bank.Id, _accessToken, new Dto.Bank
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/banks/" + bank.Id, _accessToken, new Bank
 			{
 				Id = bank.Id,
 				Title = "Bank #2"

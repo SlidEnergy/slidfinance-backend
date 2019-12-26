@@ -12,5 +12,6 @@ namespace SlidFinance.Domain
         DateTime Updated { get; set; }
         int MccId { get; set; }
         Mcc Mcc { get; set; }
+        bool IsPublic { get; set; }
     }
 }

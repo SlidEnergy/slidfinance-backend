@@ -29,14 +29,14 @@ namespace SlidFinance.WebApi
 
 			var transactions = _mapper.Map<Transaction[]>(data.Transactions);
 
-			await AddMerchantIfNotExist(transactions);
+			await AddMerchantsIfNotExist(userId, transactions);
 
 			var count = await _service.Import(userId, data.Code, data.Balance, transactions);
 
 			return count;
 		}
 
-		private async Task AddMerchantIfNotExist(ICollection<Transaction> transactions)
+		private async Task AddMerchantsIfNotExist(string userId, ICollection<Transaction> transactions)
 		{
 			var merchantList = await _merchantService.GetListAsync();
 
@@ -44,12 +44,8 @@ namespace SlidFinance.WebApi
 			{
 				if (t.MccId.HasValue)
 				{
-					var merchant = merchantList.FirstOrDefault(x => x.MccId == t.MccId.Value && x.Name == t.Description);
-					if (merchant == null)
-					{
-						merchant = new Models.Merchant() { MccId = t.MccId.Value, Name = t.Description };
-						await _merchantService.AddAsync(merchant);
-					}
+					var merchant = new Models.Merchant() { MccId = t.MccId.Value, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
+					await _merchantService.AddAsync(merchant);
 				}
 			}
 		}

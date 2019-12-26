@@ -42,13 +42,15 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			var mcc = new Mcc() { Code = "0100" };
+			_db.Mcc.Add(mcc);
 			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/transactions/", _accessToken, new Dto.Transaction() { AccountId = account.Id,
-				BankCategory = "Bank category #1", Description = "Description #1", Mcc = 5000, DateTime = DateTime.Today });
+				BankCategory = "Bank category #1", Description = "Description #1", Mcc = Convert.ToInt32(mcc.Code), DateTime = DateTime.Today });
 			var response = await SendRequest(request);
 
-			Assert.True(response.IsSuccessStatusCode);
+			response.IsSuccess();
 			Assert.NotNull(response.Content);
 			var dict = await response.ToDictionary();
 			Assert.IsTrue(dict.ContainsKey("id"));

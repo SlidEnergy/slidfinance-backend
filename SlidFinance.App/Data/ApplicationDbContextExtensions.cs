@@ -107,5 +107,29 @@ namespace SlidFinance.App
 
 			return rules;
 		}
+
+		public static async Task<List<Models.Merchant>> GetMerchantListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			if (user != null && user.isAdmin())
+			{
+				return await context.Merchants.ToListAsync();
+			}
+
+			return await context.Merchants.Where(x => x.IsPublic == true).ToListAsync();
+		}
+
+		public static async Task<Models.Merchant> GetMerchantByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			if (user != null && user.isAdmin())
+			{
+				return await context.Merchants.FindAsync(id);
+			}
+
+			return await context.Merchants.FindAsync(id);
+		}
 	}
 }

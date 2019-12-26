@@ -56,5 +56,27 @@ namespace SlidFinance.WebApi.UnitTests
 
 			return transaction;
 		}
+
+		public static async Task<Models.Merchant> CreateMerchant(this ApplicationDbContext db, int mccId)
+		{
+			var merchant = new Models.Merchant()
+			{
+				Name = Guid.NewGuid().ToString(),
+				MccId = mccId
+			};
+			db.Merchants.Add(merchant);
+			await db.SaveChangesAsync();
+
+			return merchant;
+		}
+
+		public static async Task<Mcc> CreateMcc(this ApplicationDbContext db, string code)
+		{
+			var mcc = new Mcc() { Code = code };
+			db.Mcc.Add(mcc);
+			await db.SaveChangesAsync();
+
+			return mcc;
+		}
 	}
 }

@@ -25,5 +25,11 @@ namespace SlidFinance.Models
         public DateTime Created { get; set; }
 
         public DateTime Updated { get; set; }
+
+        public string CreatedById { get; set; }
+        [Required]
+        public virtual ApplicationUser CreatedBy { get; set; }
+
+        public bool IsPublic { get; set; }
     }
 }
