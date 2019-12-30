@@ -14,6 +14,11 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
+		public async Task<Models.Merchant> GetByIdWithAccessCheckAsync(string userId, int id)
+		{
+			return await _context.GetMerchantByIdWithAccessCheckAsync(userId, id);
+		}
+
 		public async Task<List<Models.Merchant>> GetListAsync()
 		{
 			return await _context.Merchants.ToListAsync();

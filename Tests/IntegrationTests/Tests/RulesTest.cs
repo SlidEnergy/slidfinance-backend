@@ -79,7 +79,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/rules/", _accessToken, new Dto.Rule() { AccountId = account.Id,
-				BankCategory = "Bank category #1", CategoryId = category.Id, Description = "Description #1", Mcc = 5000 });
+				BankCategory = "Bank category #1", CategoryId = category.Id, Description = "Description #1", MccId = 5000 });
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -110,7 +110,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 				BankCategory = "Bank category #2",
 				CategoryId = category.Id,
 				Description = "Description #2",
-				Mcc = 2000
+				MccId = 2000
 			});
 			
 			var response = await SendRequest(request);

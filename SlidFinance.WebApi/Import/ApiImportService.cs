@@ -61,7 +61,7 @@ namespace SlidFinance.WebApi
 					var mcc = mccList.FirstOrDefault(x => x.Code == t.Mcc.Value.ToString("D4"));
 					if (mcc == null)
 					{
-						mcc = new Mcc() { Code = t.Mcc.Value.ToString("D4"), IsSystem = false };
+						mcc = new Mcc() { Code = t.Mcc.Value.ToString("D4"), IsSystem = false, Title = "", Category = MccCategory.None };
 						await _mccService.AddAsync(mcc);
 					}
 				}

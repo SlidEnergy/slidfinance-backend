@@ -36,7 +36,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
+            var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.MccId);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Rule>(newRule));
         }
@@ -46,7 +46,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var editedRule = await _rulesService.EditRule(userId, id, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
+            var editedRule = await _rulesService.EditRule(userId, id, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.MccId);
             return _mapper.Map<Dto.Rule>(editedRule);
         }
 

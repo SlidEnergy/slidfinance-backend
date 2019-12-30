@@ -36,12 +36,12 @@ namespace SlidFinance.WebApi.UnitTests
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 5555
+                MccId = 5555
             };
 
             _rules.Setup(x => x.Add(It.IsAny<Rule>())).ReturnsAsync((Rule x) => x);
 
-            var newRule = await _service.AddRule(_user.Id, account.Id, rule.BankCategory, rule.Category.Id, rule.Description, rule.Mcc);
+            var newRule = await _service.AddRule(_user.Id, account.Id, rule.BankCategory, rule.Category.Id, rule.Description, rule.MccId);
 
 			_rules.Verify(x => x.Add(It.Is<Rule>(r => r.Account.Id == rule.Account.Id &&
 				r.Category.Id == rule.Category.Id &&
@@ -71,12 +71,12 @@ namespace SlidFinance.WebApi.UnitTests
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 5555
+                MccId = 5555
             };
 
             _rules.Setup(x => x.Add(It.IsAny<Rule>())).ReturnsAsync((Rule x) => x);
 
-            var addedRule = await _service.AddRule(_user.Id, account.Id, newRule.BankCategory, newRule.Category.Id, newRule.Description, newRule.Mcc);
+            var addedRule = await _service.AddRule(_user.Id, account.Id, newRule.BankCategory, newRule.Category.Id, newRule.Description, newRule.MccId);
 
 			_rules.Verify(x => x.Add(It.Is<Rule>(r => r.Account.Id == newRule.Account.Id &&
 				  r.Category.Id == newRule.Category.Id &&

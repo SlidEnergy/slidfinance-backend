@@ -34,7 +34,7 @@ namespace SlidFinance.WebApi.UnitTests
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 5555, Order = 1
+                MccId = 5555, Order = 1
             };
             var rule2 = new Rule()
             {
@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi.UnitTests
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 3333,
+                MccId = 3333,
                 Order = 2
             };
 

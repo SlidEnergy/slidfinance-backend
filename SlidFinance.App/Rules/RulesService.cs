@@ -52,7 +52,7 @@ namespace SlidFinance.App
             return rule;
         }
 
-        public async Task<Rule> EditRule(string userId, int ruleId, int? accountId, string bankCategory, int? categoryId, string description, int? mcc)
+        public async Task<Rule> EditRule(string userId, int ruleId, int? accountId, string bankCategory, int? categoryId, string description, int? mccId)
         {
 			var editRule = await _context.GetRuleByIdWithAccessCheckAsync(userId, ruleId);
 
@@ -83,7 +83,7 @@ namespace SlidFinance.App
             editRule.Category = category;
             editRule.BankCategory = bankCategory;
             editRule.Description = description;
-            editRule.Mcc = mcc;
+            editRule.MccId = mccId;
 
             await _dal.Rules.Update(editRule);
 
@@ -128,7 +128,7 @@ namespace SlidFinance.App
                     AccountId = x.AccountId,
                     BankCategory = x.BankCategory,
                     Description = x.Description,
-                    MccId = x.Mcc,
+                    MccId = x.MccId,
                 }).ToList();
 
             generatedRules = generatedRules.Except(existGeneratedRules, new RuleComparer()).ToList();

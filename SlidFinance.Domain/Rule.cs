@@ -17,19 +17,20 @@ namespace SlidFinance.Domain
 		public int? AccountId { get; set; }
         public virtual BankAccount Account { get; set; }
 
-        public int? Mcc { get; set; }
+        public int? MccId { get; set; }
+        public virtual Mcc Mcc { get; set; }
 
         public string BankCategory { get; set; }
 
         public Rule() { }
 
-        public Rule(BankAccount account, string bankCategory, Category category, string description, int? mcc, int order)
+        public Rule(BankAccount account, string bankCategory, Category category, string description, int? mccId, int order)
         {
             Account = account;
             BankCategory = bankCategory;
             Category = category;
             Description = description;
-            Mcc = mcc;
+            MccId = mccId;
             Order = order;
         }
     }

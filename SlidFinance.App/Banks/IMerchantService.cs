@@ -6,9 +6,10 @@ namespace SlidFinance.App
 {
 	public interface IMerchantService
 	{
-		Task<Merchant> AddAsync(Merchant merchant);
-		Task<List<Merchant>> GetListAsync();
-		Task<List<Merchant>> GetListWithAccessCheckAsync(string userId);
+		Task<Models.Merchant> GetByIdWithAccessCheckAsync(string userId, int id);
+		Task<Models.Merchant> AddAsync(Merchant merchant);
+		Task<List<Models.Merchant>> GetListAsync();
+		Task<List<Models.Merchant>> GetListWithAccessCheckAsync(string userId);
 		Task<Models.Merchant> EditMerchant(string userId, Models.Merchant merchant);
 	}
 }
