@@ -21,6 +21,11 @@ namespace SlidFinance.App
 			return mcc.ToList();
 		}
 
+		public async Task<Mcc> GetByIdAsync(int id)
+		{
+			return await _dal.Mcc.GetById(id);
+		}
+
 		public async Task<Mcc> AddAsync(Mcc mcc)
 		{
 			await _dal.Mcc.Add(mcc);

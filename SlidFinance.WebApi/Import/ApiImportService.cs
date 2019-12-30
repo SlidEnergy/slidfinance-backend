@@ -39,12 +39,18 @@ namespace SlidFinance.WebApi
 		private async Task AddMerchantsIfNotExist(string userId, ICollection<Dto.ImportTransaction> transactions)
 		{
 			var merchantList = await _merchantService.GetListAsync();
+			var mccList = await _mccService.GetListAsync();
 
 			foreach (var t in transactions)
 			{
 				if (t.Mcc.HasValue)
 				{
-					var merchant = new Models.Merchant() { MccId = t.Mcc.Value, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
+					var mcc = mccList.FirstOrDefault(x => x.Code == t.Mcc.Value.ToString("D4"));
+
+					if (mcc == null)
+						throw new Exception("МСС код не найден");
+
+					var merchant = new Models.Merchant() { MccId = mcc.Id, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
 					await _merchantService.AddAsync(merchant);
 				}
 			}
