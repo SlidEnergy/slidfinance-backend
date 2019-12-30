@@ -35,13 +35,12 @@ namespace SlidFinance.WebApi.UnitTests
 			var mcc = new Mcc() { Code = "0111" };
 			_db.Mcc.Add(mcc);
 			await _db.SaveChangesAsync();
-			var transaction1 = new Dto.Transaction()
+			var transaction1 = new Dto.ImportTransaction()
 			{
 				DateTime = DateTime.Now,
 				Amount = 10,
 				Description = "Description #1",
-				BankCategory = "Bank category #1",
-				Approved = false,
+				Category = "Bank category #1",
 				Mcc = 111
 			};
 
@@ -51,7 +50,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Models.Merchant>());
 			_merchantService.Setup(x => x.AddAsync(It.IsAny<Models.Merchant>())).ReturnsAsync((Models.Merchant x) => x);
 
-			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.Transaction[] { transaction1 } });
+			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
 			_mccService.Verify(x => x.AddAsync(It.Is<Mcc>(m => m.Code == transaction1.Mcc.Value.ToString("D4") && m.IsSystem == false)));
 		}
@@ -66,13 +65,12 @@ namespace SlidFinance.WebApi.UnitTests
 			var mcc = new Mcc() { Code = "0111" };
 			_db.Mcc.Add(mcc);
 			await _db.SaveChangesAsync();
-			var transaction1 = new Dto.Transaction()
+			var transaction1 = new Dto.ImportTransaction()
 			{
 				DateTime = DateTime.Now,
 				Amount = 10,
 				Description = "Description #1",
-				BankCategory = "Bank category #1",
-				Approved = false,
+				Category = "Bank category #1",
 				Mcc = 111
 			};
 			
@@ -82,7 +80,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Models.Merchant>());
 			_merchantService.Setup(x => x.AddAsync(It.IsAny<Models.Merchant>())).ReturnsAsync((Models.Merchant x) => x);
 
-			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.Transaction[] { transaction1 } });
+			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
 			_mccService.Verify(x => x.AddAsync(It.IsAny<Mcc>()), Times.Never);
 		}

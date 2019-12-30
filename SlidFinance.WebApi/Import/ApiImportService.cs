@@ -27,30 +27,30 @@ namespace SlidFinance.WebApi
 		{
 			await AddMccIfNotExist(data.Transactions);
 
-			var transactions = _mapper.Map<Transaction[]>(data.Transactions);
+			await AddMerchantsIfNotExist(userId, data.Transactions);
 
-			await AddMerchantsIfNotExist(userId, transactions);
+			var transactions = _mapper.Map<Transaction[]>(data.Transactions);
 
 			var count = await _service.Import(userId, data.Code, data.Balance, transactions);
 
 			return count;
 		}
 
-		private async Task AddMerchantsIfNotExist(string userId, ICollection<Transaction> transactions)
+		private async Task AddMerchantsIfNotExist(string userId, ICollection<Dto.ImportTransaction> transactions)
 		{
 			var merchantList = await _merchantService.GetListAsync();
 
 			foreach (var t in transactions)
 			{
-				if (t.MccId.HasValue)
+				if (t.Mcc.HasValue)
 				{
-					var merchant = new Models.Merchant() { MccId = t.MccId.Value, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
+					var merchant = new Models.Merchant() { MccId = t.Mcc.Value, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
 					await _merchantService.AddAsync(merchant);
 				}
 			}
 		}
 
-		private async Task AddMccIfNotExist(ICollection<Dto.Transaction> transactions)
+		private async Task AddMccIfNotExist(ICollection<Dto.ImportTransaction> transactions)
 		{
 			var mccList = await _mccService.GetListAsync();
 

@@ -17,8 +17,8 @@ namespace SlidFinance.Domain
         [Required]
         public string Description { get; set; }
 
-		[Required]
-		public string UserDescription { get; set; }
+        [Required]
+        public string UserDescription { get; set; } = "";
 
 		public int AccountId { get; set; }
 		[Required]

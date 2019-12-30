@@ -9,6 +9,6 @@ namespace SlidFinance.WebApi
 
         public float? Balance { get; set; }
 
-        public ICollection<Dto.Transaction> Transactions { get; set; }
+        public ICollection<Dto.ImportTransaction> Transactions { get; set; }
     }
 }

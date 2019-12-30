@@ -47,9 +47,9 @@ namespace SlidFinance.WebApi.IntegrationTests
 				{
 					Code = account.Code,
 					Balance = 100,
-					Transactions = new Dto.Transaction[] {
-						new Dto.Transaction() { AccountId = account.Id, BankCategory = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today },
-						new Dto.Transaction() { AccountId = account.Id, BankCategory = "Bank category #2", Description = "Description #2", DateTime = DateTime.Today }
+					Transactions = new Dto.ImportTransaction[] {
+						new Dto.ImportTransaction() { Category = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today },
+						new Dto.ImportTransaction() { Category = "Bank category #2", Description = "Description #2", DateTime = DateTime.Today }
 					}
 				});
 

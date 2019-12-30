@@ -43,6 +43,19 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.Account,
 					opt => opt.MapFrom(src => context.Find<BankAccount>(src.AccountId)));
 
+			CreateMap<Dto.ImportTransaction, Transaction>()
+				.ForMember(dest => dest.BankCategory,
+					opt => opt.MapFrom(src => src.Category ?? ""))
+				.ForMember(dest => dest.Description,
+					opt => opt.MapFrom(src => src.Description ?? ""))
+				.ForMember(dest => dest.UserDescription,
+					opt => opt.Ignore())
+				.ForMember(dest => dest.Mcc,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : context.Mcc.FirstOrDefault(m => m.Code == src.Mcc.Value.ToString("D4"))))
+				.ForMember(dest => dest.MccId,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : (int?)context.Mcc.First(m => m.Code == src.Mcc.Value.ToString("D4")).Id))
+				.ForAllOtherMembers(x => x.Ignore());
+
 			CreateMap<BankAccount, Dto.BankAccount>()
 				.ForMember(dest => dest.BankId,
 					opt => opt.MapFrom(src => src.Bank.Id));
