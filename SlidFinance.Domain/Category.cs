@@ -11,18 +11,13 @@ namespace SlidFinance.Domain
         [Required]
         public string Title { get; set; }
 
-        public virtual ApplicationUser User { get; set; }
+		public Category() { }
 
-        public Category() { }
-
-        public Category(string title, int order, ApplicationUser user)
+        public Category(string title, int order)
         {
             Title = title;
             Order = order;
-            User = user;
         }
-
-        public bool IsBelongsTo(string userId) => User.Id == userId;
 
         public void Rename(string title) => Title = title;
 

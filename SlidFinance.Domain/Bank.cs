@@ -1,35 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SlidFinance.Domain
 {
-    public class Bank: IUniqueObject
+	public class Bank: IUniqueObject
     {
         public int Id { get; set; }
 
         [Required]
         public string Title { get; set; }
 
-        public float OwnFunds => Accounts == null ? 0 : Accounts.Sum(x => x.OwnFunds);
-
-        [Required]
-        public virtual ICollection<BankAccount> Accounts { get; set; }
-
-        [Required]
-        public virtual ApplicationUser User { get; set; }
-
         public Bank() { }
 
-        public Bank(string title, ApplicationUser user) {
+        public Bank(string title) {
             Title = title;
-            User = user;
-        }
-
-        public bool IsBelongsTo(string userId)
-        {
-            return User.Id == userId;
         }
 
         public void Rename(string title)

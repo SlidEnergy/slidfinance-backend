@@ -1,56 +1,57 @@
 using Moq;
-using SlidFinance.WebApi;
-using SlidFinance.App;
 using NUnit.Framework;
+using SlidFinance.App;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SlidFinance.Domain;
 
 namespace SlidFinance.WebApi.UnitTests
 {
-    public class RulesControllerTests : TestsBase
+	public class RulesControllerTests : TestsBase
     {
 		private RulesController _controller;
+		private Mock<IRulesService> _service;
 
 		[SetUp]
         public void Setup()
         {
-            var service = new RulesService(_mockedDal);
-			_controller = new RulesController(_autoMapper.Create(_db), service);
+			_service = new Mock<IRulesService>();
+			_controller = new RulesController(_autoMapper.Create(_db), _service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
         public async Task GetRules_ShouldReturnList()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1", User = _user });
-            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank });
-            var category = await _dal.Categories.Add(new Category() {Title = "Category #1", User = _user});
+            var bank = new Bank() { Title = "Bank #1" };
+            var account = new BankAccount() { Title = "Account #1", Bank = bank };
+            var category = new Category() {Title = "Category #1"};
 
-            var rule1 = await _dal.Rules.Add(new Rule()
+            var rule1 = new Rule()
             {
                 Account = account,
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 5555, Order = 1
-            });
-            var rule2 = await _dal.Rules.Add(new Rule()
+                MccId = 5555, Order = 1
+            };
+            var rule2 = new Rule()
             {
                 Account = account,
                 BankCategory = "Category #1",
                 Category = category,
                 Description = "Description #1",
-                Mcc = 3333,
+                MccId = 3333,
                 Order = 2
-            });
+            };
 
-            _rules.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(new List<Rule>() { rule1, rule2 });
+            _service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(new List<Rule>() { rule1, rule2 });
 
             var result = await _controller.GetList();
 
-            Assert.AreEqual(2, result.Value.Count());
-        }
+			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id)));
+
+		}
     }
 }

@@ -5,6 +5,9 @@ using SlidFinance.App;
 using SlidFinance.Domain;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using System.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace SlidFinance.WebApi
 {
@@ -14,11 +17,11 @@ namespace SlidFinance.WebApi
     public class ImportController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private IImportService _service;
-		private ITokenService _tokenService;
-		private IUsersService _usersService;
+        private readonly IApiImportService _service;
+		private readonly ITokenService _tokenService;
+		private readonly IUsersService _usersService;
 
-		public ImportController(IMapper mapper, IImportService importService, ITokenService tokenService, IUsersService usersService)
+		public ImportController(IMapper mapper, IApiImportService importService, ITokenService tokenService, IUsersService usersService)
         {
             _mapper = mapper;
             _service = importService;
@@ -34,9 +37,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var count = await _service.Import(userId, data.Code, data.Balance, _mapper.Map<Transaction[]>(data.Transactions));
-
-            return count;
+			return await _service.Import(userId, data);
         }
 
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]

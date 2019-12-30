@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>SlidFinanceServer.UnitTests</AssemblyName>
+    <AssemblyName>SlidFinance.UnitTests</AssemblyName>
 
-    <RootNamespace>SlidFinanceServer.UnitTests</RootNamespace>
+    <RootNamespace>SlidFinance.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

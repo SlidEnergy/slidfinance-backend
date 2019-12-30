@@ -27,7 +27,7 @@ namespace SlidFinance.WebApi
         // GET: api/Transactions
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList(int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<ActionResult<IEnumerable<Dto.Transaction>>> GetList(int? accountId, int? categoryId = null, DateTime? startDate = null, DateTime? endDate = null)
         {
 			if(startDate.HasValue)
 				startDate = startDate.Value.ToUniversalTime();
@@ -36,7 +36,7 @@ namespace SlidFinance.WebApi
 
 			var userId = User.GetUserId();
 
-            var transactions = await _service.GetList(userId, categoryId, startDate, endDate);
+            var transactions = await _service.GetListWithAccessCheckAsync(userId, accountId, categoryId, startDate, endDate);
 
             return _mapper.Map<Dto.Transaction[]>(transactions);
         }

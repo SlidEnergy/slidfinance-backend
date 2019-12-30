@@ -11,6 +11,7 @@ namespace SlidFinance.Domain
 
         public float Amount { get; set; }
 
+		public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [Required]
@@ -19,16 +20,17 @@ namespace SlidFinance.Domain
 		[Required]
 		public string UserDescription { get; set; }
 
+		public int AccountId { get; set; }
 		[Required]
         public virtual BankAccount Account { get; set; }
 
-        public int? Mcc { get; set; }
+        public int? MccId { get; set; }
+
+        public virtual Mcc Mcc { get; set; }
 
         [Required]
         public string BankCategory { get; set; }
 
         public bool Approved { get; set; }
-
-        public bool IsBelongsTo(string userId) => Account.Bank.User.Id == userId;
     }
 }

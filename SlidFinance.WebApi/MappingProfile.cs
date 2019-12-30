@@ -3,6 +3,7 @@ using SlidFinance.App;
 using SlidFinance.App.Utils;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
+using System;
 using System.Linq;
 
 namespace SlidFinance.WebApi
@@ -22,7 +23,9 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.CategoryId,
 					opt => opt.MapFrom(src => src.Category == null ? null : (int?)src.Category.Id))
 				.ForMember(dest => dest.AccountId,
-					opt => opt.MapFrom(src => src.Account.Id));
+					opt => opt.MapFrom(src => src.Account.Id))
+				.ForMember(dest => dest.Mcc,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : (int?)Convert.ToInt32(src.Mcc.Code)));
 
 			CreateMap<Dto.Transaction, Transaction>()
 				.ForMember(dest => dest.BankCategory,
@@ -33,6 +36,10 @@ namespace SlidFinance.WebApi
 					opt => opt.MapFrom(src => src.UserDescription ?? ""))
 				.ForMember(dest => dest.Category,
 					opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
+				.ForMember(dest => dest.Mcc,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : context.Mcc.FirstOrDefault(m => m.Code == src.Mcc.Value.ToString("D4"))))
+				.ForMember(dest => dest.MccId,
+					opt => opt.MapFrom(src => src.Mcc == null ? null : (int?)context.Mcc.First(m => m.Code == src.Mcc.Value.ToString("D4")).Id))
 				.ForMember(dest => dest.Account,
 					opt => opt.MapFrom(src => context.Find<BankAccount>(src.AccountId)));
 
@@ -46,15 +53,7 @@ namespace SlidFinance.WebApi
 			   .ForMember(dest => dest.Transactions,
 				   opt => opt.Ignore());
 
-			CreateMap<Bank, Dto.Bank>()
-				.ForMember(dest => dest.AccountIds,
-					opt => opt.MapFrom(src => src.Accounts.Select(x => x.Id)));
-
-			CreateMap<ApplicationUser, Dto.User>()
-				.ForMember(dest => dest.BankIds,
-					opt => opt.MapFrom(src => src.Banks.Select(x => x.Id)))
-				.ForMember(dest => dest.CategoryIds,
-					opt => opt.MapFrom(src => src.Categories.Select(x => x.Id)));
+			CreateMap<ApplicationUser, Dto.User>();
 
 			CreateMap<Rule, Dto.Rule>()
 				.ForMember(dest => dest.CategoryId,
@@ -68,6 +67,8 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.Category,
 				opt => opt.MapFrom(src => src.Category == MccCategory.None ? null :
 					new Dto.MccCategory() { Id = (int)src.Category, Title = EnumUtils.GetDescription(src.Category) }));
+
+			CreateMap<Models.Merchant, Dto.Merchant>();
 		}
     }
 }

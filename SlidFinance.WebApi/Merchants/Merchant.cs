@@ -2,9 +2,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SlidFinance.Infrastucture.Models
+namespace SlidFinance.WebApi.Dto
 {
-    public class Merchant: IMerchant
+    public class Merchant
     {
         public int Id { get; set; }
 
@@ -14,7 +14,7 @@ namespace SlidFinance.Infrastucture.Models
         public int MccId { get; set; }
 
         [Required]
-        public Mcc Mcc { get; set; }
+        public Dto.Mcc Mcc { get; set; }
 
         [Required]
         public string Name { get; set; }

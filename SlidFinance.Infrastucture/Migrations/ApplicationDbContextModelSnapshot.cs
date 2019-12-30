@@ -159,6 +159,8 @@ namespace SlidFinance.WebApi.Migrations
 
                     b.Property<string>("SecurityStamp");
 
+                    b.Property<int>("TrusteeId");
+
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName")
@@ -172,6 +174,8 @@ namespace SlidFinance.WebApi.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasName("UserNameIndex");
+
+                    b.HasIndex("TrusteeId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -209,12 +213,7 @@ namespace SlidFinance.WebApi.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Banks");
                 });
@@ -252,11 +251,7 @@ namespace SlidFinance.WebApi.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<string>("UserId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Categories");
                 });
@@ -273,6 +268,8 @@ namespace SlidFinance.WebApi.Migrations
                         .HasMaxLength(4);
 
                     b.Property<string>("Description");
+
+                    b.Property<bool>("IsSystem");
 
                     b.Property<string>("RuDescription");
 
@@ -299,7 +296,7 @@ namespace SlidFinance.WebApi.Migrations
 
                     b.Property<string>("Description");
 
-                    b.Property<int?>("Mcc");
+                    b.Property<int?>("MccId");
 
                     b.Property<int>("Order");
 
@@ -308,6 +305,8 @@ namespace SlidFinance.WebApi.Migrations
                     b.HasIndex("AccountId");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("MccId");
 
                     b.ToTable("Rules");
                 });
@@ -333,7 +332,7 @@ namespace SlidFinance.WebApi.Migrations
                     b.Property<string>("Description")
                         .IsRequired();
 
-                    b.Property<int?>("Mcc");
+                    b.Property<int?>("MccId");
 
                     b.Property<string>("UserDescription")
                         .IsRequired();
@@ -344,10 +343,48 @@ namespace SlidFinance.WebApi.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("MccId");
+
                     b.ToTable("Transactions");
                 });
 
-            modelBuilder.Entity("SlidFinance.Infrastucture.Models.Merchant", b =>
+            modelBuilder.Entity("SlidFinance.Domain.Trustee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Trustee");
+                });
+
+            modelBuilder.Entity("SlidFinance.Domain.TrusteeAccount", b =>
+                {
+                    b.Property<int>("AccountId");
+
+                    b.Property<int>("TrusteeId");
+
+                    b.HasKey("AccountId", "TrusteeId");
+
+                    b.HasIndex("TrusteeId");
+
+                    b.ToTable("TrusteeAccounts");
+                });
+
+            modelBuilder.Entity("SlidFinance.Domain.TrusteeCategory", b =>
+                {
+                    b.Property<int>("CategoryId");
+
+                    b.Property<int>("TrusteeId");
+
+                    b.HasKey("CategoryId", "TrusteeId");
+
+                    b.HasIndex("TrusteeId");
+
+                    b.ToTable("TrusteeCategories");
+                });
+
+            modelBuilder.Entity("SlidFinance.Models.Merchant", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -356,7 +393,12 @@ namespace SlidFinance.WebApi.Migrations
 
                     b.Property<DateTime>("Created");
 
+                    b.Property<string>("CreatedById")
+                        .IsRequired();
+
                     b.Property<string>("DisplayName");
+
+                    b.Property<bool>("IsPublic");
 
                     b.Property<int>("MccId");
 
@@ -366,6 +408,8 @@ namespace SlidFinance.WebApi.Migrations
                     b.Property<DateTime>("Updated");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.HasIndex("MccId");
 
@@ -417,6 +461,14 @@ namespace SlidFinance.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SlidFinance.Domain.ApplicationUser", b =>
+                {
+                    b.HasOne("SlidFinance.Domain.Trustee", "Trustee")
+                        .WithMany()
+                        .HasForeignKey("TrusteeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SlidFinance.Domain.AuthToken", b =>
                 {
                     b.HasOne("SlidFinance.Domain.ApplicationUser", "User")
@@ -425,27 +477,12 @@ namespace SlidFinance.WebApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SlidFinance.Domain.Bank", b =>
-                {
-                    b.HasOne("SlidFinance.Domain.ApplicationUser", "User")
-                        .WithMany("Banks")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("SlidFinance.Domain.BankAccount", b =>
                 {
                     b.HasOne("SlidFinance.Domain.Bank", "Bank")
-                        .WithMany("Accounts")
+                        .WithMany()
                         .HasForeignKey("BankId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("SlidFinance.Domain.Category", b =>
-                {
-                    b.HasOne("SlidFinance.Domain.ApplicationUser", "User")
-                        .WithMany("Categories")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("SlidFinance.Domain.Rule", b =>
@@ -458,6 +495,10 @@ namespace SlidFinance.WebApi.Migrations
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SlidFinance.Domain.Mcc", "Mcc")
+                        .WithMany()
+                        .HasForeignKey("MccId");
                 });
 
             modelBuilder.Entity("SlidFinance.Domain.Transaction", b =>
@@ -470,10 +511,45 @@ namespace SlidFinance.WebApi.Migrations
                     b.HasOne("SlidFinance.Domain.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId");
+
+                    b.HasOne("SlidFinance.Domain.Mcc", "Mcc")
+                        .WithMany()
+                        .HasForeignKey("MccId");
                 });
 
-            modelBuilder.Entity("SlidFinance.Infrastucture.Models.Merchant", b =>
+            modelBuilder.Entity("SlidFinance.Domain.TrusteeAccount", b =>
                 {
+                    b.HasOne("SlidFinance.Domain.BankAccount", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SlidFinance.Domain.Trustee", "Trustee")
+                        .WithMany()
+                        .HasForeignKey("TrusteeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SlidFinance.Domain.TrusteeCategory", b =>
+                {
+                    b.HasOne("SlidFinance.Domain.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("SlidFinance.Domain.Trustee", "Trustee")
+                        .WithMany()
+                        .HasForeignKey("TrusteeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SlidFinance.Models.Merchant", b =>
+                {
+                    b.HasOne("SlidFinance.Domain.ApplicationUser", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("SlidFinance.Domain.Mcc", "Mcc")
                         .WithMany()
                         .HasForeignKey("MccId")

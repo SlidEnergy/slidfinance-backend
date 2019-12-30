@@ -21,5 +21,7 @@ namespace SlidFinance.Domain
 
         [Required]
         public MccCategory Category { get; set; }
+
+        public bool IsSystem { get; set; }
     }
 }

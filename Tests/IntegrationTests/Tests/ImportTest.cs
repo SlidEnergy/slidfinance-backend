@@ -29,10 +29,12 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task Import_ShouldReturnOk()
 		{
-			var bank = new Bank("Bank #1", _user);
+			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
+			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
+			await _db.SaveChangesAsync();
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import/token", _accessToken);
 			var response = await SendRequest(request);

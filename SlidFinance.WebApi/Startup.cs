@@ -207,6 +207,7 @@ namespace SlidFinance.WebApi
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<ITelegramService, TelegramService>();
+			services.AddScoped<IApiImportService, ApiImportService>();
 
 			services.AddSlidFinanceCore();
 		}

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SlidFinance.Domain
 {
     public class Merchant : IUniqueObject
-    {
+	{
         public int Id => _model.Id;
 
         public string Address
@@ -35,6 +35,12 @@ namespace SlidFinance.Domain
         {
             get { return _model.DisplayName; }
             set { _model.DisplayName = value; }
+        }
+
+        public bool IsPublic
+        {
+            get { return _model.IsPublic; }
+            set { _model.IsPublic = value; }
         }
 
         public DateTime Created => _model.Created;

@@ -1,10 +1,10 @@
 ﻿using Moq;
-using SlidFinance.WebApi;
-using SlidFinance.App;
 using NUnit.Framework;
+using SlidFinance.App;
+using SlidFinance.Domain;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SlidFinance.Domain;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -12,44 +12,33 @@ namespace SlidFinance.WebApi.UnitTests
     public class CategoriesControllerTests : TestsBase
     {
 		private CategoriesController _controller;
+		private Mock<ICategoriesService> _service;
 
         [SetUp]
         public void Setup()
         {
-            var service = new CategoriesService(_mockedDal);
-			_controller = new CategoriesController(_autoMapper.Create(_db), service);
+            _service = new Mock<ICategoriesService>();
+			_controller = new CategoriesController(_autoMapper.Create(_db), _service.Object);
 			_controller.AddControllerContext(_user);
 		}
 
         [Test]
         public async Task GetCategories_ShouldBeListReturned()
         {
-            await _dal.Categories.Add(new Category()
+            var category1 = await _dal.Categories.Add(new Category()
             {
                 Title = "Category #1",
-                User = _user
             });
-            await _dal.Categories.Add(new Category()
+			var category2 = await _dal.Categories.Add(new Category()
             {
                 Title = "Category #2",
-                User = _user
             });
 
-            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
+			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(new List<Category>() { category1, category2 });
 
             var result = await _controller.GetList();
 
-            Assert.AreEqual(2, result.Value.Count());
-        }
-
-        [Test]
-        public async Task GetEmptyCategoryList_ShouldBeEmptyListReturned()
-        {
-            _categories.Setup(x => x.GetListWithAccessCheck(It.IsAny<string>())).ReturnsAsync(_user.Categories.ToList());
-
-            var result = await _controller.GetList();
-
-            Assert.AreEqual(0, result.Value.Count());
-        }
+			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id)));
+		}
     }
 }

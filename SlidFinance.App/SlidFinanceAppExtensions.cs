@@ -10,16 +10,17 @@ namespace SlidFinance.App
 	{
 		public static IServiceCollection AddSlidFinanceCore(this IServiceCollection services)
 		{
-			services.AddScoped<AccountsService>();
-			services.AddScoped<BanksService>();
-			services.AddScoped<RulesService>();
+			services.AddScoped<IAccountsService, AccountsService>();
+			services.AddScoped<IBanksService, BanksService>();
+			services.AddScoped<IRulesService, RulesService>();
 			services.AddScoped<IUsersService, UsersService>();
-			services.AddScoped<CategoriesService>();
+			services.AddScoped<ICategoriesService, CategoriesService>();
 			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IMccService, MccService>();
 			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 			services.AddScoped<IAuthTokenService, AuthTokenService>();
 			services.AddScoped<IImportService, ImportService>();
+			services.AddScoped<IMerchantService, MerchantService>();
 
 			return services;
 		}

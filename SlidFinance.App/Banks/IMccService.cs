@@ -6,6 +6,7 @@ namespace SlidFinance.App
 {
 	public interface IMccService
 	{
-		Task<List<Mcc>> GetList();
+		Task<List<Mcc>> GetListAsync();
+		Task<Mcc> AddAsync(Mcc mcc);
 	}
 }

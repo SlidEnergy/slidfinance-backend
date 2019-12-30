@@ -9,10 +9,12 @@ namespace SlidFinance.App
 	public class CategoryStatisticService : ICategoryStatisticService
 	{
 		private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-		public CategoryStatisticService(DataAccessLayer dal)
+		public CategoryStatisticService(DataAccessLayer dal, IApplicationDbContext context)
 		{
 			_dal = dal;
+			_context = context;
 		}
 
 		public async Task<List<CategoryStatistic>> GetStatistic(string userId, DateTime startDate, DateTime endDate)
@@ -20,7 +22,7 @@ namespace SlidFinance.App
 			var start = startDate.AddMonths(-3);// new DateTime(startDate.Year, startDate.Month, 1);
 			var end = new DateTime(endDate.Year, endDate.Month, DateTime.DaysInMonth(endDate.Year, endDate.Month));
 
-			var transactions = await _dal.Transactions.GetListWithAccessCheck(userId);
+			var transactions = await _context.GetTransactionListWithAccessCheckAsync(userId);
 
 			var groupedTransactions = (from t in transactions.AsQueryable()
 									   orderby t.DateTime descending
@@ -81,7 +83,7 @@ namespace SlidFinance.App
 		private async Task<List<GroupedTransactions>> GenerateAbsentRecords(List<GroupedTransactions> transactions, DateTime startDate, DateTime endDate, string userId)
 		{
 			var list = new List<GroupedTransactions>();
-			var categories = await _dal.Categories.GetListWithAccessCheck(userId);
+			var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
 			DateTime currentDate = startDate;
 			while (currentDate < endDate)

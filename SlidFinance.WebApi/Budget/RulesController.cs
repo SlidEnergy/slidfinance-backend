@@ -13,9 +13,9 @@ namespace SlidFinance.WebApi
     public class RulesController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly RulesService _rulesService;
+        private readonly IRulesService _rulesService;
 
-        public RulesController(IMapper mapper, RulesService rulesService)
+        public RulesController(IMapper mapper, IRulesService rulesService)
         {
             _mapper = mapper;
             _rulesService = rulesService;
@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var rules = await this._rulesService.GetList(userId);
+            var rules = await this._rulesService.GetListWithAccessCheckAsync(userId);
 
             return _mapper.Map<Dto.Rule[]>(rules);
         }
@@ -36,7 +36,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
+            var newRule = await _rulesService.AddRule(userId, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.MccId);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Rule>(newRule));
         }
@@ -46,7 +46,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            var editedRule = await _rulesService.EditRule(userId, id, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.Mcc);
+            var editedRule = await _rulesService.EditRule(userId, id, rule.AccountId, rule.BankCategory, rule.CategoryId, rule.Description, rule.MccId);
             return _mapper.Map<Dto.Rule>(editedRule);
         }
 

@@ -22,7 +22,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			_mcc.Setup(x => x.GetList()).ReturnsAsync(new List<Mcc>());
 
-			var result = await _service.GetList();
+			var result = await _service.GetListAsync();
 
 			_mcc.Verify(x => x.GetList(), Times.Exactly(1));
 		}

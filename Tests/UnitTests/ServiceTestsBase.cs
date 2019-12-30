@@ -16,12 +16,12 @@ namespace SlidFinance.WebApi.UnitTests
         protected DataAccessLayer _mockedDal;
         protected ApplicationUser _user;
 
-        protected Mock<IRepositoryWithAccessCheck<Bank>> _banks;
-        protected Mock<IRepositoryWithAccessCheck<Category>> _categories;
+        protected Mock<IRepository<Bank, int>> _banks;
+        protected Mock<IRepository<Category, int>> _categories;
         protected Mock<IRepository<ApplicationUser, string>> _users;
-        protected Mock<IRepositoryWithAccessCheck<BankAccount>> _accounts;
-        protected Mock<IRepositoryWithAccessCheck<Rule>> _rules;
-        protected Mock<IRepositoryWithAccessCheck<Transaction>> _transactions;
+        protected Mock<IRepository<BankAccount, int>> _accounts;
+        protected Mock<IRepository<Rule, int>> _rules;
+        protected Mock<IRepository<Transaction, int>> _transactions;
 		protected Mock<IAuthTokensRepository> _authTokens;
 		protected Mock<IRepository<Mcc, int>> _mcc;
 
@@ -32,28 +32,28 @@ namespace SlidFinance.WebApi.UnitTests
             optionsBuilder.UseInMemoryDatabase(TestContext.CurrentContext.Test.Name);
             _db = new ApplicationDbContext(optionsBuilder.Options);
             _dal = new DataAccessLayer(
-                new EfBanksRepository(_db),
-                new EfCategoriesRepository(_db),
+                new EfRepository<Bank, int>(_db),
+                new EfRepository<Category, int>(_db),
                 new EfRepository<ApplicationUser, string>(_db),
-                new EfBankAccountsRepository(_db),
-                new EfRulesRepository(_db),
-                new EfTransactionsRepository(_db),
+                new EfRepository<BankAccount, int>(_db),
+                new EfRepository<Rule, int>(_db),
+                new EfRepository<Transaction, int>(_db),
 				new EfAuthTokensRepository(_db),
 				new EfRepository<Mcc, int>(_db));
 
-            _banks = new Mock<IRepositoryWithAccessCheck<Bank>>();
-            _categories = new Mock<IRepositoryWithAccessCheck<Category>>();
+            _banks = new Mock<IRepository<Bank, int>>();
+            _categories = new Mock<IRepository<Category, int>>();
             _users = new Mock<IRepository<ApplicationUser, string>>();
-            _accounts = new Mock<IRepositoryWithAccessCheck<BankAccount>>();
-            _rules = new Mock<IRepositoryWithAccessCheck<Rule>>();
-            _transactions = new Mock<IRepositoryWithAccessCheck<Transaction>>();
+            _accounts = new Mock<IRepository<BankAccount, int>>();
+            _rules = new Mock<IRepository<Rule, int>>();
+            _transactions = new Mock<IRepository<Transaction, int>>();
 			_authTokens = new Mock<IAuthTokensRepository>();
 			_mcc = new Mock<IRepository<Mcc, int>>();
 
 			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 
 				_authTokens.Object, _mcc.Object);
 
-            _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com" });
+            _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", Trustee = new Trustee() });
         }
     }
 }

@@ -10,12 +10,14 @@ namespace SlidFinance.WebApi.Dto
 
         public string Title { get; set; }
 
-		public string RuTitle { get; set; }
+        public string RuTitle { get; set; }
 
         public string Description { get; set; }
 
-		public string RuDescription { get; set; }
+        public string RuDescription { get; set; }
 
         public MccCategory Category { get; set; }
+
+        public bool IsSystem { get; set; }
     }
 }

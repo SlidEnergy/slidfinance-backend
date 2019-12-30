@@ -1,41 +1,39 @@
-﻿using SlidFinance.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class BanksService
-    {
+	public class BanksService : IBanksService
+	{
         private DataAccessLayer _dal;
+		private IApplicationDbContext _context;
 
-        public BanksService(DataAccessLayer dal)
+		public BanksService(DataAccessLayer dal, IApplicationDbContext context)
         {
             _dal = dal;
+			_context = context;
+		}
+
+		public async Task<List<Bank>> GetLis()
+        {
+			var banks = await _context.Banks.ToListAsync();
+
+			return banks.OrderBy(x => x.Title).ToList();
         }
 
-        public async Task<List<Bank>> GetList(string userId)
+        public async Task<Bank> AddBank(string title)
         {
-            var banks = await _dal.Banks.GetListWithAccessCheck(userId);
-
-            return banks.OrderBy(x => x.Title).ToList();
-        }
-
-        public async Task<Bank> AddBank(string userId, string title)
-        {
-            var user = await _dal.Users.GetById(userId);
-
-            var bank = await _dal.Banks.Add(new Bank(title, user));
+            var bank = await _dal.Banks.Add(new Bank(title));
 
             return bank;
         }
 
-        public async Task<Bank> EditBank(string userId, int bankId, string title)
+        public async Task<Bank> EditBank(int bankId, string title)
         {
             var editBank = await _dal.Banks.GetById(bankId);
-
-            if (!editBank.IsBelongsTo(userId))
-                throw new EntityAccessDeniedException();
 
             editBank.Rename(title);
 
@@ -44,13 +42,9 @@ namespace SlidFinance.App
             return editBank;
         }
 
-        public async Task DeleteBank(string userId, int bankId)
+        public async Task DeleteBank(int bankId)
         {
-            var user = await _dal.Users.GetById(userId);
-
             var bank = await _dal.Banks.GetById(bankId);
-
-            bank.IsBelongsTo(userId);
 
             await _dal.Banks.Delete(bank);
         }
