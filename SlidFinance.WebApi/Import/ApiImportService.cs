@@ -25,11 +25,20 @@ namespace SlidFinance.WebApi
 
 		public async Task<int> Import(string userId, PatchAccountDataBindingModel data)
 		{
-			await AddMccIfNotExist(data.Transactions);
+			if (string.IsNullOrEmpty(userId))
+				return 0;
 
-			await AddMerchantsIfNotExist(userId, data.Transactions);
+			if (data == null)
+				return 0;
 
-			var transactions = _mapper.Map<Transaction[]>(data.Transactions);
+			if (data.Transactions != null && data.Transactions.Count > 0)
+			{
+				await AddMccIfNotExist(data.Transactions);
+
+				await AddMerchantsIfNotExist(userId, data.Transactions);
+			}
+
+			var transactions = data.Transactions == null ? null : _mapper.Map<Transaction[]>(data.Transactions);
 
 			var count = await _service.Import(userId, data.Code, data.Balance, transactions);
 
@@ -58,6 +67,9 @@ namespace SlidFinance.WebApi
 
 		private async Task AddMccIfNotExist(ICollection<Dto.ImportTransaction> transactions)
 		{
+			if (transactions == null || transactions.Count == 0)
+				return;
+
 			var mccList = await _mccService.GetListAsync();
 
 			foreach (var t in transactions)
