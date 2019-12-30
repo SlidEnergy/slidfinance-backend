@@ -66,5 +66,28 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_importService.Verify(x => x.Import(It.Is<string>(u => u == _user.Id), It.IsAny<PatchAccountDataBindingModel>()));
 		}
+
+
+		[Test]
+		public async Task ImportWithoutMcc_ShouldCallMethod()
+		{
+			var bank = new Bank() { Title = "Bank #1" };
+			_db.Banks.Add(bank);
+			var account = await _db.CreateAccount(_user);
+			var category = await _db.CreateCategory(_user);
+			var transaction1 = new Dto.ImportTransaction()
+			{
+				DateTime = DateTime.Now,
+				Amount = 10,
+				Description = "Description #1",
+				Category = "Bank category #1",
+			};
+
+			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<PatchAccountDataBindingModel>())).ReturnsAsync(1);
+
+			var result = await _controller.Import(new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
+
+			_importService.Verify(x => x.Import(It.Is<string>(u => u == _user.Id), It.IsAny<PatchAccountDataBindingModel>()));
+		}
 	}
 }

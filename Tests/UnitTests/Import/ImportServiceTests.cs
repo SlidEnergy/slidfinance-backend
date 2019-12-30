@@ -51,6 +51,50 @@ namespace SlidFinance.WebApi.UnitTests
         }
 
         [Test]
+        public async Task Import_ShouldBeAdded()
+        {
+            var bank = new Bank() { Title = "Bank #1" };
+            _db.Banks.Add(bank);
+            var account = await _db.CreateAccount(_user);
+            var category = await _db.CreateCategory(_user);
+            var transaction1 = new Transaction()
+            {
+                DateTime = DateTime.Now,
+                Amount = 10,
+                Description = "Description #1",
+                BankCategory = "Bank category #1",
+                Approved = false,
+                MccId = 111
+            };
+
+            var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction1 });
+
+            var newTransaction = await _db.Transactions.FirstOrDefaultAsync(t => t.AccountId == account.Id);
+            Assert.NotNull(newTransaction);
+        }
+
+        [Test]
+        public async Task ImportWithoutMcc_ShouldBeAdded()
+        {
+            var bank = new Bank() { Title = "Bank #1" };
+            _db.Banks.Add(bank);
+            var account = await _db.CreateAccount(_user);
+            var category = await _db.CreateCategory(_user);
+            var transaction1 = new Transaction()
+            {
+                DateTime = DateTime.Now,
+                Amount = 10,
+                Description = "Description #1",
+                BankCategory = "Bank category #1",
+            };
+
+            var count = await _service.Import(_user.Id, account.Code, 100, new Transaction[] { transaction1 });
+
+            var newTransaction = await _db.Transactions.FirstOrDefaultAsync(t => t.AccountId == account.Id);
+            Assert.NotNull(newTransaction);
+        }
+
+        [Test]
         public async Task Import_ShouldCallAddMethodTwice()
         {
 			var bank = new Bank() { Title = "Bank #1" };

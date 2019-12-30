@@ -15,7 +15,7 @@ namespace SlidFinance.Domain
         public virtual Category Category { get; set; }
 
         [Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         [Required]
         public string UserDescription { get; set; } = "";
