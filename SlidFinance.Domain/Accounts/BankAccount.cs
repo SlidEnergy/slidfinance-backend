@@ -11,19 +11,23 @@ namespace SlidFinance.Domain
 
         public float Balance { get; set; }
 
-        public float CreditLimit { get; set; }
+		public float CreditLimit { get; set; }
 
-        public float OwnFunds => Balance - CreditLimit;
-
-        [Required]
-        public string Title { get; set; }
-
-		public int BankId { get; set; }
-        [Required]
-        public virtual Bank Bank { get; set; }
+		public virtual float OwnFunds => Balance - CreditLimit;
 
 		[Required]
-		public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+        public string Title { get; set; }
+
+		public int? BankId { get; set; }
+        public virtual Bank Bank { get; set; }
+
+		public int? SelectedTariffId { get; set; }
+		public virtual ProductTariff SelectedTariff { get; set; }
+
+		public int? ProductId { get; set; }
+		public virtual Product Product { get; set; }
+
+		public ProductType Type { get; set; }
 
         public BankAccount() { }
 
@@ -33,15 +37,17 @@ namespace SlidFinance.Domain
             Title = title;
             Code = code;
             Balance = balance;
-            CreditLimit = creditLimit;
-        }
+			CreditLimit = creditLimit;
+
+		}
 
         public void Update(string title, string code, float balance, float creditLimit)
         {
             Title = title;
             Code = code;
             Balance = balance;
-            CreditLimit = creditLimit;
-        }
+			CreditLimit = creditLimit;
+
+		}
     }
 }

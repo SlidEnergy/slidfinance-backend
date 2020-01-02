@@ -45,7 +45,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = new Bank() { Title = "Bank #1" };
 			_db.Banks.Add(bank);
-			var account = new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank };
+			var account = new BankAccount() { Code = "Code #1", Bank = bank };
 			_db.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			var transaction = new Transaction()
@@ -65,7 +65,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = new Bank() { Title = "Bank #1" };
 			_db.Banks.Add(bank);
-			var account = new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank };
+			var account = new BankAccount() { Code = "Code #1", Bank = bank };
 			_db.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			var transaction = new Transaction()

@@ -27,7 +27,7 @@ namespace SlidFinance.App
 
 			foreach (var t in transactions)
 			{
-				var existTransaction = account.Transactions.Any(x => x.DateTime == t.DateTime && x.Amount == t.Amount && x.Description == t.Description);
+				var existTransaction = _context.Transactions.Any(x => x.AccountId == account.Id && x.DateTime == t.DateTime && x.Amount == t.Amount && x.Description == t.Description);
 
 				if (!existTransaction)
 				{

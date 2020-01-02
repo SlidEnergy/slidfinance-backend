@@ -56,7 +56,7 @@ namespace SlidFinance.WebApi.UnitTests
         public async Task PatchAccount_ShouldCallUpdateMethod()
         {
             var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
-            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Transactions = new List<Transaction>(), Bank = bank, Code = "Code #1"});
+            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank, Code = "Code #1"});
 
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
