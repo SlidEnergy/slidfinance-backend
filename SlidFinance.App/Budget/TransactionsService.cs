@@ -76,7 +76,7 @@ namespace SlidFinance.App
 
         public async Task<Transaction> PatchTransaction(string userId, Transaction transaction)
         {
-            Category category = null;
+            UserCategory category = null;
 
             if (transaction.Category != null)
             {

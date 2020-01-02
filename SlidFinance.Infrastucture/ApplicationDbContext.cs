@@ -29,7 +29,7 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Bank> Banks { get; set; }
 
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<UserCategory> Categories { get; set; }
 
         public DbSet<Rule> Rules { get; set; }
 

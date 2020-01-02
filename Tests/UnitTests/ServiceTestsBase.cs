@@ -17,7 +17,7 @@ namespace SlidFinance.WebApi.UnitTests
         protected ApplicationUser _user;
 
         protected Mock<IRepository<Bank, int>> _banks;
-        protected Mock<IRepository<Category, int>> _categories;
+        protected Mock<IRepository<UserCategory, int>> _categories;
         protected Mock<IRepository<ApplicationUser, string>> _users;
         protected Mock<IRepository<BankAccount, int>> _accounts;
         protected Mock<IRepository<Rule, int>> _rules;
@@ -33,7 +33,7 @@ namespace SlidFinance.WebApi.UnitTests
             _db = new ApplicationDbContext(optionsBuilder.Options);
             _dal = new DataAccessLayer(
                 new EfRepository<Bank, int>(_db),
-                new EfRepository<Category, int>(_db),
+                new EfRepository<UserCategory, int>(_db),
                 new EfRepository<ApplicationUser, string>(_db),
                 new EfRepository<BankAccount, int>(_db),
                 new EfRepository<Rule, int>(_db),
@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi.UnitTests
 				new EfRepository<Mcc, int>(_db));
 
             _banks = new Mock<IRepository<Bank, int>>();
-            _categories = new Mock<IRepository<Category, int>>();
+            _categories = new Mock<IRepository<UserCategory, int>>();
             _users = new Mock<IRepository<ApplicationUser, string>>();
             _accounts = new Mock<IRepository<BankAccount, int>>();
             _rules = new Mock<IRepository<Rule, int>>();

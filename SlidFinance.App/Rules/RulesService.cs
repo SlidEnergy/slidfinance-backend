@@ -33,7 +33,7 @@ namespace SlidFinance.App
 				account = await _context.GetAccountByIdWithAccessCheck(userId, accountId.Value);
 			}
 
-            Category category = null;
+            UserCategory category = null;
 
             if (categoryId.HasValue)
             {
@@ -69,7 +69,7 @@ namespace SlidFinance.App
 					throw new EntityNotFoundException();
 			}
 
-            Category category = null;
+            UserCategory category = null;
 
             if (categoryId.HasValue)
             {

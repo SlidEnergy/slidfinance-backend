@@ -25,7 +25,7 @@ namespace SlidFinance.WebApi.UnitTests
             var account = new BankAccount() { Title = "Account #1", Bank = bank };
 			_db.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
-            var category = new Category() { Title = "Category #1" };
+            var category = new UserCategory() { Title = "Category #1" };
 			_db.Categories.Add(category);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();
@@ -59,7 +59,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var account = new BankAccount() { Title = "Account #1", Bank = bank };
 			_db.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
-			var category = new Category() { Title = "Category #1" };
+			var category = new UserCategory() { Title = "Category #1" };
 			_db.Categories.Add(category);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			var rule = new Rule() { Account = account, Category = category };

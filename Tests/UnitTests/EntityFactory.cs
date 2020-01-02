@@ -23,9 +23,9 @@ namespace SlidFinance.WebApi.UnitTests
 			return account;
 		}
 
-		public static async Task<Category> CreateCategory(this ApplicationDbContext db, ApplicationUser user)
+		public static async Task<UserCategory> CreateCategory(this ApplicationDbContext db, ApplicationUser user)
 		{
-			var category = new Category()
+			var category = new UserCategory()
 			{
 				Title = Guid.NewGuid().ToString()
 			};

@@ -12,7 +12,7 @@ namespace SlidFinance.Domain
         public float Amount { get; set; }
 
 		public int? CategoryId { get; set; }
-        public virtual Category Category { get; set; }
+        public virtual UserCategory Category { get; set; }
 
         [Required]
         public string Description { get; set; } = "";

@@ -45,7 +45,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			
 			_dal = new DataAccessLayer(
 				new EfRepository<Bank, int>(_db),
-				new EfRepository<Category,int>(_db),
+				new EfRepository<UserCategory,int>(_db),
 				new EfRepository<ApplicationUser, string>(_db),
 				new EfRepository<BankAccount, int>(_db),
 				new EfRepository<Rule, int>(_db),

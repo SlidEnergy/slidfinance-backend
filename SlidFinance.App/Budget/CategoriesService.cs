@@ -18,14 +18,14 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
-        public async Task<List<Category>> GetListWithAccessCheckAsync(string userId)
+        public async Task<List<UserCategory>> GetListWithAccessCheckAsync(string userId)
         {
 			var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
 			return categories.OrderBy(x => x.Order).ToList();
         }
 
-        public async Task<Category> AddCategory(string userId, string title)
+        public async Task<UserCategory> AddCategory(string userId, string title)
         {
             var user = await _context.Users.FindAsync(userId);
 
@@ -33,7 +33,7 @@ namespace SlidFinance.App
 
             var order = categories.Any() ? categories.Max(x => x.Order) + 1 : 0;
 
-            var category = await _dal.Categories.Add(new Category() { Title = title, Order = order });
+            var category = await _dal.Categories.Add(new UserCategory() { Title = title, Order = order });
 			_context.TrusteeCategories.Add(new TrusteeCategory(user, category));
 			await _context.SaveChangesAsync();
 
@@ -69,7 +69,7 @@ namespace SlidFinance.App
             await ReorderAllCategories(userId);
         }
 
-        public async Task<Category> EditCategory(string userId, int categoryId, string title, int order)
+        public async Task<UserCategory> EditCategory(string userId, int categoryId, string title, int order)
         {
             var editCategory = await _context.GetCategorByIdWithAccessCheckAsync(userId, categoryId);
 
@@ -102,7 +102,7 @@ namespace SlidFinance.App
 
             int newOrder = 0;
 
-            foreach (Category c in categories.OrderBy(x => x.Order).ToList())
+            foreach (UserCategory c in categories.OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
                 _context.Categories.Update(c);
@@ -111,13 +111,13 @@ namespace SlidFinance.App
             }
         }
 
-        private async Task ReorderCategories(string userId, Category category, int order)
+        private async Task ReorderCategories(string userId, UserCategory category, int order)
         {
             var categories = await _context.GetCategoryListWithAccessCheckAsync(userId);
 
             int newOrder = order + 1;
 
-            foreach (Category c in categories.Where(x => x.Order >= order && x.Id != category.Id).OrderBy(x => x.Order).ToList())
+            foreach (UserCategory c in categories.Where(x => x.Order >= order && x.Id != category.Id).OrderBy(x => x.Order).ToList())
             {
                 c.SetOrder(newOrder);
 				_context.Categories.Update(c);
@@ -126,7 +126,7 @@ namespace SlidFinance.App
             }
         }
 
-		public async Task<Category> GetByIdWithChecks(string userId, int id)
+		public async Task<UserCategory> GetByIdWithChecks(string userId, int id)
 		{
 			var category = await _dal.Categories.GetById(id);
 
@@ -138,14 +138,14 @@ namespace SlidFinance.App
 			return category;
 		}
 
-		private async Task CheckAccessAndThrowException(string userId, Category category)
+		private async Task CheckAccessAndThrowException(string userId, UserCategory category)
 		{
 			var user = await _context.Users.FindAsync(userId);
 
 			await CheckAccessAndThrowException(user, category);
 		}
 
-		private async Task CheckAccessAndThrowException(ApplicationUser user, Category category)
+		private async Task CheckAccessAndThrowException(ApplicationUser user, UserCategory category)
 		{
 			var trustee = await _context.TrusteeCategories
 				.Where(t => t.TrusteeId == user.TrusteeId)

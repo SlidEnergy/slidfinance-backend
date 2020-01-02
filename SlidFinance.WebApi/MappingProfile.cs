@@ -35,7 +35,7 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.UserDescription,
 					opt => opt.MapFrom(src => src.UserDescription ?? ""))
 				.ForMember(dest => dest.Category,
-					opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<Category>(src.CategoryId)))
+					opt => opt.MapFrom(src => src.CategoryId == null ? null : context.Find<UserCategory>(src.CategoryId)))
 				.ForMember(dest => dest.Mcc,
 					opt => opt.MapFrom(src => src.Mcc == null ? null : context.Mcc.FirstOrDefault(m => m.Code == src.Mcc.Value.ToString("D4"))))
 				.ForMember(dest => dest.MccId,
@@ -83,7 +83,7 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.AccountId,
 					opt => opt.MapFrom((src => src.Account == null ? null : (int?)src.Account.Id)));
 
-			CreateMap<Category, Dto.Category>();
+			CreateMap<UserCategory, Dto.Category>();
 
 			CreateMap<Mcc, Dto.Mcc>()
 				.ForMember(dest => dest.Category,

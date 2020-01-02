@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = new Bank() { Title = "Bank #1" };
             var account = new BankAccount() { Title = "Account #1", Bank = bank };
-            var category = new Category() {Title = "Category #1"};
+            var category = new UserCategory() {Title = "Category #1"};
 
             var rule1 = new Rule()
             {

@@ -15,7 +15,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
@@ -47,7 +47,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			await _db.SaveChangesAsync();
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();
@@ -72,7 +72,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
@@ -95,7 +95,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 1000, 0);
 			await _dal.Rules.Add(rule);
@@ -128,7 +128,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			await _dal.Banks.Add(bank);
 			var account = new BankAccount(bank, "Account #1", "Code #1", 100, 50);
 			await _dal.Accounts.Add(account);
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			var rule = new Rule(account, "Bank category #1", category, "Description #1", 5000, 0);
 			await _dal.Rules.Add(rule);

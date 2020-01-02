@@ -19,7 +19,7 @@ namespace SlidFinance.Infrastructure
 
 			services.AddScoped<IRepository<ApplicationUser, string>, EfRepository<ApplicationUser, string>>();
 			services.AddScoped<IRepository<Bank, int>, EfRepository<Bank, int>>();
-			services.AddScoped<IRepository<Category, int>, EfRepository<Category, int>>();
+			services.AddScoped<IRepository<UserCategory, int>, EfRepository<UserCategory, int>>();
 			services.AddScoped<IRepository<BankAccount, int>, EfRepository<BankAccount, int>>();
 			services.AddScoped<IRepository<Rule, int>, EfRepository<Rule, int>>();
 			services.AddScoped<IRepository<Transaction, int>, EfRepository<Transaction, int>>();

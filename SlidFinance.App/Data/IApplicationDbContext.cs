@@ -10,7 +10,7 @@ namespace SlidFinance.App
 		DbSet<BankAccount> Accounts { get; set; }
 		DbSet<AuthToken> AuthTokens { get; set; }
 		DbSet<Bank> Banks { get; set; }
-		DbSet<Category> Categories { get; set; }
+		DbSet<UserCategory> Categories { get; set; }
 		DbSet<Mcc> Mcc { get; set; }
 		DbSet<Models.Merchant> Merchants { get; set; }
 		DbSet<Rule> Rules { get; set; }

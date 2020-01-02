@@ -25,16 +25,16 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task GetCategories_ShouldBeListReturned()
         {
-            var category1 = await _dal.Categories.Add(new Category()
+            var category1 = await _dal.Categories.Add(new UserCategory()
             {
                 Title = "Category #1",
             });
-			var category2 = await _dal.Categories.Add(new Category()
+			var category2 = await _dal.Categories.Add(new UserCategory()
             {
                 Title = "Category #2",
             });
 
-			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(new List<Category>() { category1, category2 });
+			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>())).ReturnsAsync(new List<UserCategory>() { category1, category2 });
 
             var result = await _controller.GetList();
 

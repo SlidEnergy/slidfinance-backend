@@ -52,7 +52,7 @@ namespace SlidFinance.App
 			}
 		}
 
-		private Category GetCategoryByRules(Transaction t, ICollection<Rule> rules)
+		private UserCategory GetCategoryByRules(Transaction t, ICollection<Rule> rules)
 		{
 			var rule = rules.FirstOrDefault(x =>
 				(x.Account == null || x.Account.Id.Equals(t.Account.Id)) &&

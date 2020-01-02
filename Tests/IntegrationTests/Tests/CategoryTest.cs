@@ -10,9 +10,9 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task GetCategoryList_ShouldReturnContent()
 		{
-			var category1 = new Category("Category #1", 0);
+			var category1 = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category1);
-			var category2 = new Category("Category #2", 0);
+			var category2 = new UserCategory("Category #2", 0);
 			await _dal.Categories.Add(category2);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category1));
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category2));
@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task UpdateRule_ShouldReturnContent()
 		{
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();
@@ -64,7 +64,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task DeleteRule_ShouldNoContent()
 		{
-			var category = new Category("Category #1", 0);
+			var category = new UserCategory("Category #1", 0);
 			await _dal.Categories.Add(category);
 			_db.TrusteeCategories.Add(new TrusteeCategory(_user, category));
 			await _db.SaveChangesAsync();

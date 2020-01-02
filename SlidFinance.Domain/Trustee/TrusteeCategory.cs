@@ -10,7 +10,7 @@ namespace SlidFinance.Domain
 
 		public int CategoryId { get; set; }
 		[Required]
-		public virtual Category Category { get; set; }
+		public virtual UserCategory Category { get; set; }
 
 		public TrusteeCategory(int trusteeId, int categoryId)
 		{
@@ -18,9 +18,9 @@ namespace SlidFinance.Domain
 			CategoryId = categoryId;
 		}
 
-		public TrusteeCategory(Trustee trustee, Category category) : this(trustee.Id, category.Id) { }
+		public TrusteeCategory(Trustee trustee, UserCategory category) : this(trustee.Id, category.Id) { }
 
-		public TrusteeCategory(ApplicationUser user, Category category) : this(user.TrusteeId, category.Id) { }
+		public TrusteeCategory(ApplicationUser user, UserCategory category) : this(user.TrusteeId, category.Id) { }
 
 		public TrusteeCategory(ApplicationUser user, int categoryId) : this(user.TrusteeId, categoryId) { }
 	}

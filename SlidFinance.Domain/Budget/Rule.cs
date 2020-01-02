@@ -10,7 +10,7 @@ namespace SlidFinance.Domain
 
 		public int CategoryId { get; set; }
         [Required]
-        public virtual Category Category { get; set; }
+        public virtual UserCategory Category { get; set; }
 
         public string Description { get; set; }
 
@@ -24,7 +24,7 @@ namespace SlidFinance.Domain
 
         public Rule() { }
 
-        public Rule(BankAccount account, string bankCategory, Category category, string description, int? mccId, int order)
+        public Rule(BankAccount account, string bankCategory, UserCategory category, string description, int? mccId, int order)
         {
             Account = account;
             BankCategory = bankCategory;

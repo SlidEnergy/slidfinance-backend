@@ -2,7 +2,7 @@
 
 namespace SlidFinance.Domain
 {
-    public class Category: IUniqueObject
+    public class UserCategory: IUniqueObject
     {
         public int Id { get; set; }
 
@@ -11,9 +11,9 @@ namespace SlidFinance.Domain
         [Required]
         public string Title { get; set; }
 
-		public Category() { }
+		public UserCategory() { }
 
-        public Category(string title, int order)
+        public UserCategory(string title, int order)
         {
             Title = title;
             Order = order;

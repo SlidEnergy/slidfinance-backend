@@ -4,7 +4,7 @@ namespace SlidFinance.App
 {
 	public class DataAccessLayer
     {
-        public IRepository<Category, int> Categories { get; }
+        public IRepository<UserCategory, int> Categories { get; }
 
         public IRepository<Bank, int> Banks { get; }
 
@@ -22,7 +22,7 @@ namespace SlidFinance.App
 
 		public DataAccessLayer(
             IRepository<Bank, int> banks, 
-            IRepository<Category, int> categories,
+            IRepository<UserCategory, int> categories,
             IRepository<ApplicationUser, string> users,
             IRepository<BankAccount, int> bankAccounts,
             IRepository<Rule, int> rules,

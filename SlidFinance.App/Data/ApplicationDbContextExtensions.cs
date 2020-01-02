@@ -34,7 +34,7 @@ namespace SlidFinance.App
 			return transactions;
 		}
 
-		public static async Task<List<Category>> GetCategoryListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
+		public static async Task<List<UserCategory>> GetCategoryListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
 		{
 			var user = await context.Users.FindAsync(userId);
 
@@ -82,7 +82,7 @@ namespace SlidFinance.App
 			return transactions;
 		}
 
-		public static async Task<Category> GetCategorByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
+		public static async Task<UserCategory> GetCategorByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
 		{
 			var user = await context.Users.FindAsync(userId);
 

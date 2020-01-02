@@ -31,7 +31,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = new Bank() { Title = "Bank #1" };
 			var account = new BankAccount() { Transactions = new List<Transaction>(), Bank = bank };
-			var category = new Category() { Title = "Category #1"};
+			var category = new UserCategory() { Title = "Category #1"};
 			var t1 = new Transaction()
 			{
 				DateTime = new DateTime(2019, 6, 1),
@@ -63,7 +63,7 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
             var account = await _dal.Accounts.Add(new BankAccount() { Code = "Code #1", Transactions = new List<Transaction>(), Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1" });
+            var category = await _dal.Categories.Add(new UserCategory() { Title = "Category #1" });
 			var mcc = new Mcc() { Code = "0111" };
 			_db.Mcc.Add(mcc);
 			await _db.SaveChangesAsync();
@@ -102,7 +102,7 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = await _dal.Banks.Add(new Bank() {Title = "Bank #1"});
             var account = await _dal.Accounts.Add(new BankAccount() {Transactions = new List<Transaction>(), Bank = bank});
-			var category = await _dal.Categories.Add(new Category() { Title = "Category #1" });
+			var category = await _dal.Categories.Add(new UserCategory() { Title = "Category #1" });
 			var transaction = await _dal.Transactions.Add(new Transaction()
                 {DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account});
 
@@ -125,7 +125,7 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1"});
             var account = await _dal.Accounts.Add(new BankAccount() { Transactions = new List<Transaction>(), Bank = bank });
-            var category = await _dal.Categories.Add(new Category() { Title = "Category #1"});
+            var category = await _dal.Categories.Add(new UserCategory() { Title = "Category #1"});
             var transaction = await _dal.Transactions.Add(new Transaction()
             { DateTime = DateTime.Now, Amount = 10, Description = "Description #1", Account = account, Category = category });
 
