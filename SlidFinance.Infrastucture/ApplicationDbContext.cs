@@ -21,9 +21,13 @@ namespace SlidFinance.Infrastructure
 
 			modelBuilder.Entity<TrusteeCategory>()
 				.HasKey(key => new { key.CategoryId, key.TrusteeId });
+
+			modelBuilder.Entity<TrusteeProduct>()
+				.HasKey(key => new { key.ProductId, key.TrusteeId });
+
 		}
 
-        public DbSet<Transaction> Transactions { get; set; }
+		public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<BankAccount> Accounts { get; set; }
 
@@ -41,7 +45,10 @@ namespace SlidFinance.Infrastructure
 
 		public DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
 		public DbSet<TrusteeCategory> TrusteeCategories { get; set; }
+		public DbSet<TrusteeProduct> TrusteeProducts { get; set; }
 
 		public DbSet<ApplicationUser> Users { get; set; }
+
+		public DbSet<Product> Products { get; set; }
     }
 }

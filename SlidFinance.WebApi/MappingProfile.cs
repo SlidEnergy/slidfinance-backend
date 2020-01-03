@@ -71,7 +71,11 @@ namespace SlidFinance.WebApi
 
 			CreateMap<Dto.BankAccount, BankAccount>()
 			   .ForMember(dest => dest.Bank,
-				   opt => opt.MapFrom(src => context.Find<Bank>(src.BankId)));
+				   opt => opt.MapFrom(src => context.Find<Bank>(src.BankId)))
+			   .ForMember(dest => dest.Product,
+					opt => opt.Ignore())
+			   .ForMember(dest => dest.SelectedTariff,
+					opt => opt.Ignore());
 
 			CreateMap<ApplicationUser, Dto.User>();
 

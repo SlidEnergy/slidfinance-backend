@@ -17,7 +17,9 @@ namespace SlidFinance.App
 		DbSet<Transaction> Transactions { get; set; }
 		DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
 		DbSet<TrusteeCategory> TrusteeCategories { get; set; }
+		DbSet<TrusteeProduct> TrusteeProducts { get; set; }
 		DbSet<ApplicationUser> Users { get; set; }
+		DbSet<Product> Products { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}
