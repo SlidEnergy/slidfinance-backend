@@ -12,12 +12,12 @@ namespace SlidFinance.WebApi
 	[Route("api/v1/[controller]")]
     [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [ApiController]
-    public sealed class ProductController : ControllerBase
+    public sealed class ProductsController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IProductsService _service;
 
-        public ProductController(IMapper mapper, IProductsService service)
+        public ProductsController(IMapper mapper, IProductsService service)
         {
             _mapper = mapper;
             _service = service;
@@ -75,9 +75,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-			var model = await _service.GetByIdWithAccessCheck(userId, id);
-
-			_mapper.Map(product, model);
+			var model = _mapper.Map<Product>(product);
 
             var editAccount = await _service.EditProduct(userId, model);
 

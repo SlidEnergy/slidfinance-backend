@@ -32,7 +32,15 @@ namespace SlidFinance.App
 
 		public async Task<Product> EditProduct(string userId, Product product)
 		{
-			_context.Products.Update(product);
+			var model = await _context.GetProductByIdWithAccessCheck(userId, product.Id);
+
+			model.Title = product.Title;
+			model.Image = product.Image;
+			model.IsPublic = product.IsPublic;
+			model.Approved = product.Approved;
+			model.Type = product.Type;
+
+			_context.Products.Update(model);
 			await _context.SaveChangesAsync();
 
 			return product;

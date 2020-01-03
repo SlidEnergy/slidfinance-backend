@@ -93,6 +93,8 @@ namespace SlidFinance.WebApi
 					new Dto.MccCategory() { Id = (int)src.Category, Title = EnumUtils.GetDescription(src.Category) }));
 
 			CreateMap<Models.Merchant, Dto.Merchant>();
+			CreateMap<Product, Dto.Product>();
+			CreateMap<Dto.Product, Product>();
 		}
     }
 }

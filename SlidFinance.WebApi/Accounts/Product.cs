@@ -9,6 +9,8 @@ namespace SlidFinance.WebApi.Dto
 	{
 		public int Id { get; set; }
 
+		public string Title { get; set; }
+
 		public int? BankId { get; set; }
 
 		public ProductType Type { get; set; }

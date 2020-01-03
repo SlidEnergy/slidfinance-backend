@@ -8,6 +8,8 @@ namespace SlidFinance.Domain
 	{
 		public int Id { get; set; }
 
+		public string Title { get; set; }
+
 		public int? BankId { get; set; }
 		public virtual Bank Bank { get; set; }
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SlidFinance.WebApi.UnitTests
+namespace SlidFinance.WebApi.IntegrationTests
 {
 	public static class EntityFactoryExtensions
 	{
