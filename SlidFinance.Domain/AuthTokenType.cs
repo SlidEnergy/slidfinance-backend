@@ -7,6 +7,7 @@ namespace SlidFinance.Domain
 	public enum AuthTokenType
 	{
 		RefreshToken = 1,
-		TelegramChatId = 2
+		TelegramChatId = 2,
+		ImportToken = 3
 	}
 }

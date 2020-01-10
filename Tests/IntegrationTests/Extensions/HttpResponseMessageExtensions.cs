@@ -45,5 +45,11 @@ namespace SlidFinance.WebApi.IntegrationTests
 			string json = await response.Content.ReadAsStringAsync();
 			return JsonConvert.DeserializeObject<T>(json);
 		}
+
+		public static async Task<string> ToJsonString(this HttpResponseMessage response)
+		{
+			string json = await response.Content.ReadAsStringAsync();
+			return (string)JsonConvert.DeserializeObject(json);
+		}
 	}
 }

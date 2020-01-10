@@ -25,7 +25,22 @@ namespace SlidFinance.WebApi
 			_userManager = userManager;
 		}
 
-        public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
+		public async Task<TokensCortage> RefreshImportToken(string refreshToken)
+		{
+			var savedToken = await _authTokenService.FindAnyToken(refreshToken);
+
+			if (savedToken == null || savedToken.Type != AuthTokenType.ImportToken)
+				throw new SecurityTokenException("Invalid refresh token");
+
+			var newToken = _tokenGenerator.GenerateAccessToken(savedToken.User, AccessMode.Import);
+			var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
+
+			await _authTokenService.UpdateToken(savedToken, newRefreshToken);
+
+			return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
+		}
+
+		public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
         {
             var principal = GetPrincipalFromExpiredToken(token);
             var userId = principal.GetUserId();
@@ -54,7 +69,15 @@ namespace SlidFinance.WebApi
 			};
 		}
 
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+		public async Task<string> GenerateImportToken(ApplicationUser user)
+		{
+			var importToken = _tokenGenerator.GenerateRefreshToken();
+			await _authTokenService.AddToken(user.Id, importToken, AuthTokenType.ImportToken);
+
+			return importToken;
+		}
+
+		private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
 			var tokenValidationParameters = new TokenValidationParameters
             {

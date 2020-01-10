@@ -15,15 +15,32 @@ namespace SlidFinance.WebApi.IntegrationTests
 
 		}
 
-		[Test]
-		public async Task GetToken_ShouldReturnTokens()
+		private async Task<string> GetRefreshToken() 
 		{
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import/token", _accessToken);
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import/refreshtoken", _accessToken);
 			var response = await SendRequest(request);
 
 			response.IsSuccess();
 			Assert.NotNull(response.Content);
-			var tokenCortage = await response.ToObject<TokensCortage>();
+			return await response.ToJsonString();
+		}
+
+		[Test]
+		public async Task GetToken_ShouldReturnTokens()
+		{
+			var refreshToken = await GetRefreshToken();
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import/token", null, new TokensCortage { RefreshToken = refreshToken });
+			var response = await SendRequest(request);
+
+			response.IsSuccess();
+			Assert.NotNull(response.Content);
+			var newTokenCortage = await response.ToObject<TokensCortage>();
+		}
+
+		[Test]
+		public async Task GetRefreshToken_ShouldReturnTokens()
+		{
+			var refreshToken = await GetRefreshToken();
 		}
 
 		[Test]
@@ -36,13 +53,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account));
 			await _db.SaveChangesAsync();
 
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import/token", _accessToken);
-			var response = await SendRequest(request);
-			response.IsSuccess();
-			Assert.NotNull(response.Content);
-			var tokenCortage = await response.ToObject<TokensCortage>();
-
-			request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import", tokenCortage.Token,
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/import", _accessToken,
 				new PatchAccountDataBindingModel()
 				{
 					Code = account.Code,
@@ -53,7 +64,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 					}
 				});
 
-			response = await SendRequest(request);
+			var response = await SendRequest(request);
 
 			response.IsSuccess();
 		}

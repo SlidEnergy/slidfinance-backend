@@ -7,6 +7,8 @@ namespace SlidFinance.WebApi
 	public interface ITokenService
 	{
 		Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode);
+		Task<string> GenerateImportToken(ApplicationUser user);
+		Task<TokensCortage> RefreshImportToken(string refreshToken);
 		Task<TokensCortage> RefreshToken(string token, string refreshToken);
 		Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password);
 	}

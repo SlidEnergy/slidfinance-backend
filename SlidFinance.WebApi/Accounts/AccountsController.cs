@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace SlidFinance.WebApi
 {
 	[Route("api/v1/[controller]")]
-    [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [ApiController]
     public sealed class AccountsController : ControllerBase
     {
@@ -22,6 +21,7 @@ namespace SlidFinance.WebApi
             _service = service;
         }
 
+        [Authorize(Policy = Policy.MustBeAllOrImportAccessMode)]
         [HttpGet]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<Dto.BankAccount>>> GetList(int? bankId = null)
@@ -33,6 +33,7 @@ namespace SlidFinance.WebApi
             return _mapper.Map<Dto.BankAccount[]>(accounts);
         }
 
+        [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
@@ -55,6 +56,7 @@ namespace SlidFinance.WebApi
             return _mapper.Map<Dto.BankAccount>(patchedAccount);
         }
 
+        [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpPost]
         public async Task<ActionResult<Dto.BankAccount>> Add(AddBankAccountBindingModel account)
         {
@@ -65,6 +67,7 @@ namespace SlidFinance.WebApi
             return CreatedAtAction("GetList", _mapper.Map<Dto.BankAccount>(newAccount));
         }
 
+        [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpPut("{id}")]
         public async Task<ActionResult<Dto.BankAccount>> Update(int id, EditBankAccountBindingModel account)
         {
@@ -75,6 +78,7 @@ namespace SlidFinance.WebApi
             return _mapper.Map<Dto.BankAccount>(editAccount);
         }
 
+        [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

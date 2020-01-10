@@ -27,23 +27,34 @@ namespace SlidFinance.WebApi.UnitTests
 		}
 
         [Test]
-        public async Task ImportToken_ShouldCallMethod()
+        public async Task GetRefreshToken_ShouldCallMethod()
         {
 			var token = Guid.NewGuid().ToString();
 			var refreshToken = Guid.NewGuid().ToString();
 
 			_usersService.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-			_tokenService.Setup(x => x.GenerateAccessAndRefreshTokens(It.IsAny<ApplicationUser>(), It.IsAny<AccessMode>()))
-				.ReturnsAsync(new TokensCortage() { Token = token, RefreshToken = refreshToken });
+			_tokenService.Setup(x => x.GenerateImportToken(It.IsAny<ApplicationUser>()))
+				.ReturnsAsync(refreshToken);
 			
-			var result = await _controller.GetToken();
+			var result = await _controller.GetRefreshToken();
 
 			_usersService.Verify(x => x.GetById(It.Is<string>(id => id == _user.Id)));
-			_tokenService.Verify(x => x.GenerateAccessAndRefreshTokens(
-				It.Is<ApplicationUser>(u => u.Id == _user.Id), 
-				It.Is<AccessMode>(mode => mode == AccessMode.Import)));
+			_tokenService.Verify(x => x.GenerateImportToken(It.Is<ApplicationUser>(u => u.Id == _user.Id)));
 		}
 
+		[Test]
+		public async Task RefreshToken_ShouldCallMethod()
+		{
+			var token = Guid.NewGuid().ToString();
+			var refreshToken = Guid.NewGuid().ToString();
+
+			_tokenService.Setup(x => x.RefreshImportToken(It.IsAny<string>()))
+				.ReturnsAsync(new TokensCortage() { Token = token, RefreshToken = refreshToken });
+
+			var result = await _controller.Refresh(refreshToken);
+
+			_tokenService.Verify(x => x.RefreshImportToken(It.Is<string>(t => t == refreshToken)));
+		}
 		[Test]
 		public async Task Import_ShouldCallMethod()
 		{

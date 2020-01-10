@@ -50,9 +50,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 
 		[Test]
-		[TestCase(AccessMode.All)]
-		[TestCase(AccessMode.Import)]
-		public async Task RefreshToken_ShouldCalledMethods(AccessMode accessMode)
+		public async Task RefreshToken_ShouldCalledMethods()
 		{
 			var authSettings = SettingsFactory.CreateAuth();
 			var tokenGenerator = new TokenGenerator(authSettings);
@@ -70,6 +68,29 @@ namespace SlidFinance.WebApi.UnitTests
 			await _service.RefreshToken(token, refreshToken);
 
 			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>()));
+			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
+			_authTokenService.Verify(x => x.FindAnyToken(It.Is<string>(t => t == refreshToken)));
+		}
+
+		[Test]
+		public async Task RefreshImportToken_ShouldCalledMethods()
+		{
+			var authSettings = SettingsFactory.CreateAuth();
+			var tokenGenerator = new TokenGenerator(authSettings);
+
+			var token = tokenGenerator.GenerateAccessToken(_user, AccessMode.All);
+			var refreshToken = tokenGenerator.GenerateRefreshToken();
+
+			var newAccessToken = Guid.NewGuid().ToString();
+			var newRefreshToken = Guid.NewGuid().ToString();
+
+			_tokenGenerator.Setup(x => x.GenerateAccessToken(It.IsAny<ApplicationUser>(), It.IsAny<AccessMode>())).Returns(newAccessToken);
+			_tokenGenerator.Setup(x => x.GenerateRefreshToken()).Returns(newRefreshToken);
+			_authTokenService.Setup(x => x.FindAnyToken(It.IsAny<string>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
+
+			await _service.RefreshImportToken(refreshToken);
+
+			_tokenGenerator.Verify(x => x.GenerateAccessToken(It.Is<ApplicationUser>(u=>u == _user), It.Is<AccessMode>(m => m == AccessMode.Import)));
 			_tokenGenerator.Verify(x => x.GenerateRefreshToken());
 			_authTokenService.Verify(x => x.FindAnyToken(It.Is<string>(t => t == refreshToken)));
 		}

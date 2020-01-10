@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using SlidFinance.App;
-using SlidFinance.Domain;
+using SlidFinance.WebApi.Dto;
+using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using System.Linq;
-using System;
-using System.Collections.Generic;
 
 namespace SlidFinance.WebApi
 {
-    
-    [Route("api/v1/[controller]")]
+
+	[Route("api/v1/[controller]")]
     [ApiController]
     public class ImportController : ControllerBase
     {
@@ -35,26 +34,39 @@ namespace SlidFinance.WebApi
         [ProducesResponseType(404)]
         public async Task<ActionResult<int>> Import(PatchAccountDataBindingModel data)
         {
-            var userId = User.GetUserId();
+			var userId = User.GetUserId();
 
 			return await _service.Import(userId, data);
         }
 
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]
-		[HttpPost("token")]
+		[HttpPost("refreshToken")]
 		[ProducesResponseType(200)]
-		public async Task<ActionResult<TokensCortage>> GetToken()
+		public async Task<ActionResult<string>> GetRefreshToken()
 		{
 			var userId = User.GetUserId();
 
 			var user = await _usersService.GetById(userId);
 
 			if (user == null)
-			{
-				return NotFound();
-			}
+				throw new AuthenticationException();
 
-			return await _tokenService.GenerateAccessAndRefreshTokens(user, AccessMode.Import);
+			return await _tokenService.GenerateImportToken(user);
+		}
+
+		[HttpPost("token")]
+		public async Task<ActionResult<TokenInfo>> Refresh(TokensCortage tokens)
+		{
+			try
+			{
+				var newTokens = await _tokenService.RefreshImportToken(tokens.RefreshToken);
+
+				return new TokenInfo() { Token = newTokens.Token, RefreshToken = newTokens.RefreshToken };
+			}
+			catch (SecurityTokenException exc)
+			{
+				return BadRequest();
+			}
 		}
 	}
 }
