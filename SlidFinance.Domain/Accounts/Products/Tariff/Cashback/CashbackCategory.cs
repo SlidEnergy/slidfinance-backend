@@ -11,6 +11,8 @@ namespace SlidFinance.Domain
 
 		public string Title { get; set; }
 
+		public string Description { get; set; }
+
 		public int TariffId { get; set; }
 		[Required]
 		public virtual ProductTariff Tariff { get; set; }
