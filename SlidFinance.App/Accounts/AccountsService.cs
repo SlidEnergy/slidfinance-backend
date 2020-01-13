@@ -43,15 +43,20 @@ namespace SlidFinance.App
             return account;
         }
 
-        public async Task<BankAccount> EditAccount(string userId, int accountId, string title, string code, float balance, float creditLimit)
+        public async Task<BankAccount> Update(string userId, BankAccount account)
         {
-            var editAccount = await GetByIdWithChecks(userId, accountId);
+            var model = await GetByIdWithChecks(userId, account.Id);
 
-			editAccount.Update(title, code, balance, creditLimit);
+			model.Title = account.Title;
+			model.Code = account.Code;
+			model.Balance = account.Balance;
+			model.CreditLimit = account.CreditLimit;
+			model.SelectedTariffId = account.SelectedTariffId;
+			model.ProductId = account.ProductId;
 
-            await _dal.Accounts.Update(editAccount);
+            await _dal.Accounts.Update(model);
 
-            return editAccount;
+            return model;
         }
 
         public async Task<BankAccount> PatchAccount(string userId, BankAccount account)

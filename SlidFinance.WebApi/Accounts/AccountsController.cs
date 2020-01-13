@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using SlidFinance.App;
+using SlidFinance.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -69,11 +70,13 @@ namespace SlidFinance.WebApi
 
         [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.BankAccount>> Update(int id, EditBankAccountBindingModel account)
+        public async Task<ActionResult<Dto.BankAccount>> Update(int id, Dto.BankAccount account)
         {
             var userId = User.GetUserId();
 
-            var editAccount = await _service.EditAccount(userId, id, account.Title, account.Code, account.Balance, account.CreditLimit);
+            var model = _mapper.Map<BankAccount>(account);
+
+            var editAccount = await _service.Update(userId, model);
 
             return _mapper.Map<Dto.BankAccount>(editAccount);
         }
