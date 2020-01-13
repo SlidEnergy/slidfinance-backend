@@ -15,6 +15,6 @@ namespace SlidFinance.Domain
 
 		public int MccId { get; set; }
 		[Required]
-		public virtual MccCategory Mcc { get; set; }
+		public virtual Mcc Mcc { get; set; }
 	}
 }
