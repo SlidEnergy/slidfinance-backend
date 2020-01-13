@@ -23,6 +23,7 @@ namespace SlidFinance.App
 		DbSet<ProductTariff> Tariffs { get; set; }
 		DbSet<CashbackCategory> CashbackCategories { get; set; }
 		DbSet<CashbackCategoryMcc> CashbackCategoryMcc { get; set; }
+		DbSet<Cashback> Cashback { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}

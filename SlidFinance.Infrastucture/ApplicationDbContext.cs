@@ -55,6 +55,8 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<CashbackCategory> CashbackCategories { get; set; }
 
+        public DbSet<Cashback> Cashback { get; set; }
+
         public DbSet<CashbackCategoryMcc> CashbackCategoryMcc { get; set; }
     }
 }
