@@ -10,6 +10,18 @@ namespace SlidFinance.App
 {
 	public static class ApplicationDbContextExtensions
 	{
+		public static async Task<List<ProductTariff>> GetProductTariffsWithAccessCheckAsync(this IApplicationDbContext context, string userId, int productId)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			var product = await context.GetProductByIdWithAccessCheck(userId, productId);
+
+			if (product == null)
+				return null;
+
+			return await context.Tariffs.Where(x => x.ProductId == productId).ToListAsync();
+		}
+
 		public static async Task<List<Product>> GetProductListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
 		{
 			var user = await context.Users.FindAsync(userId);
@@ -70,6 +82,30 @@ namespace SlidFinance.App
 				.ToListAsync();
 
 			return rules;
+		}
+
+		public static async Task<ProductTariff> GetProductTariffByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			var tariff = await context.Tariffs.FindAsync(id);
+
+			if (tariff == null)
+				return null;
+
+			var product = await context.Products.FindAsync(tariff.ProductId);
+
+			if (product == null)
+				return null;
+
+			if (product.IsPublic && product.Approved)
+				return tariff;
+
+			if (await context.TrusteeProducts
+				.Where(t => t.TrusteeId == user.TrusteeId && t.ProductId == tariff.ProductId).FirstOrDefaultAsync() != null)
+				return tariff;
+
+			return null;
 		}
 
 		public static async Task<Product> GetProductByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace SlidFinance.WebApi.UnitTests
 {
-    public class ProductServiceTests : TestsBase
+    public class ProductsServiceTests : TestsBase
     {
         private ProductsService _service;
 
@@ -19,7 +19,7 @@ namespace SlidFinance.WebApi.UnitTests
         }
 
         [Test]
-        public async Task GetProduct_ShouldReturnList()
+        public async Task GetProducts_ShouldReturnList()
         {
 			var bank = await _db.CreateBank();
 			var product1 = await _db.CreateProduct(_user, bank.Id);
@@ -36,7 +36,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var bank = await _db.CreateBank();
 
 			var product = new Product() { BankId = bank.Id, Title = "Product #1" };
-			await _service.AddProduct(_user.Id, product);
+			await _service.Add(_user.Id, product);
 
 			var addedProduct = _db.TrusteeProducts
 				.Where(t => t.TrusteeId == _user.TrusteeId)
@@ -54,7 +54,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var product = await _db.CreateProduct(_user, bank.Id);
    
 			var model = new Product() { Id = product.Id, BankId = bank.Id, Title = "Product #1" };
-			await _service.EditProduct(_user.Id, model);
+			await _service.Edit(_user.Id, model);
 
 			var updatedProduct = _db.TrusteeProducts
 				.Where(t => t.TrusteeId == _user.TrusteeId)

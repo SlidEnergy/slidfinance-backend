@@ -78,7 +78,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var authSettings = SettingsFactory.CreateAuth();
 			var tokenGenerator = new TokenGenerator(authSettings);
 
-			var token = tokenGenerator.GenerateAccessToken(_user, AccessMode.All);
+			var token = tokenGenerator.GenerateAccessToken(_user, AccessMode.Import);
 			var refreshToken = tokenGenerator.GenerateRefreshToken();
 
 			var newAccessToken = Guid.NewGuid().ToString();
@@ -86,7 +86,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_tokenGenerator.Setup(x => x.GenerateAccessToken(It.IsAny<ApplicationUser>(), It.IsAny<AccessMode>())).Returns(newAccessToken);
 			_tokenGenerator.Setup(x => x.GenerateRefreshToken()).Returns(newRefreshToken);
-			_authTokenService.Setup(x => x.FindAnyToken(It.IsAny<string>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.RefreshToken));
+			_authTokenService.Setup(x => x.FindAnyToken(It.IsAny<string>())).ReturnsAsync(new AuthToken("any", refreshToken, _user, AuthTokenType.ImportToken));
 
 			await _service.RefreshImportToken(refreshToken);
 

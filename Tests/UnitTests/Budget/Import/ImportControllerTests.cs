@@ -51,7 +51,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_tokenService.Setup(x => x.RefreshImportToken(It.IsAny<string>()))
 				.ReturnsAsync(new TokensCortage() { Token = token, RefreshToken = refreshToken });
 
-			var result = await _controller.Refresh(refreshToken);
+			var result = await _controller.Refresh(new TokensCortage() { RefreshToken = refreshToken });
 
 			_tokenService.Verify(x => x.RefreshImportToken(It.Is<string>(t => t == refreshToken)));
 		}

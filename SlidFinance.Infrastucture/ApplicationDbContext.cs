@@ -50,5 +50,7 @@ namespace SlidFinance.Infrastructure
 		public DbSet<ApplicationUser> Users { get; set; }
 
 		public DbSet<Product> Products { get; set; }
+
+        public DbSet<ProductTariff> Tariffs { get; set; }
     }
 }

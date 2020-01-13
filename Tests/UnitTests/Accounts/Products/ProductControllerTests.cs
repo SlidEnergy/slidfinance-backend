@@ -46,11 +46,11 @@ namespace SlidFinance.WebApi.UnitTests
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
 			var product = new Dto.Product() { Title = "Product #1", BankId = bank.Id };
 
-			_service.Setup(x => x.AddProduct(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
+			_service.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
 			var result = await _controller.Add(product);
 
-			_service.Verify(x => x.AddProduct(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Title == product.Title && product.BankId == bank.Id)));
+			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Title == product.Title && product.BankId == bank.Id)));
 		}
 
 		[Test]
@@ -59,11 +59,11 @@ namespace SlidFinance.WebApi.UnitTests
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
 			var product = new Dto.Product() { Id = 1, Title = "Product #1", BankId = bank.Id };
 
-			_service.Setup(x => x.EditProduct(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
+			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
 			var result = await _controller.Update(product.Id, product);
 
-			_service.Verify(x => x.EditProduct(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Id == product.Id && p.Title == product.Title && product.BankId == bank.Id)));
+			_service.Verify(x => x.Edit(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Id == product.Id && p.Title == product.Title && product.BankId == bank.Id)));
 		}
 
 		[Test]
@@ -73,7 +73,7 @@ namespace SlidFinance.WebApi.UnitTests
 			var product = new Product() { Id = 1, Title = "Product #1", BankId = bank.Id };
 
 			_service.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(product);
-			_service.Setup(x => x.EditProduct(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
+			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
 			var result = await _controller.PatchProduct(product.Id, new JsonPatchDocument<Dto.Product>(
 				new List<Operation<Dto.Product>>() 
@@ -82,7 +82,7 @@ namespace SlidFinance.WebApi.UnitTests
 					}, 
 					new CamelCasePropertyNamesContractResolver()));
 
-			_service.Verify(x => x.EditProduct(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Id == product.Id && p.Title == "Product #2" && product.BankId == bank.Id)));
+			_service.Verify(x => x.Edit(It.Is<string>(u => u == _user.Id), It.Is<Product>(p => p.Id == product.Id && p.Title == "Product #2" && product.BankId == bank.Id)));
 		}
 	}
 }

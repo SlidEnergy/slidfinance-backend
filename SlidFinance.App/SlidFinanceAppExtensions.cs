@@ -22,6 +22,7 @@ namespace SlidFinance.App
 			services.AddScoped<IImportService, ImportService>();
 			services.AddScoped<IMerchantService, MerchantService>();
 			services.AddScoped<IProductsService, ProductsService>();
+			services.AddScoped<IProductTariffsService, ProductTariffsService>();
 
 			return services;
 		}

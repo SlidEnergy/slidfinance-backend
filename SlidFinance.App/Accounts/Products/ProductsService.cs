@@ -19,7 +19,7 @@ namespace SlidFinance.App
 
 		public Task<List<Product>> GetListWithAccessCheckAsync(string userId) => _context.GetProductListWithAccessCheckAsync(userId);
 
-		public async Task<Product> AddProduct(string userId, Product product)
+		public async Task<Product> Add(string userId, Product product)
 		{
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -30,7 +30,7 @@ namespace SlidFinance.App
 			return product;
 		}
 
-		public async Task<Product> EditProduct(string userId, Product product)
+		public async Task<Product> Edit(string userId, Product product)
 		{
 			var model = await _context.GetProductByIdWithAccessCheck(userId, product.Id);
 
@@ -43,12 +43,15 @@ namespace SlidFinance.App
 			_context.Products.Update(model);
 			await _context.SaveChangesAsync();
 
-			return product;
+			return model;
 		}
 
-		public async Task DeleteProduct(string userId, int productId)
+		public async Task Delete(string userId, int id)
 		{
-			var product = await _context.GetProductByIdWithAccessCheck(userId, productId);
+			var product = await _context.GetProductByIdWithAccessCheck(userId, id);
+
+			if (product == null) 
+				return;
 
 			_context.Products.Remove(product);
 			await _context.SaveChangesAsync();

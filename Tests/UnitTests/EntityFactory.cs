@@ -37,6 +37,20 @@ namespace SlidFinance.WebApi.UnitTests
 			return product;
 		}
 
+		public static async Task<ProductTariff> CreateTariff(this ApplicationDbContext db, ApplicationUser user, int productId)
+		{
+			var tariff = new ProductTariff()
+			{
+				ProductId = productId,
+				Title = Guid.NewGuid().ToString(),
+				Type = ProductType.Card
+			};
+			db.Tariffs.Add(tariff);
+			await db.SaveChangesAsync();
+
+			return tariff;
+		}
+
 		public static async Task<UserCategory> CreateCategory(this ApplicationDbContext db, ApplicationUser user)
 		{
 			var category = new UserCategory()

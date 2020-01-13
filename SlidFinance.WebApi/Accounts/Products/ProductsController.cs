@@ -51,7 +51,7 @@ namespace SlidFinance.WebApi
 
             _mapper.Map(dto, model);
 
-            var patchetProduct = await _service.EditProduct(userId, model);
+            var patchetProduct = await _service.Edit(userId, model);
 
             return _mapper.Map<Dto.Product>(patchetProduct);
         }
@@ -65,7 +65,7 @@ namespace SlidFinance.WebApi
 
 			_mapper.Map(product, model);
 
-			var newProduct = await _service.AddProduct(userId, model);
+			var newProduct = await _service.Add(userId, model);
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.Product>(newProduct));
         }
@@ -77,7 +77,7 @@ namespace SlidFinance.WebApi
 
 			var model = _mapper.Map<Product>(product);
 
-            var editAccount = await _service.EditProduct(userId, model);
+            var editAccount = await _service.Edit(userId, model);
 
             return _mapper.Map<Dto.Product>(editAccount);
         }
@@ -87,7 +87,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-            await _service.DeleteProduct(userId, id);
+            await _service.Delete(userId, id);
 
             return NoContent();
         }
