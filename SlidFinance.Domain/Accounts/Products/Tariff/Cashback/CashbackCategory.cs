@@ -16,5 +16,9 @@ namespace SlidFinance.Domain
 		public int TariffId { get; set; }
 		[Required]
 		public virtual ProductTariff Tariff { get; set; }
+
+		public float CashbackLimit { get; set; }
+
+		public CashbackCategoryType Type { get; set; }
 	}
 }

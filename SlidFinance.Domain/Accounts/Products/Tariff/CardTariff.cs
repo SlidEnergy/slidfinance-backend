@@ -16,5 +16,7 @@ namespace SlidFinance.Domain.Accounts.Template.Tariff
 		public float MaintenancePayment { get; set; }
 
 		public MaintenancePaymentType MaintenancePaymentType { get; set; }
+
+		public float TotalCashbackLimit { get; set; }
 	}
 }
