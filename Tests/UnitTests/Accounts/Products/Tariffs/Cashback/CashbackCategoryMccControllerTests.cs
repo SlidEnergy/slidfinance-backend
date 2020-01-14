@@ -30,12 +30,10 @@ namespace SlidFinance.WebApi.UnitTests
             var bank = new Bank() { Title = "Bank #1" };
 			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
 			var tariff = new ProductTariff() { Id = 1, Title = "Tariff #1", ProductId = product.Id };
-			var mcc1 = new Mcc() { Id = 1, Title = "Tariff #1", Code = "1111"};
-			var mcc2 = new Mcc() { Id = 2, Title = "Tariff #1", Code = "2222" };
 			var category = new CashbackCategory() { Id = 1, Title = "Category #2", TariffId = tariff.Id };
 
-			var cashbackMcc1 = new CashbackCategoryMcc() { CategoryId = category.Id, MccId = mcc1.Id };
-			var cashbackMcc2 = new CashbackCategoryMcc() { CategoryId = category.Id, MccId = mcc2.Id };
+			var cashbackMcc1 = new CashbackCategoryMcc() { CategoryId = category.Id, MccCode = 6812};
+			var cashbackMcc2 = new CashbackCategoryMcc() { CategoryId = category.Id, MccCode = 6814};
 
 			_service.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(new List<CashbackCategoryMcc>() { cashbackMcc1, cashbackMcc2});
 
@@ -52,16 +50,15 @@ namespace SlidFinance.WebApi.UnitTests
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
 			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
 			var tariff = new ProductTariff() { Id = 1, Title = "Tariff #1", ProductId = product.Id };
-			var mcc = new Mcc() { Id = 1, Title = "Mcc #1", Code = "1111"};
 			var category = new CashbackCategory() { Id = 1, Title = "Category #1", TariffId = tariff.Id };
 
-			var categoryMcc = new Dto.CashbackCategoryMcc() { CategoryId = category.Id, MccId = mcc.Id };
+			var categoryMcc = new CashbackCategoryMcc() { CategoryId = category.Id, MccCode = 6812};
 
 			_service.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<CashbackCategoryMcc>())).ReturnsAsync((string u, CashbackCategoryMcc x) => x);
 
 			var result = await _controller.Add(categoryMcc);
 
-			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<CashbackCategoryMcc>(p => p.CategoryId == category.Id && p.MccId == mcc.Id)));
+			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<CashbackCategoryMcc>(p => p.CategoryId == category.Id && p.MccCode == 6812)));
 		}
 	}
 }

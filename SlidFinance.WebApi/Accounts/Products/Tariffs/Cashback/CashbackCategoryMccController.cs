@@ -25,27 +25,23 @@ namespace SlidFinance.WebApi
 
         [HttpGet("cashback/categories/{categoryId}/mcc")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.CashbackCategoryMcc>>> GetList(int categoryId)
+        public async Task<ActionResult<IEnumerable<CashbackCategoryMcc>>> GetList(int categoryId)
         {
             var userId = User.GetUserId();
 
             var models = await _service.GetListWithAccessCheckAsync(userId, categoryId);
 
-            return _mapper.Map<Dto.CashbackCategoryMcc[]>(models);
+            return _mapper.Map<CashbackCategoryMcc[]>(models);
         }
 
         [HttpPost("cashback/categories/{categoryId}/mcc")]
-        public async Task<ActionResult<Dto.CashbackCategoryMcc>> Add(Dto.CashbackCategoryMcc cashbackCategoryMcc)
+        public async Task<ActionResult<CashbackCategoryMcc>> Add(CashbackCategoryMcc cashbackCategoryMcc)
         {
             var userId = User.GetUserId();
 
-            var model = new CashbackCategoryMcc();
+            var newModel = await _service.Add(userId, cashbackCategoryMcc);
 
-            _mapper.Map(cashbackCategoryMcc, model);
-
-            var newModel = await _service.Add(userId, model);
-
-            return CreatedAtAction("GetList", new { newModel.CategoryId }, _mapper.Map<Dto.CashbackCategoryMcc>(newModel));
+            return CreatedAtAction("GetList", new { newModel.CategoryId }, newModel);
         }
 
         //     [HttpPut("cashback/categories/{categoryId}/mcc/{id}")]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -10,11 +11,10 @@ namespace SlidFinance.Domain
 		public int Id { get; set; }
 
 		public int CategoryId { get; set; }
-		[Required]
+
+		[JsonIgnore]
 		public virtual CashbackCategory Category { get; set; }
 
-		public int MccId { get; set; }
-		[Required]
-		public virtual Mcc Mcc { get; set; }
+		public int MccCode { get; set; }
 	}
 }

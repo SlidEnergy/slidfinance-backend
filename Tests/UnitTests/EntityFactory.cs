@@ -65,12 +65,12 @@ namespace SlidFinance.WebApi.UnitTests
 			return model;
 		}
 
-		public static async Task<CashbackCategoryMcc> CreateCashbackCategoryMcc(this ApplicationDbContext db, ApplicationUser user, int categoryId, int mccId)
+		public static async Task<CashbackCategoryMcc> CreateCashbackCategoryMcc(this ApplicationDbContext db, ApplicationUser user, int categoryId, int mccCode)
 		{
 			var model = new CashbackCategoryMcc()
 			{
 				CategoryId = categoryId,
-				MccId = mccId
+				MccCode = mccCode
 			};
 			db.CashbackCategoryMcc.Add(model);
 			await db.SaveChangesAsync();

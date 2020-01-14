@@ -25,7 +25,11 @@ namespace SlidFinance.Infrastructure
 			modelBuilder.Entity<TrusteeProduct>()
 				.HasKey(key => new { key.ProductId, key.TrusteeId });
 
-		}
+            modelBuilder.Entity<CashbackCategoryMcc>()
+                .HasOne(x => x.Category)
+                .WithMany()
+                .IsRequired();
+        }
 
 		public DbSet<Transaction> Transactions { get; set; }
 

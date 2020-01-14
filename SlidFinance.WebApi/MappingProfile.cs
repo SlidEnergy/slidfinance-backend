@@ -106,13 +106,6 @@ namespace SlidFinance.WebApi
 			CreateMap<Dto.CashbackCategory, CashbackCategory>()
 				.ForMember(dest => dest.Tariff,
 					opt => opt.Ignore());
-
-			CreateMap<CashbackCategoryMcc, Dto.CashbackCategoryMcc>();
-			CreateMap<Dto.CashbackCategoryMcc, CashbackCategoryMcc>()
-				.ForMember(dest => dest.Category,
-					opt => opt.Ignore())
-				.ForMember(dest => dest.Mcc,
-					opt => opt.Ignore());
 		}
     }
 }
