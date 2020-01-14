@@ -50,6 +50,34 @@ namespace SlidFinance.WebApi.IntegrationTests
 
 			return tariff;
 		}
+
+		public static async Task<CashbackCategory> CreateCashbackCategory(this ApplicationDbContext db, ApplicationUser user, int tariffId)
+		{
+			var model = new CashbackCategory()
+			{
+				TariffId = tariffId,
+				Title = Guid.NewGuid().ToString(),
+				Type = CashbackCategoryType.DefaultCashback
+			};
+			db.CashbackCategories.Add(model);
+			await db.SaveChangesAsync();
+
+			return model;
+		}
+
+		public static async Task<CashbackCategoryMcc> CreateCashbackCategoryMcc(this ApplicationDbContext db, ApplicationUser user, int categoryId, int mccId)
+		{
+			var model = new CashbackCategoryMcc()
+			{
+				CategoryId = categoryId,
+				MccId = mccId
+			};
+			db.CashbackCategoryMcc.Add(model);
+			await db.SaveChangesAsync();
+
+			return model;
+		}
+
 		public static async Task<UserCategory> CreateCategory(this ApplicationDbContext db, ApplicationUser user)
 		{
 			var category = new UserCategory()

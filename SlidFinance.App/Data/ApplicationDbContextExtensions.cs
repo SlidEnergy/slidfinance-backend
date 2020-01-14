@@ -10,6 +10,30 @@ namespace SlidFinance.App
 {
 	public static class ApplicationDbContextExtensions
 	{
+		public static async Task<List<CashbackCategoryMcc>> GetCashbackCategoryMccWithAccessCheckAsync(this IApplicationDbContext context, string userId, int categoryId)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			var category = await context.GetCashbackCategoryByIdWithAccessCheck(userId, categoryId);
+
+			if (category == null)
+				return null;
+
+			return await context.CashbackCategoryMcc.Where(x => x.CategoryId == categoryId).ToListAsync();
+		}
+
+		public static async Task<List<CashbackCategory>> GetCashbackCategoriesWithAccessCheckAsync(this IApplicationDbContext context, string userId, int tariffId)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			var tariff = await context.GetProductTariffByIdWithAccessCheck(userId, tariffId);
+
+			if (tariff == null)
+				return null;
+
+			return await context.CashbackCategories.Where(x => x.TariffId == tariffId).ToListAsync();
+		}
+
 		public static async Task<List<ProductTariff>> GetProductTariffsWithAccessCheckAsync(this IApplicationDbContext context, string userId, int productId)
 		{
 			var user = await context.Users.FindAsync(userId);
@@ -82,6 +106,35 @@ namespace SlidFinance.App
 				.ToListAsync();
 
 			return rules;
+		}
+
+		public static async Task<ProductTariff> GetCashbackCategoryByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			var category = await context.CashbackCategories.FindAsync(id);
+
+			if (category == null)
+				return null;
+
+			var tariff = await context.Tariffs.FindAsync(category.TariffId);
+
+			if (tariff == null)
+				return null;
+
+			var product = await context.Products.FindAsync(tariff.ProductId);
+
+			if (product == null)
+				return null;
+
+			if (product.IsPublic && product.Approved)
+				return tariff;
+
+			if (await context.TrusteeProducts
+				.Where(t => t.TrusteeId == user.TrusteeId && t.ProductId == tariff.ProductId).FirstOrDefaultAsync() != null)
+				return tariff;
+
+			return null;
 		}
 
 		public static async Task<ProductTariff> GetProductTariffByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)
