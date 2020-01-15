@@ -14,10 +14,10 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-			var tariff = await _db.CreateTariff(_user, product.Id);
+			var tariff = await _db.CreateTariff(product.Id);
 
-			var category1 = await _db.CreateCashbackCategory(_user, product.Id);
-			var category2 = await _db.CreateCashbackCategory(_user, product.Id);
+			var category1 = await _db.CreateCashbackCategory(product.Id);
+			var category2 = await _db.CreateCashbackCategory(product.Id);
 
 			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/tariffs/" + tariff.Id + "/cashback/categories", _accessToken);
 			var response = await SendRequest(request);

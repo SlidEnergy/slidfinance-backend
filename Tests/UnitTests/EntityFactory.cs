@@ -37,7 +37,7 @@ namespace SlidFinance.WebApi.UnitTests
 			return product;
 		}
 
-		public static async Task<ProductTariff> CreateTariff(this ApplicationDbContext db, ApplicationUser user, int productId)
+		public static async Task<ProductTariff> CreateTariff(this ApplicationDbContext db, int productId)
 		{
 			var tariff = new ProductTariff()
 			{
@@ -51,13 +51,13 @@ namespace SlidFinance.WebApi.UnitTests
 			return tariff;
 		}
 
-		public static async Task<CashbackCategory> CreateCashbackCategory(this ApplicationDbContext db, ApplicationUser user, int tariffId)
+		public static async Task<CashbackCategory> CreateCashbackCategory(this ApplicationDbContext db, int tariffId)
 		{
 			var model = new CashbackCategory()
 			{
 				TariffId = tariffId,
 				Title = Guid.NewGuid().ToString(),
-				Type = CashbackCategoryType.DefaultCashback
+				Type = CashbackCategoryType.BaseCashback
 			};
 			db.CashbackCategories.Add(model);
 			await db.SaveChangesAsync();
@@ -65,7 +65,7 @@ namespace SlidFinance.WebApi.UnitTests
 			return model;
 		}
 
-		public static async Task<CashbackCategoryMcc> CreateCashbackCategoryMcc(this ApplicationDbContext db, ApplicationUser user, int categoryId, int mccCode)
+		public static async Task<CashbackCategoryMcc> CreateCashbackCategoryMcc(this ApplicationDbContext db, int categoryId, int mccCode)
 		{
 			var model = new CashbackCategoryMcc()
 			{
@@ -73,6 +73,19 @@ namespace SlidFinance.WebApi.UnitTests
 				MccCode = mccCode
 			};
 			db.CashbackCategoryMcc.Add(model);
+			await db.SaveChangesAsync();
+
+			return model;
+		}
+
+		public static async Task<Cashback> CreateCashback(this ApplicationDbContext db, int categoryId)
+		{
+			var model = new Cashback()
+			{
+				CategoryId = categoryId,
+				Percent = 0.01f
+			};
+			db.Cashback.Add(model);
 			await db.SaveChangesAsync();
 
 			return model;

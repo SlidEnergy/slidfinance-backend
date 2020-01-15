@@ -24,8 +24,8 @@ namespace SlidFinance.WebApi.UnitTests
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
 
-			var tariff1 = await _db.CreateTariff(_user, product.Id);
-			var tariff2 = await _db.CreateTariff(_user, product.Id);
+			var tariff1 = await _db.CreateTariff(product.Id);
+			var tariff2 = await _db.CreateTariff(product.Id);
 
 			var list = await _service.GetListWithAccessCheckAsync(_user.Id, product.Id);
 
@@ -54,7 +54,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-			var tariff = await _db.CreateTariff(_user, product.Id);
+			var tariff = await _db.CreateTariff(product.Id);
 
 			var model = new ProductTariff() { Id = tariff.Id, ProductId = product.Id, Title = "Tariff #1" };
 			await _service.Edit(_user.Id, model);

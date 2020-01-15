@@ -23,11 +23,11 @@ namespace SlidFinance.WebApi.UnitTests
         {
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-            var tariff = await _db.CreateTariff(_user, product.Id);
-            var category = await _db.CreateCashbackCategory(_user, tariff.Id);
+            var tariff = await _db.CreateTariff(product.Id);
+            var category = await _db.CreateCashbackCategory(tariff.Id);
 
-            await _db.CreateCashbackCategoryMcc(_user, category.Id, 4812);
-			await _db.CreateCashbackCategoryMcc(_user, category.Id, 4812);
+            await _db.CreateCashbackCategoryMcc(category.Id, 4812);
+			await _db.CreateCashbackCategoryMcc(category.Id, 4812);
 
 			var list = await _service.GetListWithAccessCheckAsync(_user.Id, category.Id);
 
@@ -39,8 +39,8 @@ namespace SlidFinance.WebApi.UnitTests
         {
             var bank = await _db.CreateBank();
             var product = await _db.CreateProduct(_user, bank.Id);
-            var tariff = await _db.CreateTariff(_user, product.Id);
-            var category = await _db.CreateCashbackCategory(_user, tariff.Id);
+            var tariff = await _db.CreateTariff(product.Id);
+            var category = await _db.CreateCashbackCategory(tariff.Id);
 
             var categoryMcc = new CashbackCategoryMcc() { CategoryId = category.Id, MccCode = 6812};
             await _service.Add(_user.Id, categoryMcc);

@@ -12,7 +12,7 @@ namespace SlidFinance.TelegramBot.Models.Commands
 
 		public CommandList(
 			StartCommand start,
-			WhichToPayCommand whichToPay,
+			WhichCardToPayCommand whichToPay,
 			GetCategoryStatisticCommand getCategoryStatistic
 		) {
 			commandsList = new List<Command>() {

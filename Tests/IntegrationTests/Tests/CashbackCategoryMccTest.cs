@@ -14,10 +14,10 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-			var tariff = await _db.CreateTariff(_user, product.Id);
-			var category = await _db.CreateCashbackCategory(_user, tariff.Id);
-			await _db.CreateCashbackCategoryMcc(_user, category.Id, 4812);
-			await _db.CreateCashbackCategoryMcc(_user, category.Id, 4814);
+			var tariff = await _db.CreateTariff(product.Id);
+			var category = await _db.CreateCashbackCategory(tariff.Id);
+			await _db.CreateCashbackCategoryMcc(category.Id, 4812);
+			await _db.CreateCashbackCategoryMcc(category.Id, 4814);
 
 			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/cashback/categories/" + category.Id + "/mcc", _accessToken);
 			var response = await SendRequest(request);
@@ -33,8 +33,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-			var tariff = await _db.CreateTariff(_user, product.Id);
-			var category = await _db.CreateCashbackCategory(_user, tariff.Id);
+			var tariff = await _db.CreateTariff(product.Id);
+			var category = await _db.CreateCashbackCategory(tariff.Id);
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/cashback/categories/" + category.Id + "/mcc", _accessToken, new CashbackCategoryMcc()
 			{

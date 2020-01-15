@@ -23,9 +23,9 @@ namespace SlidFinance.WebApi.UnitTests
         {
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
-            var tariff = await _db.CreateTariff(_user, product.Id);
-            var cashbackCategory1 = await _db.CreateCashbackCategory(_user, tariff.Id);
-            var cashbackCategory2 = await _db.CreateCashbackCategory(_user, tariff.Id);
+            var tariff = await _db.CreateTariff(product.Id);
+            await _db.CreateCashbackCategory(tariff.Id);
+            await _db.CreateCashbackCategory(tariff.Id);
 
 			var list = await _service.GetListWithAccessCheckAsync(_user.Id, product.Id);
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using SlidFinance.App.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,6 @@ namespace SlidFinance.App
 			services.AddScoped<ICategoriesService, CategoriesService>();
 			services.AddScoped<ITransactionsService, TransactionsService>();
 			services.AddScoped<IMccService, MccService>();
-			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 			services.AddScoped<IAuthTokenService, AuthTokenService>();
 			services.AddScoped<IImportService, ImportService>();
 			services.AddScoped<IMerchantService, MerchantService>();
@@ -25,6 +25,11 @@ namespace SlidFinance.App
 			services.AddScoped<IProductTariffsService, ProductTariffsService>();
 			services.AddScoped<ICashbackCategoriesService, CashbackCategoriesService>();
 			services.AddScoped<ICashbackCategoryMccService, CashbackCategoryMccService>();
+
+			// Analysis
+
+			services.AddScoped<ICashbackService, CashbackService>();
+			services.AddScoped<ICategoryStatisticService, CategoryStatisticService>();
 
 			return services;
 		}

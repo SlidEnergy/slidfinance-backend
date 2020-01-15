@@ -6,7 +6,7 @@ namespace SlidFinance.Domain
 {
 	public enum CashbackCategoryType
 	{
-		DefaultCashback = 0,
+		BaseCashback = 0,
 		NoCashback = 1,
 		IncreasedCashback = 2
 	}

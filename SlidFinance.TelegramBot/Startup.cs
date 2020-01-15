@@ -94,7 +94,7 @@ namespace SlidFinance.TelegramBot
 			services.AddScoped<CommandList>();
 			services.AddScoped<GetCategoryStatisticCommand>();
 			services.AddScoped<StartCommand>();
-			services.AddScoped<WhichToPayCommand>();
+			services.AddScoped<WhichCardToPayCommand>();
 
 			services.AddScoped<IMemoryCache>(x => new MemoryCache(new MemoryCacheOptions()));
 		}
