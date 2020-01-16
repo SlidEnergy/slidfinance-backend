@@ -15,7 +15,7 @@ namespace SlidFinance.App.Analysis
 
 		public override string ToString()
 		{
-			var title = string.Format("{0}: {1} от {2} ({3}) - {4:P2}%", SearchPart, AccountTitle, CategoryTitle, Percent);
+			var title = string.Format("{0}: {1} от {2} ({3}) - {4:P2}%", SearchPart, AccountTitle, BankTitle, CategoryTitle, Percent);
 
 			return title;
 		}
