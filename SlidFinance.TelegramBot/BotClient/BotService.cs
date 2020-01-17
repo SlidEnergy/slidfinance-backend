@@ -29,7 +29,7 @@ namespace SlidFinance.TelegramBot
 			var client = string.IsNullOrEmpty(settings.Socks5Host)
 				? new TelegramBotClient(settings.Token)
 				: new TelegramBotClient(settings.Token, new HttpToSocks5Proxy(settings.Socks5Host, settings.Socks5Port));
-			await client.SetWebhookAsync(settings.Url + "/api/update");
+			await client.SetWebhookAsync(settings.Url + "/api/messages");
 			return client;
 		}
 	}

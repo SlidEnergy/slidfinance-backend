@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +17,8 @@ using Microsoft.Extensions.Options;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
+using SlidFinance.TelegramBot.Bots;
+using SlidFinance.TelegramBot.Dialogs;
 using SlidFinance.TelegramBot.Models;
 using SlidFinance.TelegramBot.Models.Commands;
 
@@ -64,6 +68,9 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
+
+			//app.UseWebSockets();
+			//app.UseBotFramework();
 		}
 
 		private void ConfigureInfrastructure(IServiceCollection services)
@@ -110,6 +117,37 @@ namespace SlidFinance.TelegramBot
 			services.AddScoped<WhichCardToPayCommand>();
 
 			services.AddScoped<IMemoryCache>(x => new MemoryCache(new MemoryCacheOptions()));
+
+			// ECHO BOT
+
+			// Create the Bot Framework Adapter with error handling enabled.
+			//services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+
+			// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+			services.AddTransient<IBot, EchoBot>();
+
+			// DIALOG BOT
+
+			// Create the Bot Framework Adapter with error handling enabled.
+			services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
+
+			// Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
+			services.AddSingleton<IStorage, MemoryStorage>();
+
+			// Create the User state. (Used in this bot's Dialog implementation.)
+			services.AddSingleton<UserState>();
+
+			// Create the Conversation state. (Used by the Dialog system itself.)
+			services.AddSingleton<ConversationState>();
+
+			services.AddScoped<WhichCardToPayDialog>();
+
+			// The MainDialog that will be run by the bot.
+			services.AddScoped<MainDialog>();
+
+			// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+			services.AddTransient<IBot, DialogAndWelcomeBot<MainDialog>>();
+
 		}
 	}
 }
