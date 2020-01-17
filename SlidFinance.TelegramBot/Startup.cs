@@ -41,7 +41,7 @@ namespace SlidFinance.TelegramBot
 			services.AddIdentityCore<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-			services.AddSlidFinanceInfrastructure(ConnectionStringFactory.Get());
+			ConfigureInfrastructure(services);
 			services.AddSlidFinanceCore();
 
 			ConfigureBot(services);
@@ -64,6 +64,19 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
+		}
+
+		private void ConfigureInfrastructure(IServiceCollection services)
+		{
+			string connectionString = "";
+
+			if (CurrentEnvironment.IsProduction())
+				connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+			else
+				connectionString = Configuration.GetConnectionString(Environment.MachineName) ??
+					Configuration.GetConnectionString("DefaultConnection");
+
+			services.AddSlidFinanceInfrastructure(connectionString);
 		}
 
 		private void ConfigureBot(IServiceCollection services)
