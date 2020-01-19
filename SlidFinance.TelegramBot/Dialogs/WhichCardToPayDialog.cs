@@ -41,28 +41,35 @@ namespace SlidFinance.TelegramBot.Dialogs
 
 		private async Task<DialogTurnResult> SearchStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
 		{
-			var chatId = Convert.ToInt64(stepContext.Context.Activity.Recipient.Id);
-			var searchString = (string)stepContext.Result;
-
-			if (!string.IsNullOrEmpty(searchString))
+			if (stepContext.Context.Activity.ChannelId == Microsoft.Bot.Connector.Channels.Telegram)
 			{
-				var user = await _usersService.GetByTelegramChatIdAsync(chatId);
+				var chatId = Convert.ToInt64(stepContext.Context.Activity.From.Id);
+				var searchString = (string)stepContext.Result;
 
-				if (user == null)
+				if (!string.IsNullOrEmpty(searchString))
 				{
-					//TODO: заменить на диалог для неавторизованного пользователя
-					await stepContext.Context.SendActivityAsync("Пользователь не авторизован. Войдите в систему, перейдите на вкладку \"Настройки\" и нажмите привязать аккаунт Телеграм.", null, InputHints.IgnoringInput, cancellationToken);
+					var user = await _usersService.GetByTelegramChatIdAsync(chatId);
+
+					if (user == null)
+					{
+						//TODO: заменить на диалог для неавторизованного пользователя
+						await stepContext.Context.SendActivityAsync("Пользователь не авторизован. Войдите в систему, перейдите на вкладку \"Настройки\" и нажмите привязать аккаунт Телеграм.", null, InputHints.IgnoringInput, cancellationToken);
+					}
+
+					var result = await _service.WhichCardToPay(user.Id, searchString);
+
+					var message = string.Join("\r\n", result);
+
+					await stepContext.Context.SendActivityAsync(message, null, InputHints.IgnoringInput, cancellationToken);
 				}
-
-				var result = await _service.WhichCardToPay(user.Id, searchString);
-
-				var message = string.Join("\r\n", result);
-
-				await stepContext.Context.SendActivityAsync(message, null, InputHints.IgnoringInput, cancellationToken);
+				else
+				{
+					//TODO: обработать неверный ввод
+				}
 			}
 			else 
 			{
-				//TODO: обработать неверный ввод
+				await stepContext.Context.SendActivityAsync("Ваш канал не поддерживается.", null, InputHints.IgnoringInput, cancellationToken);
 			}
 
 			return await stepContext.EndDialogAsync(null, cancellationToken);

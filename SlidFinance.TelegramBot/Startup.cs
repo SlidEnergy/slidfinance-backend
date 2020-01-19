@@ -141,12 +141,15 @@ namespace SlidFinance.TelegramBot
 			services.AddSingleton<ConversationState>();
 
 			services.AddScoped<WhichCardToPayDialog>();
+			services.AddScoped<CategoryStatisticDialog>();
 
 			// The MainDialog that will be run by the bot.
 			services.AddScoped<MainDialog>();
 
 			// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
 			services.AddTransient<IBot, DialogAndWelcomeBot<MainDialog>>();
+
+			services.AddScoped<DialogList>();
 
 		}
 	}

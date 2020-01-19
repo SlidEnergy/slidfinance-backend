@@ -12,12 +12,12 @@ namespace SlidFinance.TelegramBot
 			IWebHost webHost = CreateWebHostBuilder(args).Build();
 
 			// Create a new scope
-			using (var scope = webHost.Services.CreateScope())
-			{
-				var botService = scope.ServiceProvider.GetRequiredService<IBotService>();
+			//using (var scope = webHost.Services.CreateScope())
+			//{
+			//	var botService = scope.ServiceProvider.GetRequiredService<IBotService>();
 
-				await botService.InitAsync();
-			}
+			//	await botService.InitAsync();
+			//}
 
 			// Run the WebHost, and start accepting requests
 			// There's an async overload, so we may as well use it
