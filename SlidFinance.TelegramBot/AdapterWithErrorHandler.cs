@@ -1,7 +1,9 @@
 ﻿using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Builder.TraceExtensions;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SlidFinance.TelegramBot.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +13,8 @@ namespace SlidFinance.TelegramBot
 {
 	public class AdapterWithErrorHandler : BotFrameworkHttpAdapter
 	{
-		public AdapterWithErrorHandler(IConfiguration configuration, ILogger<BotFrameworkHttpAdapter> logger)
-			: base(configuration, logger)
+		public AdapterWithErrorHandler(ICredentialProvider credentialProvider, ILogger<BotFrameworkHttpAdapter> logger)
+			: base(credentialProvider, null, logger)
 		{
 			OnTurnError = async (turnContext, exception) =>
 			{

@@ -18,15 +18,13 @@ namespace SlidFinance.TelegramBot.Bots
 		protected readonly BotState ConversationState;
 		protected readonly BotState UserState;
 		protected readonly ILogger Logger;
-		protected readonly DialogList _dialogList;
 
-		public DialogBot(ConversationState conversationState, UserState userState, T dialog, DialogList dialogList, ILogger<DialogBot<T>> logger)
+		public DialogBot(ConversationState conversationState, UserState userState, T dialog, ILogger<DialogBot<T>> logger)
 		{
 			ConversationState = conversationState;
 			UserState = userState;
 			Dialog = dialog;
 			Logger = logger;
-			_dialogList = dialogList;
 		}
 
 		public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default(CancellationToken))
