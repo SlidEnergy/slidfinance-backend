@@ -71,11 +71,11 @@ namespace SlidFinance.WebApi
         }
 
         [HttpPut("products/{productId}/tariffs/{id}")]
-        public async Task<ActionResult<Dto.ProductTariff>> Update(int id, Dto.ProductTariff product)
+        public async Task<ActionResult<Dto.ProductTariff>> Update(int id, Dto.ProductTariff tariff)
         {
             var userId = User.GetUserId();
 
-			var model = _mapper.Map<ProductTariff>(product);
+			var model = _mapper.Map<ProductTariff>(tariff);
 
             var editAccount = await _service.Edit(userId, model);
 

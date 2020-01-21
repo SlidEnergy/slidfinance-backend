@@ -44,12 +44,12 @@ namespace SlidFinance.App
 
 		public async Task Delete(string userId, int id)
 		{
-			var tariff = await _context.GetProductByIdWithAccessCheck(userId, id);
+			var tariff = await _context.GetProductTariffByIdWithAccessCheck(userId, id);
 
 			if (tariff == null)
 				return;
 
-			_context.Products.Remove(tariff);
+			_context.Tariffs.Remove(tariff);
 			await _context.SaveChangesAsync();
 		}
 	}
