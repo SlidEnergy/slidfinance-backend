@@ -1,22 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.BotFramework;
+using Microsoft.Bot.Builder.Integration.AspNet.Core;
+using Microsoft.Bot.Connector.Authentication;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
+using SlidFinance.TelegramBot.Bots;
+using SlidFinance.TelegramBot.Dialogs;
 using SlidFinance.TelegramBot.Models;
-using SlidFinance.TelegramBot.Models.Commands;
+using System;
 
 namespace SlidFinance.TelegramBot
 {
@@ -43,10 +41,9 @@ namespace SlidFinance.TelegramBot
 
 			ConfigureInfrastructure(services);
 			services.AddSlidFinanceCore();
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
 			ConfigureBot(services);
-
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +61,9 @@ namespace SlidFinance.TelegramBot
 
 			//app.UseHttpsRedirection();
 			app.UseMvc();
+
+			//app.UseWebSockets();
+			//app.UseBotFramework();
 		}
 
 		private void ConfigureInfrastructure(IServiceCollection services)
@@ -81,35 +81,46 @@ namespace SlidFinance.TelegramBot
 
 		private void ConfigureBot(IServiceCollection services)
 		{
-			TelegramBotSettings botSettings;
+			BotBuilderSettings botBuilderSettings;
 
 			if (CurrentEnvironment.IsDevelopment())
 			{
-				botSettings = Configuration
+				botBuilderSettings = Configuration
 					.GetSection("Security")
-					.GetSection("TelegramBot")
-					.Get<TelegramBotSettings>();
+					.GetSection("BotBuilder")
+					.Get<BotBuilderSettings>();
 			}
 			else
 			{
-				botSettings = new TelegramBotSettings
+				botBuilderSettings = new BotBuilderSettings
 				{
-					Name = Environment.GetEnvironmentVariable("BOT_NAME"),
-					Url = Environment.GetEnvironmentVariable("BOT_URL"),
-					Token = Environment.GetEnvironmentVariable("BOT_TOKEN")
+					MicrosoftAppId = Environment.GetEnvironmentVariable("MicrosoftAppId"),
+					MicrosoftAppPassword = Environment.GetEnvironmentVariable("MicrosoftAppPassword"),
 				};
 			}
 
-			services.AddSingleton<TelegramBotSettings>(x => botSettings);
-			services.AddSingleton<IBotService>(x => new BotService(botSettings));
-			services.AddScoped<IUpdateService, UpdateService>();
+			services.AddSingleton<ICredentialProvider>(x => new SimpleCredentialProvider(botBuilderSettings.MicrosoftAppId, botBuilderSettings.MicrosoftAppPassword));
 
-			services.AddScoped<CommandList>();
-			services.AddScoped<GetCategoryStatisticCommand>();
-			services.AddScoped<StartCommand>();
-			services.AddScoped<WhichCardToPayCommand>();
+			// Create the Bot Framework Adapter with error handling enabled.
+			services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
-			services.AddScoped<IMemoryCache>(x => new MemoryCache(new MemoryCacheOptions()));
+			// Create the storage we'll be using for User and Conversation state. (Memory is great for testing purposes.)
+			services.AddSingleton<IStorage, MemoryStorage>();
+
+			// Create the User state. (Used in this bot's Dialog implementation.)
+			services.AddSingleton<UserState>();
+
+			// Create the Conversation state. (Used by the Dialog system itself.)
+			services.AddSingleton<ConversationState>();
+
+			services.AddScoped<WhichCardToPayDialog>();
+			services.AddScoped<CategoryStatisticDialog>();
+
+			// The MainDialog that will be run by the bot.
+			services.AddScoped<MainDialog>();
+
+			// Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
+			services.AddTransient<IBot, DialogAndWelcomeBot<MainDialog>>();
 		}
 	}
 }
