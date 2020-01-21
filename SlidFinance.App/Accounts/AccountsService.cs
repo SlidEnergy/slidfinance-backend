@@ -53,6 +53,7 @@ namespace SlidFinance.App
 			model.CreditLimit = account.CreditLimit;
 			model.SelectedTariffId = account.SelectedTariffId;
 			model.ProductId = account.ProductId;
+			model.Opened = account.Opened;
 
             await _dal.Accounts.Update(model);
 

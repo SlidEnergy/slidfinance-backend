@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
-namespace SlidFinance.Domain.Accounts.Template.Tariff
+namespace SlidFinance.Domain
 {
 	[Table("CardTariffs")]
 	public class CardTariff: ProductTariff

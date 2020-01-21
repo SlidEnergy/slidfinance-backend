@@ -8,8 +8,6 @@ namespace SlidFinance.Domain
 	[Table("DepositAccounts")]
 	public class DepositAccount: BankAccount
 	{
-		public DateTime PeriodStartDate { get; set; }
-
 		public int Duration { get; set; }
 	}
 }

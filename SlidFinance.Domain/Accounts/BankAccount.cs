@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SlidFinance.Domain
@@ -28,6 +29,8 @@ namespace SlidFinance.Domain
 		public virtual Product Product { get; set; }
 
 		public ProductType Type { get; set; }
+
+        public DateTime? Opened { get; set; }
 
         public BankAccount() { }
 

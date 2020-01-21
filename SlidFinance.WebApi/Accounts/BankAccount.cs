@@ -1,4 +1,5 @@
 ﻿using SlidFinance.Domain;
+using System;
 
 namespace SlidFinance.WebApi.Dto
 {
@@ -21,5 +22,7 @@ namespace SlidFinance.WebApi.Dto
 		public int? ProductId { get; set; }
 
 		public ProductType Type { get; set; }
+
+        public DateTime? Opened { get; set; }
     }
 }
