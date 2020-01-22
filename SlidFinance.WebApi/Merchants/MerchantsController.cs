@@ -20,25 +20,23 @@ namespace SlidFinance.WebApi
         }
 
         [HttpGet]
-        public async Task<ActionResult<Dto.Merchant[]>> GetList()
+        public async Task<ActionResult<Merchant[]>> GetList()
         {
             var userId = User.GetUserId();
 
             var list = await this._merchantService.GetListWithAccessCheckAsync(userId);
 
-            return _mapper.Map<Dto.Merchant[]>(list);
+            return list.ToArray();
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.Merchant[]>> Update(int id, Dto.Merchant merchant)
+        public async Task<ActionResult<Merchant>> Update(int id, Merchant merchant)
         {
             var userId = User.GetUserId();
 
-            var existMerchant = _mapper.Map<Models.Merchant>(merchant);
+            var model = await _merchantService.EditMerchant(userId, merchant);
 
-            var model = await _merchantService.EditMerchant(userId, existMerchant);
-
-            return _mapper.Map<Dto.Merchant[]>(model);
+            return model;
         }
     }
 }

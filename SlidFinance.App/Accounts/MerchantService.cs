@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,22 +15,22 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
-		public async Task<Models.Merchant> GetByIdWithAccessCheckAsync(string userId, int id)
+		public async Task<Merchant> GetByIdWithAccessCheckAsync(string userId, int id)
 		{
 			return await _context.GetMerchantByIdWithAccessCheckAsync(userId, id);
 		}
 
-		public async Task<List<Models.Merchant>> GetListAsync()
+		public async Task<List<Merchant>> GetListAsync()
 		{
 			return await _context.Merchants.ToListAsync();
 		}
 
-		public async Task<List<Models.Merchant>> GetListWithAccessCheckAsync(string userId)
+		public async Task<List<Merchant>> GetListWithAccessCheckAsync(string userId)
 		{
 			return await _context.GetMerchantListWithAccessCheckAsync(userId);
 		}
 
-		public async Task<Models.Merchant> AddAsync(Models.Merchant merchant)
+		public async Task<Merchant> AddAsync(Merchant merchant)
 		{
 			var existMerchant = await _context.Merchants.FirstOrDefaultAsync(x => x.MccId == merchant.MccId && x.Name == merchant.Name);
 			if (existMerchant == null)
@@ -41,7 +42,7 @@ namespace SlidFinance.App
 			return merchant;
 		}
 
-		public async Task<Models.Merchant> EditMerchant(string userId, Models.Merchant merchant)
+		public async Task<Merchant> EditMerchant(string userId, Merchant merchant)
 		{
 			var editMerchant = await _context.GetMerchantByIdWithAccessCheckAsync(userId, merchant.Id);
 

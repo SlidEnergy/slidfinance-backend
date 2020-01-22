@@ -59,7 +59,7 @@ namespace SlidFinance.WebApi
 					if (mcc == null)
 						throw new Exception("МСС код не найден");
 
-					var merchant = new Models.Merchant() { MccId = mcc.Id, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
+					var merchant = new Merchant() { MccId = mcc.Id, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
 					await _merchantService.AddAsync(merchant);
 				}
 			}

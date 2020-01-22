@@ -46,7 +46,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
 			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
-			var tariff = new Dto.ProductTariff() { Title = "Tariff #1", ProductId = product.Id };
+			var tariff = new ProductTariff() { Title = "Tariff #1", ProductId = product.Id };
 
 			_service.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<ProductTariff>())).ReturnsAsync((string u, ProductTariff x) => x);
 
@@ -60,7 +60,7 @@ namespace SlidFinance.WebApi.UnitTests
 		{
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
 			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
-			var tariff = new Dto.ProductTariff() { Title = "Tariff #1", ProductId = product.Id };
+			var tariff = new ProductTariff() { Title = "Tariff #1", ProductId = product.Id };
 
 			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<ProductTariff>())).ReturnsAsync((string u, ProductTariff x) => x);
 
@@ -79,10 +79,10 @@ namespace SlidFinance.WebApi.UnitTests
 			_service.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(tariff);
 			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<ProductTariff>())).ReturnsAsync((string u, ProductTariff x) => x);
 
-			var result = await _controller.Patch(tariff.Id, new JsonPatchDocument<Dto.ProductTariff>(
-				new List<Operation<Dto.ProductTariff>>() 
+			var result = await _controller.Patch(tariff.Id, new JsonPatchDocument<ProductTariff>(
+				new List<Operation<ProductTariff>>() 
 					{ 
-						new Operation<Dto.ProductTariff>() { op = "replace", path = "/title", value = "Product #2" } 
+						new Operation<ProductTariff>() { op = "replace", path = "/title", value = "Product #2" } 
 					}, 
 					new CamelCasePropertyNamesContractResolver()));
 

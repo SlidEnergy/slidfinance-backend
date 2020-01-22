@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -12,7 +13,7 @@ namespace SlidFinance.Domain
 		public string Title { get; set; }
 
 		public int ProductId { get; set; }
-		[Required]
+		[JsonIgnore]
 		public virtual Product Product { get; set; }
 
 		public ProductType Type { get; set; }

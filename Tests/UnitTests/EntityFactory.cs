@@ -125,9 +125,9 @@ namespace SlidFinance.WebApi.UnitTests
 			return transaction;
 		}
 
-		public static async Task<Models.Merchant> CreateMerchant(this ApplicationDbContext db, int mccId)
+		public static async Task<Merchant> CreateMerchant(this ApplicationDbContext db, int mccId)
 		{
-			var merchant = new Models.Merchant()
+			var merchant = new Merchant()
 			{
 				Name = Guid.NewGuid().ToString(),
 				MccId = mccId

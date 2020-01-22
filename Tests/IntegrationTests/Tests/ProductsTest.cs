@@ -30,7 +30,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			var bank = await _db.CreateBank();
 
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/products/", _accessToken, new Dto.Product() { 
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/products/", _accessToken, new Product() { 
 				BankId = bank.Id, 
 				Title = "Product #1",
 				Image = "Image #2",
@@ -69,7 +69,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/products/" + product.Id, _accessToken, new Dto.Product
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/products/" + product.Id, _accessToken, new Product
 			{
 				Id = product.Id,
 				Title = "Product #2",

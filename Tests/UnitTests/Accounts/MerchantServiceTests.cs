@@ -28,7 +28,7 @@ namespace SlidFinance.WebApi.UnitTests
             _db.Mcc.Add(mcc);
             await _db.SaveChangesAsync();
 
-            var merchant = new Models.Merchant() { MccId = mcc.Id, Name = Guid.NewGuid().ToString() };
+            var merchant = new Merchant() { MccId = mcc.Id, Name = Guid.NewGuid().ToString() };
             await _service.AddAsync(merchant);
 
             var count = await _db.Merchants.CountAsync();
@@ -39,7 +39,7 @@ namespace SlidFinance.WebApi.UnitTests
         public async Task AddMerchant_ShouldNotBeAdded()
         {
             var mcc = await _db.CreateMcc("0100");
-            var merchant = new Models.Merchant() { MccId = mcc.Id, Name = Guid.NewGuid().ToString() };
+            var merchant = new Merchant() { MccId = mcc.Id, Name = Guid.NewGuid().ToString() };
             _db.Merchants.Add(merchant);
             await _db.SaveChangesAsync();
 
@@ -78,7 +78,7 @@ namespace SlidFinance.WebApi.UnitTests
             var mcc = await _db.CreateMcc("0100");
             var merchant = await _db.CreateMerchant(mcc.Id);
 
-            var newMerchant = new Models.Merchant() { Id = merchant.Id, Name = merchant.Name, IsPublic = true };
+            var newMerchant = new Merchant() { Id = merchant.Id, Name = merchant.Name, IsPublic = true };
 
             await _service.EditMerchant(_user.Id, newMerchant);
 
@@ -93,7 +93,7 @@ namespace SlidFinance.WebApi.UnitTests
             var mcc = await _db.CreateMcc("0100");
             var merchant = await _db.CreateMerchant(mcc.Id);
 
-            var newMerchant = new Models.Merchant() { Id = merchant.Id, Name = merchant.Name, DisplayName = "Merchant #1" };
+            var newMerchant = new Merchant() { Id = merchant.Id, Name = merchant.Name, DisplayName = "Merchant #1" };
 
             await _service.EditMerchant(_user.Id, newMerchant);
 

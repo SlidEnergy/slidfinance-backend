@@ -25,19 +25,19 @@ namespace SlidFinance.WebApi
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.Product>>> GetList()
+        public async Task<ActionResult<IEnumerable<Product>>> GetList()
         {
             var userId = User.GetUserId();
 
             var products = await _service.GetListWithAccessCheckAsync(userId);
 
-            return _mapper.Map<Dto.Product[]>(products);
+            return products;
         }
 
         [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<Dto.Product>> PatchProduct(int id, JsonPatchDocument<Dto.Product> patchDoc)
+        public async Task<ActionResult<Product>> PatchProduct(int id, JsonPatchDocument<Product> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -46,40 +46,31 @@ namespace SlidFinance.WebApi
 
 			var model = await _service.GetByIdWithAccessCheck(userId, id);
 
-			var dto = _mapper.Map<Dto.Product>(model);
-			patchDoc.ApplyTo(dto);
-
-            _mapper.Map(dto, model);
+			patchDoc.ApplyTo(model);
 
             var patchetProduct = await _service.Edit(userId, model);
 
-            return _mapper.Map<Dto.Product>(patchetProduct);
+            return patchetProduct;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Dto.Product>> Add(Dto.Product product)
+        public async Task<ActionResult<Product>> Add(Product product)
         {
             var userId = User.GetUserId();
 
-			var model = new Product();
+			var newProduct = await _service.Add(userId, product);
 
-			_mapper.Map(product, model);
-
-			var newProduct = await _service.Add(userId, model);
-
-            return CreatedAtAction("GetList", _mapper.Map<Dto.Product>(newProduct));
+            return CreatedAtAction("GetList", newProduct);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Dto.Product>> Update(int id, Dto.Product product)
+        public async Task<ActionResult<Product>> Update(int id, Product product)
         {
             var userId = User.GetUserId();
 
-			var model = _mapper.Map<Product>(product);
+            var editAccount = await _service.Edit(userId, product);
 
-            var editAccount = await _service.Edit(userId, model);
-
-            return _mapper.Map<Dto.Product>(editAccount);
+            return editAccount;
         }
 
         [HttpDelete("{id}")]

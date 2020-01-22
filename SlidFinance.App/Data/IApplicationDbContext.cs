@@ -12,7 +12,7 @@ namespace SlidFinance.App
 		DbSet<Bank> Banks { get; set; }
 		DbSet<UserCategory> Categories { get; set; }
 		DbSet<Mcc> Mcc { get; set; }
-		DbSet<Models.Merchant> Merchants { get; set; }
+		DbSet<Merchant> Merchants { get; set; }
 		DbSet<Rule> Rules { get; set; }
 		DbSet<Transaction> Transactions { get; set; }
 		DbSet<TrusteeAccount> TrusteeAccounts { get; set; }

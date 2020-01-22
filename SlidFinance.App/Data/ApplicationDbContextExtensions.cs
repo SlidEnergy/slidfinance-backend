@@ -230,7 +230,7 @@ namespace SlidFinance.App
 			return rules;
 		}
 
-		public static async Task<List<Models.Merchant>> GetMerchantListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
+		public static async Task<List<Merchant>> GetMerchantListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
 		{
 			var user = await context.Users.FindAsync(userId);
 
@@ -242,7 +242,7 @@ namespace SlidFinance.App
 			return await context.Merchants.Where(x => x.IsPublic == true).ToListAsync();
 		}
 
-		public static async Task<Models.Merchant> GetMerchantByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
+		public static async Task<Merchant> GetMerchantByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
 		{
 			var user = await context.Users.FindAsync(userId);
 

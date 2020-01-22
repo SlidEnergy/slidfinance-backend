@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -14,7 +15,7 @@ namespace SlidFinance.Domain
 		public string Description { get; set; }
 
 		public int TariffId { get; set; }
-		[Required]
+		[JsonIgnore]
 		public virtual ProductTariff Tariff { get; set; }
 
 		public float CashbackLimit { get; set; }

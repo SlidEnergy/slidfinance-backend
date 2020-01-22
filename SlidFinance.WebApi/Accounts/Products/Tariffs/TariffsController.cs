@@ -25,19 +25,19 @@ namespace SlidFinance.WebApi
 
         [HttpGet("products/{productId}/tariffs")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.ProductTariff>>> GetList(int productId)
+        public async Task<ActionResult<IEnumerable<ProductTariff>>> GetList(int productId)
         {
             var userId = User.GetUserId();
 
             var products = await _service.GetListWithAccessCheckAsync(userId, productId);
 
-            return _mapper.Map<Dto.ProductTariff[]>(products);
+            return products;
         }
 
         [HttpPatch("products/{productId}/tariffs/{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<Dto.ProductTariff>> Patch(int id, JsonPatchDocument<Dto.ProductTariff> patchDoc)
+        public async Task<ActionResult<ProductTariff>> Patch(int id, JsonPatchDocument<ProductTariff> patchDoc)
         {
             if (patchDoc == null)
                 return BadRequest();
@@ -46,40 +46,31 @@ namespace SlidFinance.WebApi
 
 			var model = await _service.GetByIdWithAccessCheck(userId, id);
 
-			var dto = _mapper.Map<Dto.ProductTariff>(model);
-			patchDoc.ApplyTo(dto);
-
-            _mapper.Map(dto, model);
+			patchDoc.ApplyTo(model);
 
             var patchetProduct = await _service.Edit(userId, model);
 
-            return _mapper.Map<Dto.ProductTariff>(patchetProduct);
+            return patchetProduct;
         }
 
         [HttpPost("products/{productId}/tariffs")]
-        public async Task<ActionResult<Dto.ProductTariff>> Add(Dto.ProductTariff tariff)
+        public async Task<ActionResult<ProductTariff>> Add(ProductTariff tariff)
         {
             var userId = User.GetUserId();
 
-			var model = new ProductTariff();
+			var newTariff = await _service.Add(userId, tariff);
 
-			_mapper.Map(tariff, model);
-
-			var newTariff = await _service.Add(userId, model);
-
-            return CreatedAtAction("GetList", new { newTariff.ProductId }, _mapper.Map<Dto.ProductTariff>(newTariff));
+            return CreatedAtAction("GetList", new { newTariff.ProductId }, newTariff);
         }
 
         [HttpPut("products/{productId}/tariffs/{id}")]
-        public async Task<ActionResult<Dto.ProductTariff>> Update(int id, Dto.ProductTariff tariff)
+        public async Task<ActionResult<ProductTariff>> Update(int id, ProductTariff tariff)
         {
             var userId = User.GetUserId();
 
-			var model = _mapper.Map<ProductTariff>(tariff);
+            var editAccount = await _service.Edit(userId, tariff);
 
-            var editAccount = await _service.Edit(userId, model);
-
-            return _mapper.Map<Dto.ProductTariff>(editAccount);
+            return editAccount;
         }
 
         [HttpDelete("products/{productId}/tariffs/{id}")]

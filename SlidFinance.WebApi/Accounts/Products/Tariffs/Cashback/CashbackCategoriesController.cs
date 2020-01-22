@@ -25,13 +25,13 @@ namespace SlidFinance.WebApi
 
         [HttpGet("tariffs/{tariffId}/cashback/categories")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<Dto.CashbackCategory>>> GetList(int tariffId)
+        public async Task<ActionResult<IEnumerable<CashbackCategory>>> GetList(int tariffId)
         {
             var userId = User.GetUserId();
 
             var products = await _service.GetListWithAccessCheckAsync(userId, tariffId);
 
-            return _mapper.Map<Dto.CashbackCategory[]>(products);
+            return products;
         }
     }
 }

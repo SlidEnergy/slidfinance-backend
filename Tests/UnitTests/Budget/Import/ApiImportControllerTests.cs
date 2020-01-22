@@ -48,8 +48,8 @@ namespace SlidFinance.WebApi.UnitTests
 			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
-			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Models.Merchant>());
-			_merchantService.Setup(x => x.AddAsync(It.IsAny<Models.Merchant>())).ReturnsAsync((Models.Merchant x) => x);
+			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());
+			_merchantService.Setup(x => x.AddAsync(It.IsAny<Merchant>())).ReturnsAsync((Merchant x) => x);
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
@@ -82,8 +82,8 @@ namespace SlidFinance.WebApi.UnitTests
 			queue.Enqueue(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(queue.Dequeue);
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
-			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Models.Merchant>());
-			_merchantService.Setup(x => x.AddAsync(It.IsAny<Models.Merchant>())).ReturnsAsync((Models.Merchant x) => x);
+			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());
+			_merchantService.Setup(x => x.AddAsync(It.IsAny<Merchant>())).ReturnsAsync((Merchant x) => x);
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
@@ -112,8 +112,8 @@ namespace SlidFinance.WebApi.UnitTests
 			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync((Mcc x) => x);
-			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Models.Merchant>());
-			_merchantService.Setup(x => x.AddAsync(It.IsAny<Models.Merchant>())).ReturnsAsync((Models.Merchant x) => x);
+			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());
+			_merchantService.Setup(x => x.AddAsync(It.IsAny<Merchant>())).ReturnsAsync((Merchant x) => x);
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 

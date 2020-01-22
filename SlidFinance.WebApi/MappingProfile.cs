@@ -91,21 +91,6 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.Category,
 					opt => opt.MapFrom(src => src.Category == MccCategory.None ? null :
 						new Dto.MccCategory() { Id = (int)src.Category, Title = EnumUtils.GetDescription(src.Category) }));
-
-			CreateMap<Models.Merchant, Dto.Merchant>();
-			CreateMap<Product, Dto.Product>();
-			CreateMap<Dto.Product, Product>()
-				.ForMember(dest => dest.Bank,
-					opt => opt.Ignore());
-			CreateMap<ProductTariff, Dto.ProductTariff>();
-			CreateMap<Dto.ProductTariff, ProductTariff>()
-				.ForMember(dest => dest.Product,
-					opt => opt.Ignore());
-
-			CreateMap<CashbackCategory, Dto.CashbackCategory>();
-			CreateMap<Dto.CashbackCategory, CashbackCategory>()
-				.ForMember(dest => dest.Tariff,
-					opt => opt.Ignore());
 		}
     }
 }

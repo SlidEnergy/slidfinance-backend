@@ -44,7 +44,7 @@ namespace SlidFinance.WebApi.UnitTests
 		public async Task AddProduct_ShouldCallMethod()
 		{
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
-			var product = new Dto.Product() { Title = "Product #1", BankId = bank.Id };
+			var product = new Product() { Title = "Product #1", BankId = bank.Id };
 
 			_service.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
@@ -57,7 +57,7 @@ namespace SlidFinance.WebApi.UnitTests
 		public async Task UpdateProduct_ShouldCallMethod()
 		{
 			var bank = new Bank() { Id = 1, Title = "Bank #1" };
-			var product = new Dto.Product() { Id = 1, Title = "Product #1", BankId = bank.Id };
+			var product = new Product() { Id = 1, Title = "Product #1", BankId = bank.Id };
 
 			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
@@ -75,10 +75,10 @@ namespace SlidFinance.WebApi.UnitTests
 			_service.Setup(x => x.GetByIdWithAccessCheck(It.IsAny<string>(), It.IsAny<int>())).ReturnsAsync(product);
 			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<Product>())).ReturnsAsync((string u, Product x) => x);
 
-			var result = await _controller.PatchProduct(product.Id, new JsonPatchDocument<Dto.Product>(
-				new List<Operation<Dto.Product>>() 
+			var result = await _controller.PatchProduct(product.Id, new JsonPatchDocument<Product>(
+				new List<Operation<Product>>() 
 					{ 
-						new Operation<Dto.Product>() { op = "replace", path = "/title", value = "Product #2" } 
+						new Operation<Product>() { op = "replace", path = "/title", value = "Product #2" } 
 					}, 
 					new CamelCasePropertyNamesContractResolver()));
 

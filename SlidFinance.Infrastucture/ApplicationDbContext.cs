@@ -29,6 +29,27 @@ namespace SlidFinance.Infrastructure
                 .HasOne(x => x.Category)
                 .WithMany()
                 .IsRequired();
+
+
+            modelBuilder.Entity<ProductTariff>()
+                .HasOne(x => x.Product)
+                .WithMany()
+                .IsRequired();
+
+            modelBuilder.Entity<CashbackCategory>()
+             .HasOne(x => x.Tariff)
+             .WithMany()
+             .IsRequired();
+
+            modelBuilder.Entity<Merchant>()
+             .HasOne(x => x.Mcc)
+             .WithMany()
+             .IsRequired();
+
+            modelBuilder.Entity<Merchant>()
+             .HasOne(x => x.CreatedBy)
+             .WithMany()
+             .IsRequired();
         }
 
 		public DbSet<Transaction> Transactions { get; set; }
@@ -45,7 +66,7 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Mcc> Mcc { get; set; }
 
-        public DbSet<Models.Merchant> Merchants { get; set; }
+        public DbSet<Merchant> Merchants { get; set; }
 
 		public DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
 		public DbSet<TrusteeCategory> TrusteeCategories { get; set; }

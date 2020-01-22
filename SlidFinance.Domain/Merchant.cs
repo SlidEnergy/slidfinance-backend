@@ -1,57 +1,35 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using SlidFinance.Domain;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SlidFinance.Domain
 {
-    public class Merchant : IUniqueObject
-	{
-        public int Id => _model.Id;
+    public class Merchant
+    {
+        public int Id { get; set; }
 
-        public string Address
-        {
-            get { return _model.Address; }
-            set { _model.Address = value; }
-        }
+        public string Address { get; set; }
 
-        public int MccId
-        {
-            get { return _model.MccId; }
-            set { _model.MccId = value; }
-        }
+        public int MccId { get; set; }
 
-        public Mcc Mcc
-        {
-            get { return _model.Mcc; }
-            set { _model.Mcc = value; }
-        }
+        [JsonIgnore]
+        public virtual Mcc Mcc { get; set; }
 
-        public string Name
-        {
-            get { return _model.Name; }
-            set { _model.Name = value; }
-        }
+        [Required]
+        public string Name { get; set; }
 
-        public string DisplayName
-        {
-            get { return _model.DisplayName; }
-            set { _model.DisplayName = value; }
-        }
+        public string DisplayName { get; set; }
 
-        public bool IsPublic
-        {
-            get { return _model.IsPublic; }
-            set { _model.IsPublic = value; }
-        }
+        [Required]
+        public DateTime Created { get; set; }
 
-        public DateTime Created => _model.Created;
+        public DateTime Updated { get; set; }
 
-        public DateTime Updated => _model.Updated;
+        public string CreatedById { get; set; }
+        [JsonIgnore]
+        public virtual ApplicationUser CreatedBy { get; set; }
 
-        private IMerchant _model;
-
-        public Merchant(IMerchant merchant)
-        {
-            _model = merchant;
-        }
+        public bool IsPublic { get; set; }
     }
 }
