@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SlidFinance.App.Analysis
 {
-	public class CashbackCategoryByMccCodeWithCashbackPercent
+	public class CashbackCategoryBySearchPartWithCashbackPercent
 	{
 		public string SearchPart;
 		public int Id;

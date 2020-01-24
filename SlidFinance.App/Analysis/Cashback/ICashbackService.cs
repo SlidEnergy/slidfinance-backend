@@ -5,6 +5,6 @@ namespace SlidFinance.App.Analysis
 {
 	public interface ICashbackService
 	{
-		Task<List<WhichCardToPay>> WhichCardToPay(string userId, string searchString);
+		Task<List<WhichCardToPay>> WhichCardToPayAsync(string userId, string searchString);
 	}
 }

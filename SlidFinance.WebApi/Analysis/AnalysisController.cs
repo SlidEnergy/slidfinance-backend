@@ -27,7 +27,7 @@ namespace SlidFinance.WebApi
         {
             var userId = User.GetUserId();
 
-			return await _cashbackService.WhichCardToPay(userId, search);
+			return await _cashbackService.WhichCardToPayAsync(userId, search);
         }
 
         [HttpGet("category")]

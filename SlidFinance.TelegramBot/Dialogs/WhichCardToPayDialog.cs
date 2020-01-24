@@ -56,7 +56,7 @@ namespace SlidFinance.TelegramBot.Dialogs
 						await stepContext.Context.SendActivityAsync("Пользователь не авторизован. Войдите в систему, перейдите на вкладку \"Настройки\" и нажмите привязать аккаунт Телеграм.", null, InputHints.IgnoringInput, cancellationToken);
 					}
 
-					var result = await _service.WhichCardToPay(user.Id, searchString);
+					var result = await _service.WhichCardToPayAsync(user.Id, searchString);
 
 					var message = string.Join("\r\n", result);
 

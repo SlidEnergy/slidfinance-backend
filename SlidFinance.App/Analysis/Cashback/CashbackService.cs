@@ -18,7 +18,7 @@ namespace SlidFinance.App.Analysis
 			_context = context;
 		}
 
-		private int[] ConvertToMccCodes(string searchString)
+		private int[] findMccCodesInString(string searchString)
 		{
 			var regex = new Regex(@"\b\d{4}\b", RegexOptions.IgnoreCase);
 			var matches = regex.Matches(searchString);
@@ -27,14 +27,28 @@ namespace SlidFinance.App.Analysis
 			return codes;
 		}
 
-		public async Task<List<WhichCardToPay>> WhichCardToPay(string userId, string searchString)
+		private string[] findSearchPartInStringWithoutMcc(string searchString, int[] mcc)
 		{
-			var codes = ConvertToMccCodes(searchString);
+			var parts = searchString.Split(" ");
+			return parts.Except(mcc.Select(x => x.ToString())).ToArray();
+		}
+
+		public async Task<List<WhichCardToPay>> WhichCardToPayAsync(string userId, string searchString)
+		{
+			var codes = findMccCodesInString(searchString);
+
+			var parts = findSearchPartInStringWithoutMcc(searchString, codes);
 
 			// Все счета пользователя
 			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
 
-			var categories = await GetCashbackCategoriesByMccCodesAsync(accounts, codes);
+			var categoriesByMcc = await GetCashbackCategoriesByMccAsync(accounts, codes);
+
+			var categoriesByTitle = await GetCashbackCategoriesByTitleAsync(accounts, parts);
+
+			//var categoriesByMerchant = await GetCashbackCategoriesByMerchantAsync(accounts, codes);
+
+			var categories = categoriesByMcc.Union(categoriesByTitle).ToList();
 
 			// Получаем информацию о величине кэшбэка
 			var categoriesWithCashback = AddCashbackPercentInfo(categories);
@@ -48,7 +62,7 @@ namespace SlidFinance.App.Analysis
 			return whichCardToPay;
 		}
 
-		private async Task<List<CashbackCategoryByMccCode>> GetCashbackCategoriesByMccCodesAsync(List<BankAccount> accounts, int[] mccCodes)
+		private async Task<List<CashbackCategoryBySearchPart>> GetCashbackCategoriesByMccAsync(List<BankAccount> accounts, int[] mccCodes)
 		{
 			// Все категории кэшбэков по тарифам
 			var allUserCategories = await _context.CashbackCategories
@@ -58,9 +72,9 @@ namespace SlidFinance.App.Analysis
 			// Запрашиваем все категории где упоминаются наши MCC
 			var allCategoriesByMcc = await _context.CashbackCategoryMcc
 				.Where(m => mccCodes.Contains(m.MccCode))
-				.Join(allUserCategories, m => m.CategoryId, c => c.Id, (m, c) => new CashbackCategoryByMccCode()
+				.Join(allUserCategories, m => m.CategoryId, c => c.Id, (m, c) => new CashbackCategoryBySearchPart()
 				{
-					MccCode = m.MccCode.ToString(),
+					SearchPart = m.MccCode.ToString(),
 					Id = c.Id,
 					Title = c.Title,
 					TariffId = c.TariffId,
@@ -73,9 +87,9 @@ namespace SlidFinance.App.Analysis
 			var baseCashbackCategories = (from code in mccCodes
 										  from cat in allUserCategories
 										  where cat.Type == CashbackCategoryType.BaseCashback
-										  select new CashbackCategoryByMccCode()
+										  select new CashbackCategoryBySearchPart()
 										  {
-											  MccCode = code.ToString(),
+											  SearchPart = code.ToString(),
 											  Id = cat.Id,
 											  Title = cat.Title,
 											  TariffId = cat.TariffId,
@@ -83,7 +97,7 @@ namespace SlidFinance.App.Analysis
 										  }).ToList();
 
 			// Ищем кэшбэк в категории базового кэшбэка за исключением категории без кэшбэка и в категориях повышенного кэшбэка
-			var comparer = new CashbackCategoryByMccCodeEqualityComparer();
+			var comparer = new CashbackCategoryBySearchPartEqualityComparer();
 			var categories = increasedCashbackCategories.Union(baseCashbackCategories.Except(noCashbackCategories, comparer), comparer).ToList();
 
 			// TODO: отфильтровать только действующие категории
@@ -91,18 +105,64 @@ namespace SlidFinance.App.Analysis
 			return categories;
 		}
 
-		private List<CashbackCategoryByMccCodeWithCashbackPercent> AddCashbackPercentInfo(List<CashbackCategoryByMccCode> categories)
+		private async Task<List<CashbackCategoryBySearchPart>> GetCashbackCategoriesByTitleAsync(List<BankAccount> accounts, string[] parts)
 		{
-			return categories.GroupJoin(_context.Cashback, cat => cat.Id, cb => cb.CategoryId, (cat, cbs) => new CashbackCategoryByMccCodeWithCashbackPercent()
+			// Все категории кэшбэков по тарифам
+			var allUserCategories = await _context.CashbackCategories
+				.Join(accounts, cat => cat.TariffId, a => a.SelectedTariffId, (cat, a) => cat)
+				.ToListAsync();
+
+			// Запрашиваем все категории где есть совпадения в названии
+			var increasedCashbackCategories = new List<CashbackCategoryBySearchPart>();
+
+			foreach (var part in parts) {
+				foreach (var category in allUserCategories)
+				{
+					if (category.Title.Contains(part, StringComparison.CurrentCultureIgnoreCase))
+						increasedCashbackCategories.Add(new CashbackCategoryBySearchPart()
+						{
+							SearchPart = part,
+							Id = category.Id,
+							Title = category.Title,
+							TariffId = category.TariffId,
+							Type = category.Type
+						});
+				}
+			}
+
+			var baseCashbackCategories = (from part in parts
+										  from cat in allUserCategories
+										  where cat.Type == CashbackCategoryType.BaseCashback
+										  select new CashbackCategoryBySearchPart()
+										  {
+											  SearchPart = part,
+											  Id = cat.Id,
+											  Title = cat.Title,
+											  TariffId = cat.TariffId,
+											  Type = cat.Type
+										  }).ToList();
+
+			// Ищем кэшбэк в категории базового кэшбэка за исключением категории без кэшбэка и в категориях повышенного кэшбэка
+			var comparer = new CashbackCategoryBySearchPartEqualityComparer();
+			var categories = increasedCashbackCategories.Union(baseCashbackCategories, comparer).ToList();
+
+			// TODO: отфильтровать только действующие категории
+
+			return categories;
+		}
+
+		private List<CashbackCategoryBySearchPartWithCashbackPercent> AddCashbackPercentInfo(List<CashbackCategoryBySearchPart> categories)
+		{
+			return categories.GroupJoin(_context.Cashback, cat => cat.Id, cb => cb.CategoryId, (cat, cbs) => new CashbackCategoryBySearchPartWithCashbackPercent()
 			{
-				SearchPart = cat.MccCode,
+				SearchPart = cat.SearchPart,
 				CategoryTitle = cat.Title,
 				Percent = cbs.Max(x => x.Percent),
 				TariffId = cat.TariffId,
 			}).ToList();
 		}
 
-		private List<WhichCardToPay> AddAdditionalInfo(List<CashbackCategoryByMccCodeWithCashbackPercent> categoriesWithMaxCashback, List<BankAccount> accounts)
+		private List<WhichCardToPay> AddAdditionalInfo(List<CashbackCategoryBySearchPartWithCashbackPercent> categoriesWithMaxCashback, List<BankAccount> accounts)
 		{
 			return (from cat in categoriesWithMaxCashback
 					join tar in _context.Tariffs on cat.TariffId equals tar.Id
@@ -119,7 +179,7 @@ namespace SlidFinance.App.Analysis
 					}).ToList();
 		}
 
-		private List<T> FilterCategoriesWithMaxCashback<T>(List<T> categoriesWithCashback) where T : CashbackCategoryByMccCodeWithCashbackPercent
+		private List<T> FilterCategoriesWithMaxCashback<T>(List<T> categoriesWithCashback) where T : CashbackCategoryBySearchPartWithCashbackPercent
 		{
 			return (from cat in categoriesWithCashback
 					group cat by new
@@ -129,10 +189,10 @@ namespace SlidFinance.App.Analysis
 					select new
 					{
 						SearchPart = g.Key.SearchPart,
-						Categories = g.Where(x => x.SearchPart == g.Key.SearchPart && x.Percent == g.Max(y => y.Percent)).FirstOrDefault()
+						Categories = g.Where(x => x.SearchPart == g.Key.SearchPart && x.Percent == g.Max(y => y.Percent)).ToList()
 					})
-												 .Select(x => x.Categories)
-												 .ToList();
+					.SelectMany(x => x.Categories)
+					.ToList();
 		}
 	}
 }
