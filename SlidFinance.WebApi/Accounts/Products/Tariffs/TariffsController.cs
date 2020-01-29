@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-	[Route("api/v1")]
+	[Route("api/v1/[controller]")]
     [Authorize(Policy = Policy.MustBeAllAccessMode)]
     [ApiController]
     public sealed class TariffsController : ControllerBase
@@ -23,7 +23,7 @@ namespace SlidFinance.WebApi
             _service = service;
         }
 
-        [HttpGet("products/{productId}/tariffs")]
+        [HttpGet]
         [ProducesResponseType(200)]
         public async Task<ActionResult<IEnumerable<ProductTariff>>> GetList(int productId)
         {
@@ -34,7 +34,7 @@ namespace SlidFinance.WebApi
             return products;
         }
 
-        [HttpPatch("products/{productId}/tariffs/{id}")]
+        [HttpPatch("{id}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<ProductTariff>> Patch(int id, JsonPatchDocument<ProductTariff> patchDoc)
@@ -53,7 +53,7 @@ namespace SlidFinance.WebApi
             return patchetProduct;
         }
 
-        [HttpPost("products/{productId}/tariffs")]
+        [HttpPost]
         public async Task<ActionResult<ProductTariff>> Add(ProductTariff tariff)
         {
             var userId = User.GetUserId();
@@ -63,7 +63,7 @@ namespace SlidFinance.WebApi
             return CreatedAtAction("GetList", new { newTariff.ProductId }, newTariff);
         }
 
-        [HttpPut("products/{productId}/tariffs/{id}")]
+        [HttpPut("{id}")]
         public async Task<ActionResult<ProductTariff>> Update(int id, ProductTariff tariff)
         {
             var userId = User.GetUserId();
@@ -73,7 +73,7 @@ namespace SlidFinance.WebApi
             return editAccount;
         }
 
-        [HttpDelete("products/{productId}/tariffs/{id}")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             var userId = User.GetUserId();

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
 using System.Linq;
+using System;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -31,5 +32,41 @@ namespace SlidFinance.WebApi.UnitTests
 
 			Assert.AreEqual(2, list.Count);
         }
+
+		[Test]
+		public async Task Add_ShouldBeAdded()
+		{
+			var bank = await _db.CreateBank();
+			var product = await _db.CreateProduct(_user, bank.Id);
+			var tariff = await _db.CreateTariff(product.Id);
+
+			var model = new CashbackCategory() { TariffId = tariff.Id, Title = Guid.NewGuid().ToString()};
+			await _service.Add(_user.Id, model);
+
+
+			var addedModel = _db.CashbackCategories
+				.Where(t => t.TariffId == tariff.Id)
+				.FirstOrDefault();
+
+			Assert.NotNull(addedModel);
+		}
+
+		[Test]
+		public async Task Update_ShouldBeUpdated()
+		{
+			var bank = await _db.CreateBank();
+			var product = await _db.CreateProduct(_user, bank.Id);
+			var tariff = await _db.CreateTariff(product.Id);
+			var category = await _db.CreateCashbackCategory(tariff.Id);
+
+			var model = new CashbackCategory() { Id = tariff.Id, TariffId = tariff.Id, Title = Guid.NewGuid().ToString() };
+			await _service.Edit(_user.Id, model);
+
+			var updatedModel = _db.CashbackCategories
+				.Where(t => t.Id == category.Id)
+				.FirstOrDefault();
+
+			Assert.AreEqual(model.Title, updatedModel.Title);
+		}
 	}
 }

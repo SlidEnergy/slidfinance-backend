@@ -42,5 +42,35 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_service.Verify(x => x.GetListWithAccessCheckAsync(It.Is<string>(u => u == _user.Id), It.Is<int>(p => p == tariff.Id)));
 		}
+
+		[Test]
+		public async Task Add_ShouldCallMethod()
+		{
+			var bank = new Bank() { Id = 1, Title = "Bank #1" };
+			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
+			var tariff = new ProductTariff() { Title = "Tariff #1", ProductId = product.Id };
+			var category = new CashbackCategory() { Title = "Category #1", TariffId = tariff.Id };
+
+			_service.Setup(x => x.Add(It.IsAny<string>(), It.IsAny<CashbackCategory>())).ReturnsAsync((string u, CashbackCategory x) => x);
+
+			var result = await _controller.Add(category);
+
+			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<CashbackCategory>(p => p.Title == category.Title && p.TariffId == tariff.Id)));
+		}
+
+		[Test]
+		public async Task Update_ShouldCallMethod()
+		{
+			var bank = new Bank() { Id = 1, Title = "Bank #1" };
+			var product = new Product() { Id = 1, Title = "Product #1", Bank = bank };
+			var tariff = new ProductTariff() { Id = 1, Title = "Tariff #1", ProductId = product.Id };
+			var category = new CashbackCategory() { Id = 1, Title = "Category #1", TariffId = tariff.Id };
+
+			_service.Setup(x => x.Edit(It.IsAny<string>(), It.IsAny<CashbackCategory>())).ReturnsAsync((string u, CashbackCategory x) => x);
+
+			var result = await _controller.Update(category.Id, category);
+
+			_service.Verify(x => x.Edit(It.Is<string>(u => u == _user.Id), It.Is<CashbackCategory>(p => p.Id == category.Id && p.Title == category.Title && p.TariffId == tariff.Id)));
+		}
 	}
 }

@@ -108,7 +108,7 @@ namespace SlidFinance.App
 			return rules;
 		}
 
-		public static async Task<ProductTariff> GetCashbackCategoryByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)
+		public static async Task<CashbackCategory> GetCashbackCategoryByIdWithAccessCheck(this IApplicationDbContext context, string userId, int id)
 		{
 			var user = await context.Users.FindAsync(userId);
 
@@ -128,11 +128,11 @@ namespace SlidFinance.App
 				return null;
 
 			if (product.IsPublic && product.Approved)
-				return tariff;
+				return category;
 
 			if (await context.TrusteeProducts
 				.Where(t => t.TrusteeId == user.TrusteeId && t.ProductId == tariff.ProductId).FirstOrDefaultAsync() != null)
-				return tariff;
+				return category;
 
 			return null;
 		}

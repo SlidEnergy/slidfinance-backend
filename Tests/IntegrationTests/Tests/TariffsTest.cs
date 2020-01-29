@@ -17,7 +17,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var tariff1 = await _db.CreateTariff(product.Id);
 			var tariff2 = await _db.CreateTariff(product.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/products/" + product.Id + "/tariffs", _accessToken);
+			var request = HttpRequestBuilder.CreateJsonRequest("GET", "/api/v1/tariffs?productId=" + product.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);
@@ -32,7 +32,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var bank = await _db.CreateBank();
 			var product = await _db.CreateProduct(_user, bank.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/products/" + product.Id + "/tariffs", _accessToken, new ProductTariff() { 
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/tariffs", _accessToken, new ProductTariff() { 
 				ProductId = product.Id, 
 				Title = "Tariff #1",
 				Type = ProductType.Card
@@ -53,7 +53,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var product = await _db.CreateProduct(_user, bank.Id);
 			var tariff = await _db.CreateTariff(product.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("PATCH", "/api/v1/products/" + product.Id + "/tariffs/" + tariff.Id, _accessToken, new[] { new { op = "replace", path = "/title", value = "Tariff #2" } });
+			var request = HttpRequestBuilder.CreateJsonRequest("PATCH", "/api/v1/tariffs/" + tariff.Id, _accessToken, new[] { new { op = "replace", path = "/title", value = "Tariff #2" } });
 
 			var response = await SendRequest(request);
 
@@ -70,9 +70,9 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var product = await _db.CreateProduct(_user, bank.Id);
 			var tariff = await _db.CreateTariff(product.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/products/" + product.Id + "/tariffs/" + tariff.Id, _accessToken, new ProductTariff
+			var request = HttpRequestBuilder.CreateJsonRequest("PUT", "/api/v1/tariffs/" + tariff.Id, _accessToken, new ProductTariff
 			{
-				Id = product.Id,
+				Id = tariff.Id,
 				Title = "Tariff #2",
 				ProductId = product.Id,
 				Type = ProductType.Card
@@ -93,7 +93,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var product = await _db.CreateProduct(_user, bank.Id);
 			var tariff = await _db.CreateTariff(product.Id);
 
-			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/products/" + product.Id + "/tariffs/" + tariff.Id, _accessToken);
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/tariffs/" + tariff.Id, _accessToken);
 			var response = await SendRequest(request);
 
 			Assert.True(response.IsSuccessStatusCode);

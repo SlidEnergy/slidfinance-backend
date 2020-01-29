@@ -52,7 +52,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			var result = await _controller.Add(tariff);
 
-			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<ProductTariff>(p => p.Title == tariff.Title && tariff.ProductId == product.Id)));
+			_service.Verify(x => x.Add(It.Is<string>(u => u == _user.Id), It.Is<ProductTariff>(p => p.Title == tariff.Title && p.ProductId == product.Id)));
 		}
 
 		[Test]
@@ -66,7 +66,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			var result = await _controller.Update(product.Id, tariff);
 
-			_service.Verify(x => x.Edit(It.Is<string>(u => u == _user.Id), It.Is<ProductTariff>(p => p.Id == tariff.Id && p.Title == tariff.Title && tariff.ProductId == product.Id)));
+			_service.Verify(x => x.Edit(It.Is<string>(u => u == _user.Id), It.Is<ProductTariff>(p => p.Id == tariff.Id && p.Title == tariff.Title && p.ProductId == product.Id)));
 		}
 
 		[Test]
