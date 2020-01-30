@@ -16,6 +16,9 @@ using SlidFinance.App;
 using SlidFinance.Domain;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
+using Swashbuckle.AspNetCore.Newtonsoft;
 
 namespace SlidFinance.WebApi
 {
@@ -38,12 +41,13 @@ namespace SlidFinance.WebApi
 			ConfigureAutoMapper(services);
 
 			services.AddCors();
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-				.AddJsonOptions(options =>
+			services.AddControllers()
+				.AddNewtonsoftJson(opts =>
 				{
-					options.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-					options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-				}); ;
+					opts.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+					opts.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+				});
+				
 
 			ConfigureInfrastructure(services);
 
@@ -162,7 +166,7 @@ namespace SlidFinance.WebApi
 			services.AddIdentityCore<ApplicationUser>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
 
-			services.AddScoped<RoleManager<IdentityRole>>();
+			//services.AddScoped<RoleManager<IdentityRole>>();
 		}
 
 		private void ConfigureAutoMapper(IServiceCollection services)
@@ -196,8 +200,10 @@ namespace SlidFinance.WebApi
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
 				c.OperationFilter<SecurityRequirementsOperationFilter>();
 
-				c.SchemaFilter<EnumAsModelSchemaFilter>();
+				//c.SchemaFilter<EnumAsModelSchemaFilter>();
 			});
+
+			services.AddSwaggerGenNewtonsoftSupport();
 		}
 
 		private void ConfigureInfrastructure(IServiceCollection services)

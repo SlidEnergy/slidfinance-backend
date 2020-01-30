@@ -60,7 +60,7 @@ namespace SlidFinance.WebApi
 
 				var schema = new OpenApiSchema
 				{
-					Reference = new OpenApiReference { }
+					Reference = new OpenApiReference { },
 					Ref = $"#/definitions/{enumType.Name}"
 				};
 				if (enumProperty.Value.Enum != null)
