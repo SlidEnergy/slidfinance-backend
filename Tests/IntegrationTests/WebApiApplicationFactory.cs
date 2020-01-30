@@ -1,19 +1,42 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SlidFinance.Infrastructure;
 using System;
+using System.Linq;
 
 namespace SlidFinance.WebApi.IntegrationTests
 {
 	public class WebApiApplicationFactory<TStartup> : WebApplicationFactory<Startup>
 	{
+		public Action<IServiceCollection> Registrations { get; set; }
+
+		public WebApiApplicationFactory() : this(null)
+		{
+		}
+
+		public WebApiApplicationFactory(Action<IServiceCollection> registrations = null)
+		{
+			Registrations = registrations ?? (collection => { });
+		}
+
 		protected override void ConfigureWebHost(IWebHostBuilder builder)
 		{
-			builder.ConfigureServices(services =>
+			builder.ConfigureTestServices(services =>
 			{
+				// Remove the app's ApplicationDbContext registration.
+				var descriptor = services.SingleOrDefault(
+					d => d.ServiceType ==
+						typeof(DbContextOptions<ApplicationDbContext>));
+
+				if (descriptor != null)
+				{
+					services.Remove(descriptor);
+				}
+
 				// Create a new service provider.
 				var serviceProvider = new ServiceCollection()
 					.AddEntityFrameworkInMemoryDatabase()

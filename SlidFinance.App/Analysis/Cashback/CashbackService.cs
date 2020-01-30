@@ -42,9 +42,12 @@ namespace SlidFinance.App.Analysis
 			// Все счета пользователя
 			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
 
-			var categoriesByMcc = await GetCashbackCategoriesByMccAsync(accounts, codes);
+			// Все категории кэшбэков по тарифам
+			var allUserCategories = await _context.GetCashbackCategoriesWithAccessCheckAsync(userId);
 
-			var categoriesByTitle = await GetCashbackCategoriesByTitleAsync(accounts, parts);
+			var categoriesByMcc = await GetCashbackCategoriesByMccAsync(allUserCategories, codes);
+
+			var categoriesByTitle = GetCashbackCategoriesByTitleAsync(allUserCategories, parts);
 
 			//var categoriesByMerchant = await GetCashbackCategoriesByMerchantAsync(accounts, codes);
 
@@ -62,15 +65,12 @@ namespace SlidFinance.App.Analysis
 			return whichCardToPay;
 		}
 
-		private async Task<List<CashbackCategoryBySearchPart>> GetCashbackCategoriesByMccAsync(List<BankAccount> accounts, int[] mccCodes)
+		private async Task<List<CashbackCategoryBySearchPart>> GetCashbackCategoriesByMccAsync(List<CashbackCategory> allUserCategories, int[] mccCodes)
 		{
-			// Все категории кэшбэков по тарифам
-			var allUserCategories = await _context.CashbackCategories
-				.Join(accounts, cat => cat.TariffId, a => a.SelectedTariffId, (cat, a) => cat)
-				.ToListAsync();
+			var allCategoriesMcc = await _context.CashbackCategoryMcc.Where(x => allUserCategories.Select(c => c.Id).Contains(x.CategoryId)).ToListAsync();
 
 			// Запрашиваем все категории где упоминаются наши MCC
-			var allCategoriesByMcc = await _context.CashbackCategoryMcc
+			var allCategoriesByMcc = allCategoriesMcc
 				.Where(m => mccCodes.Contains(m.MccCode))
 				.Join(allUserCategories, m => m.CategoryId, c => c.Id, (m, c) => new CashbackCategoryBySearchPart()
 				{
@@ -79,7 +79,7 @@ namespace SlidFinance.App.Analysis
 					Title = c.Title,
 					TariffId = c.TariffId,
 					Type = c.Type
-				}).ToListAsync();
+				}).ToList();
 
 			var increasedCashbackCategories = allCategoriesByMcc.Where(x => x.Type == CashbackCategoryType.IncreasedCashback).ToList();
 			var noCashbackCategories = allCategoriesByMcc.Where(x => x.Type == CashbackCategoryType.NoCashback).ToList();
@@ -105,13 +105,8 @@ namespace SlidFinance.App.Analysis
 			return categories;
 		}
 
-		private async Task<List<CashbackCategoryBySearchPart>> GetCashbackCategoriesByTitleAsync(List<BankAccount> accounts, string[] parts)
+		private List<CashbackCategoryBySearchPart> GetCashbackCategoriesByTitleAsync(List<CashbackCategory> allUserCategories, string[] parts)
 		{
-			// Все категории кэшбэков по тарифам
-			var allUserCategories = await _context.CashbackCategories
-				.Join(accounts, cat => cat.TariffId, a => a.SelectedTariffId, (cat, a) => cat)
-				.ToListAsync();
-
 			// Запрашиваем все категории где есть совпадения в названии
 			var increasedCashbackCategories = new List<CashbackCategoryBySearchPart>();
 

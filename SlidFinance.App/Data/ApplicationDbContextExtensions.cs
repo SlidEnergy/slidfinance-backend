@@ -22,16 +22,27 @@ namespace SlidFinance.App
 			return await context.CashbackCategoryMcc.Where(x => x.CategoryId == categoryId).ToListAsync();
 		}
 
-		public static async Task<List<CashbackCategory>> GetCashbackCategoriesWithAccessCheckAsync(this IApplicationDbContext context, string userId, int tariffId)
+		public static async Task<List<CashbackCategory>> GetCashbackCategoriesWithAccessCheckAsync(this IApplicationDbContext context, string userId, int? tariffId = null)
 		{
 			var user = await context.Users.FindAsync(userId);
 
-			var tariff = await context.GetProductTariffByIdWithAccessCheck(userId, tariffId);
+			if (tariffId.HasValue)
+			{
+				var tariff = await context.GetProductTariffByIdWithAccessCheck(userId, tariffId.Value);
 
-			if (tariff == null)
-				return null;
+				if (tariff == null)
+					return null;
 
-			return await context.CashbackCategories.Where(x => x.TariffId == tariffId).ToListAsync();
+				return await context.CashbackCategories.Where(x => x.TariffId == tariffId).ToListAsync();
+			}
+			else
+			{
+				return await context.TrusteeAccounts
+				.Where(x => x.TrusteeId == user.TrusteeId)
+				.Join(context.Accounts, t => t.AccountId, a => a.Id, (t, a) => a)
+				.Join(context.CashbackCategories, acc => acc.SelectedTariffId, cat => cat.TariffId, (acc, cat) => cat)
+				.ToListAsync();
+			}
 		}
 
 		public static async Task<List<ProductTariff>> GetProductTariffsWithAccessCheckAsync(this IApplicationDbContext context, string userId, int productId)
