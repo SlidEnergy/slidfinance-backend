@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Newtonsoft;
+using Microsoft.AspNetCore.Mvc.Controllers;
 
 namespace SlidFinance.WebApi
 {
@@ -182,25 +183,47 @@ namespace SlidFinance.WebApi
 			// Register the Swagger generator, defining 1 or more Swagger documents
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1",  new OpenApiInfo { Title = "SlidFinance", Version = "v1" });
-				//c.AddSecurityDefinition("Oauth2", new OAuth2Scheme
-				//{
-				//	Type = "oauth2",
-				//	Flow = "password",
-				//	TokenUrl = "/api/v1/users/token",
-				//	Scopes = new Dictionary<string, string> {
-				//		{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
-				//		{ Policy.MustBeAllOrImportAccessMode, "Режим доступа: ко всем объектам или только импорт" }
-				//	}
-				//});
-				//c.AddSecurityDefinition("Bearer", new OpenApi ApiKeyScheme { In = "header", Description = "Please enter JWT with Bearer into field", Name = "Authorization", Type = "apiKey" });
+				c.SwaggerDoc("v1", new OpenApiInfo { Title = "SlidFinance", Version = "v1" });
 
-				//c.DescribeAllEnumsAsStrings();
+				c.AddSecurityDefinition("Oauth2", new OpenApiSecurityScheme
+				{
+					Type = Microsoft.OpenApi.Models.SecuritySchemeType.OAuth2,
+					Flows = new OpenApiOAuthFlows
+					{
+						Implicit = new OpenApiOAuthFlow
+						{
+							AuthorizationUrl = new Uri("/api/v1/users/token", UriKind.Relative),
+							Scopes = new Dictionary<string, string>
+							{
+								{ Policy.MustBeAllAccessMode, "Режим доступа: ко всем объектам" },
+								{ Policy.MustBeAllOrImportAccessMode, "Режим доступа: ко всем объектам или только импорт" }
+							}
+						}
+					}
+				});
+
+				c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					Description = "Токен авторизации JWT, использующий схему Bearer. Пример: \"Authorization: Bearer {token}\", provide value: \"Bearer {token}\"",
+					Name = "Authorization",
+					In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+					Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey
+				});
+
 
 				c.OperationFilter<ResponseWithDescriptionOperationFilter>();
 				c.OperationFilter<SecurityRequirementsOperationFilter>();
 
-				//c.SchemaFilter<EnumAsModelSchemaFilter>();
+				c.CustomOperationIds(apiDesc =>
+				{
+					if (apiDesc.ActionDescriptor is ControllerActionDescriptor)
+					{
+						var descriptor = (ControllerActionDescriptor)apiDesc.ActionDescriptor;
+						return $"{descriptor.ControllerName}_{descriptor.ActionName}";
+					}
+
+					return null;
+				});
 			});
 
 			services.AddSwaggerGenNewtonsoftSupport();

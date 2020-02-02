@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.UnitTests
@@ -14,17 +15,18 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new MccService(_mockedDal);
+            _service = new MccService(_db);
         }
 
 		[Test]
 		public async Task GetMccList_ShouldBeCallGetListMethod()
 		{
-			_mcc.Setup(x => x.GetList()).ReturnsAsync(new List<Mcc>());
+			await _db.CreateMcc("4814");
+			await _db.CreateMcc("4812");
 
 			var result = await _service.GetListAsync();
 
-			_mcc.Verify(x => x.GetList(), Times.Exactly(1));
+			Assert.AreEqual(2, result.Count());
 		}
 	}
 }
