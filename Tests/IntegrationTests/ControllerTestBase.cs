@@ -30,7 +30,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 			if (_client == null)
 				throw new Exception("Клиент для web api не создан.");
 
-			var scope = _factory.Server.Host.Services.CreateScope();
+			var scope = _factory.Services.CreateScope();
 
 			if (scope == null)
 				throw new Exception("Область видимости scope для сервисов не создана.");

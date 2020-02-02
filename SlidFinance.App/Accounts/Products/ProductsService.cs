@@ -24,6 +24,7 @@ namespace SlidFinance.App
 			var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
 			_context.Products.Add(product);
+			await _context.SaveChangesAsync();
 			_context.TrusteeProducts.Add(new TrusteeProduct(user, product));
 			await _context.SaveChangesAsync();
 

@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 
@@ -18,15 +19,15 @@ namespace SlidFinance.WebApi
         /// <summary>
         /// Применяет фильтр для переданного ApiDescription.
         /// </summary>
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             if (operation.Responses == null)
-                operation.Responses = new Dictionary<string, Response>();
+                operation.Responses = new OpenApiResponses();
 
             foreach (int code in _codes.Keys)
             {
                 if (!operation.Responses.ContainsKey(code.ToString()))
-                    operation.Responses.Add(code.ToString(), new Response { Description = this._codes[code] });
+                    operation.Responses.Add(code.ToString(), new OpenApiResponse { Description = this._codes[code] });
             }
         }
     }

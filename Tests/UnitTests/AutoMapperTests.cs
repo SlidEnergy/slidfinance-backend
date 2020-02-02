@@ -16,9 +16,11 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public void CreateMapperProfile_Validated()
         {
-            var context = new ApplicationDbContext(new DbContextOptions<ApplicationDbContext>());
-            Mapper.Initialize(x=>x.AddProfile(new MappingProfile(context)));
-            Mapper.Configuration.AssertConfigurationIsValid();
-        }
+			var context = new ApplicationDbContext(new DbContextOptions<ApplicationDbContext>());
+			var config = new MapperConfiguration(cfg => {
+				cfg.AddProfile(new MappingProfile(context));
+			});
+			config.AssertConfigurationIsValid();
+		}
     }
 }
