@@ -98,6 +98,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Title = Guid.NewGuid().ToString()
 			};
 			db.Categories.Add(category);
+			await db.SaveChangesAsync();
 			db.TrusteeCategories.Add(new TrusteeCategory(user, category));
 			await db.SaveChangesAsync();
 
@@ -106,7 +107,10 @@ namespace SlidFinance.WebApi.UnitTests
 
 		public static async Task<ApplicationUser> CreateUser(this ApplicationDbContext db)
 		{
-			var user = new ApplicationUser() { Email = Guid.NewGuid().ToString() };
+			var trustee = new Trustee();
+			db.Trustee.Add(trustee);
+			await db.SaveChangesAsync();
+			var user = new ApplicationUser() { Email = Guid.NewGuid().ToString(), TrusteeId = trustee.Id};
 			db.Users.Add(user);
 			await db.SaveChangesAsync();
 

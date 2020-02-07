@@ -68,6 +68,7 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Merchant> Merchants { get; set; }
 
+        public DbSet<Trustee> Trustee { get; set; }
 		public DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
 		public DbSet<TrusteeCategory> TrusteeCategories { get; set; }
 		public DbSet<TrusteeProduct> TrusteeProducts { get; set; }

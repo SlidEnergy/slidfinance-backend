@@ -53,7 +53,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 
 				_authTokens.Object, _mcc.Object);
 
-            _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", Trustee = new Trustee() });
+            _user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", TrusteeId = 1, Trustee = new Trustee { Id = 1 } });
         }
     }
 }

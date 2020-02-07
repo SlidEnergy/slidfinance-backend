@@ -22,13 +22,15 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task AddFirstCategory_ShouldBeCallAddMethodWithRightArguments()
         {
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _categories.Setup(x => x.Add(It.IsAny<UserCategory>())).ReturnsAsync(new UserCategory());
-
             var category1 = await _service.AddCategory(_user.Id, "Category #1");
 
-            _categories.Verify(x => x.Add(
-                It.Is<UserCategory>(c => c.Title == "Category #1" && c.Order == 0)), Times.Exactly(1));
+            var addedEntity = _db.TrusteeCategories
+                          .Where(t => t.TrusteeId == _user.TrusteeId)
+                          .Join(_db.Categories, t1 => t1.CategoryId, t2 => t2.Id, (t1, t2) => t2)
+                          .Where(c => c.Title == "Category #1" && c.Order == 0)
+                          .FirstOrDefault();
+
+            Assert.NotNull(addedEntity);
         }
 
         [Test]
@@ -40,8 +42,13 @@ namespace SlidFinance.WebApi.UnitTests
 
             var category2 = await _service.AddCategory(_user.Id, "Category #2");
 
-            _categories.Verify(x => x.Add(
-                It.Is<UserCategory>(c => c.Title == "Category #2" && c.Order == 1)), Times.Exactly(1));
+            var addedEntity = _db.TrusteeCategories
+                 .Where(t => t.TrusteeId == _user.TrusteeId)
+                 .Join(_db.Categories, t1 => t1.CategoryId, t2 => t2.Id, (t1, t2) => t2)
+                 .Where(c => c.Title == "Category #2" && c.Order == 1)
+                 .FirstOrDefault();
+
+            Assert.NotNull(addedEntity);
         }
 
         [Test]
