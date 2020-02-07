@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
+using System.Linq;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -15,6 +16,23 @@ namespace SlidFinance.WebApi.UnitTests
         public void Setup()
         {
             _service = new AccountsService(_mockedDal, _db);
+        }
+
+
+        [Test]
+        public async Task AddAccount_ShouldBeAdded()
+        {
+            var bank = await _db.CreateBank();
+            var account = new BankAccount { Code = "code_1", BankId = bank.Id };
+
+            await _service.AddAccount(_user.Id, account);
+
+            var addedEntity = _db.TrusteeAccounts
+                .Where(t => t.TrusteeId == _user.TrusteeId)
+                .Join(_db.Accounts, t1 => t1.AccountId, t2 => t2.Id, (t1, t2) => t2)
+                .FirstOrDefault();
+
+            Assert.NotNull(addedEntity);
         }
 
         [Test]

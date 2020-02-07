@@ -17,6 +17,12 @@ namespace SlidFinance.Domain
 
 		public TrusteeProduct(int trusteeId, int productId)
 		{
+			if (trusteeId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(trusteeId));
+
+			if (productId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(productId));
+
 			TrusteeId = trusteeId;
 			ProductId = productId;
 		}

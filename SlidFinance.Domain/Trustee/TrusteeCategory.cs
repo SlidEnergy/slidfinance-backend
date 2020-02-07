@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SlidFinance.Domain
 {
@@ -14,6 +15,12 @@ namespace SlidFinance.Domain
 
 		public TrusteeCategory(int trusteeId, int categoryId)
 		{
+			if (trusteeId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(trusteeId));
+
+			if (categoryId <= 0)
+				throw new ArgumentOutOfRangeException(nameof(categoryId));
+
 			TrusteeId = trusteeId;
 			CategoryId = categoryId;
 		}

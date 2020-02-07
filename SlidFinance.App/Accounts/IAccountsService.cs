@@ -6,7 +6,7 @@ namespace SlidFinance.App
 {
 	public interface IAccountsService
 	{
-		Task<BankAccount> AddAccount(string userId, int bankId, string title, string code, float balance, float creditLimit);
+		Task<BankAccount> AddAccount(string userId, BankAccount account);
 		Task DeleteAccount(string userId, int accountId);
 		Task<BankAccount> Update(string userId, BankAccount account);
 		Task<BankAccount> GetByIdWithAccessCheck(string userId, int id);

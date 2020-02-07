@@ -29,14 +29,18 @@ namespace SlidFinance.App
             return accounts;
         }
 
-        public async Task<BankAccount> AddAccount(string userId, int bankId, string title, string code, float balance, float creditLimit)
+        public async Task<BankAccount> AddAccount(string userId, BankAccount account)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-            var bank = await _context.Banks.FindAsync(bankId);
+            var bank = await _context.Banks.FindAsync(account.BankId);
 
-			var account = new BankAccount(bank, title, code, balance, creditLimit);
+			if (bank == null)
+				throw new EntityNotFoundException();
+
 			_context.Accounts.Add(account);
+			await _context.SaveChangesAsync();
+
 			_context.TrusteeAccounts.Add(new TrusteeAccount(user, account));
 			await _context.SaveChangesAsync();
 
