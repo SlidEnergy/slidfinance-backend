@@ -59,7 +59,8 @@ namespace SlidFinance.App
 			model.ProductId = account.ProductId;
 			model.Opened = account.Opened;
 
-            await _dal.Accounts.Update(model);
+			_context.Accounts.Update(model);
+			await _context.SaveChangesAsync();
 
             return model;
         }
@@ -87,12 +88,13 @@ namespace SlidFinance.App
         {
 			var account = await GetByIdWithChecks(userId, accountId);
 
-			await _dal.Accounts.Delete(account);
+			_context.Accounts.Remove(account);
+			await _context.SaveChangesAsync();
         }
 
 		private async Task<BankAccount> GetByIdWithChecks(string userId, int id)
 		{
-			var account = await _dal.Accounts.GetById(id);
+			var account = await _context.Accounts.FindAsync(id);
 
 			if (account == null)
 				throw new EntityNotFoundException();
