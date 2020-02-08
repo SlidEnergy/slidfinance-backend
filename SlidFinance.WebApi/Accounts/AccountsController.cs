@@ -59,11 +59,11 @@ namespace SlidFinance.WebApi
 
         [Authorize(Policy = Policy.MustBeAllAccessMode)]
         [HttpPost]
-        public async Task<ActionResult<Dto.BankAccount>> Add(BankAccount account)
+        public async Task<ActionResult<Dto.BankAccount>> Add(Dto.BankAccount account)
         {
             var userId = User.GetUserId();
 
-            var newAccount = await _service.AddAccount(userId, account);
+            var newAccount = await _service.AddAccount(userId, _mapper.Map<BankAccount>(account));
 
             return CreatedAtAction("GetList", _mapper.Map<Dto.BankAccount>(newAccount));
         }

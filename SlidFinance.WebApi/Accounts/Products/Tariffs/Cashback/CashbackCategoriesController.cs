@@ -53,5 +53,15 @@ namespace SlidFinance.WebApi
 
             return editModel;
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var userId = User.GetUserId();
+
+            await _service.Delete(userId, id);
+
+            return NoContent();
+        }
     }
 }

@@ -38,5 +38,16 @@ namespace SlidFinance.App
 
 			return model;
 		}
+
+		public async Task Delete(string userId, int id)
+		{
+			var tariff = await _context.GetCashbackCategoryByIdWithAccessCheck(userId, id);
+
+			if (tariff == null)
+				return;
+
+			_context.CashbackCategories.Remove(tariff);
+			await _context.SaveChangesAsync();
+		}
 	}
 }

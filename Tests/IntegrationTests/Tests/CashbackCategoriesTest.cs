@@ -71,5 +71,19 @@ namespace SlidFinance.WebApi.IntegrationTests
 			var dict = await response.ToDictionary();
 			Assert.IsTrue(dict.ContainsKey("id"));
 		}
+
+		[Test]
+		public async Task DeleteCategory_ShouldNoContent()
+		{
+			var bank = await _db.CreateBank();
+			var product = await _db.CreateProduct(_user, bank.Id);
+			var tariff = await _db.CreateTariff(product.Id);
+			var category = await _db.CreateCashbackCategory(tariff.Id);
+
+			var request = HttpRequestBuilder.CreateJsonRequest("DELETE", "/api/v1/cashbackcategories/" + category.Id, _accessToken);
+			var response = await SendRequest(request);
+
+			Assert.True(response.IsSuccessStatusCode);
+		}
 	}
 }

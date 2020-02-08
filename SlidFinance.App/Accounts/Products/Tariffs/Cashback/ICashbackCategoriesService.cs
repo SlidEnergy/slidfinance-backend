@@ -9,5 +9,6 @@ namespace SlidFinance.App
 		Task<List<CashbackCategory>> GetListWithAccessCheckAsync(string userId, int tariffId);
 		Task<CashbackCategory> Add(string userId, CashbackCategory category);
 		Task<CashbackCategory> Edit(string userId, CashbackCategory category);
+		Task Delete(string userId, int id);
 	}
 }
