@@ -20,6 +20,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Newtonsoft;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using AspNetCore.Authentication.ApiKey;
 
 namespace SlidFinance.WebApi
 {
@@ -156,6 +157,10 @@ namespace SlidFinance.WebApi
 						ValidateIssuerSigningKey = true,
 					};
 					// options.SaveToken = true;
+				})
+				.AddApiKeyInQueryParams<Auth.ApiKeyProvider>(options =>
+				{
+					options.KeyName = "api_key";
 				});
 
 			services.AddSingleton<AuthSettings>(x => authSettings);
