@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace SlidFinance.App
@@ -17,7 +18,7 @@ namespace SlidFinance.App
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         }
     }
 }
