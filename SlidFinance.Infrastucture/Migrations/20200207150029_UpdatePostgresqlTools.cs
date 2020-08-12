@@ -7,7 +7,15 @@ namespace SlidFinance.WebApi.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
+			migrationBuilder.Sql("ALTER SEQUENCE \"Transactions_Id2_seq\" RENAME TO \"Transactions_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"ProductTariff_Id_seq\" RENAME TO \"Tariffs_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"Rules_Id2_seq\" RENAME TO \"Rules_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"Product_Id_seq\" RENAME TO \"Products_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"Categories_Id2_seq\" RENAME TO \"Categories_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"Banks_Id2_seq\" RENAME TO \"Banks_Id_seq\";");
+			migrationBuilder.Sql("ALTER SEQUENCE \"Accounts_Id2_seq\" RENAME TO \"Accounts_Id_seq\";");
+
+			migrationBuilder.AlterColumn<int>(
                 name: "Id",
                 table: "Trustee",
                 nullable: false,
