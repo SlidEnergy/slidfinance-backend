@@ -164,10 +164,12 @@ namespace SlidFinance.WebApi
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
-			services.AddIdentityCore<ApplicationUser>()
-				.AddEntityFrameworkStores<ApplicationDbContext>();
+			//services.AddIdentityCore<ApplicationUser>()
+				//.AddEntityFrameworkStores<ApplicationDbContext>();
 
 			//services.AddScoped<RoleManager<IdentityRole>>();
+			services.AddIdentity<ApplicationUser, IdentityRole>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
 		}
 
 		private void ConfigureAutoMapper(IServiceCollection services)
