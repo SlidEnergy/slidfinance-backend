@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.Extensions.Logging;
+using SlidFinance.Domain;
 
 namespace SlidFinance.WebApi.Auth
 {
@@ -16,12 +14,19 @@ namespace SlidFinance.WebApi.Auth
 			_logger = logger;
 		}
 
-		public Task<IApiKey> ProvideAsync(string key)
+		public async Task<IApiKey> ProvideAsync(string key)
 		{
 			try
 			{
-				// write your validation implementation here and return an instance of a valid ApiKey or retun null for an invalid key.
-				return Task.FromResult<IApiKey>(null);
+				if (string.IsNullOrEmpty(key))
+					return null;
+
+				ApplicationUser user = null;
+
+				if (user == null)
+					return null;
+
+				return await Task.FromResult(new ApiKey("TESTAPIKEY=", user.Id));
 			}
 			catch (System.Exception exception)
 			{

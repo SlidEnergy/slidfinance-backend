@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Newtonsoft;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using AspNetCore.Authentication.ApiKey;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace SlidFinance.WebApi
 {
@@ -49,7 +50,7 @@ namespace SlidFinance.WebApi
 					opts.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 					opts.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
 				});
-				
+
 
 			ConfigureInfrastructure(services);
 
@@ -88,7 +89,7 @@ namespace SlidFinance.WebApi
 			app.UseAuthorization();
 
 			if (env.IsProduction())
-			{ 
+			{
 				app.UseHttpsRedirection();
 			}
 
@@ -105,7 +106,8 @@ namespace SlidFinance.WebApi
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 			});
 
-			app.UseEndpoints(endpoints => {
+			app.UseEndpoints(endpoints =>
+			{
 				endpoints.MapControllers();
 			});
 		}
@@ -133,12 +135,31 @@ namespace SlidFinance.WebApi
 			}
 
 			services
-				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddAuthentication(sharedOptions =>
+				{
+					sharedOptions.DefaultScheme = "smart";
+					sharedOptions.DefaultChallengeScheme = "smart";
+				})
+				.AddPolicyScheme("smart", "Authorization Bearer or api key", options =>
+				{
+					options.ForwardDefaultSelector = context =>
+					{
+						var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+						if (authHeader?.StartsWith("Bearer ") == true)
+						{
+							return JwtBearerDefaults.AuthenticationScheme;
+						}
+						return ApiKeyDefaults.AuthenticationScheme;
+					};
+				})
 				.AddJwtBearer(options =>
 				{
 					options.RequireHttpsMetadata = false;
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
+						NameClaimType = JwtRegisteredClaimNames.Email,
+						RoleClaimType = "role",
+
 						// Укзывает, будет ли проверяться издатель при проверке токена
 						ValidateIssuer = false,
 						// Строка, представляющая издателя
@@ -160,6 +181,7 @@ namespace SlidFinance.WebApi
 				})
 				.AddApiKeyInQueryParams<Auth.ApiKeyProvider>(options =>
 				{
+					options.Realm = "SlidFinance";
 					options.KeyName = "api_key";
 				});
 
@@ -169,7 +191,12 @@ namespace SlidFinance.WebApi
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
 			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
-			services.AddIdentityCore<ApplicationUser>()
+			services.AddIdentityCore<ApplicationUser>(options =>
+			{
+				options.User.RequireUniqueEmail = true;
+				options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.Email;
+				options.ClaimsIdentity.RoleClaimType = "role";
+			})
 				.AddRoles<IdentityRole>()
 				.AddRoleManager<RoleManager<IdentityRole>>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
