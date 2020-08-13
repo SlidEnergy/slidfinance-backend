@@ -291,6 +291,7 @@ namespace SlidFinance.WebApi
 				// Добавляем политики на наличие нужной роли у учётной записи.
 				options.AddPolicy(Policy.MustBeAllAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString()));
 				options.AddPolicy(Policy.MustBeAllOrImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Import.ToString()));
+				options.AddPolicy(Policy.MustBeAllOrExportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Export.ToString()));
 				options.AddPolicy(Policy.MustBeAdmin, policy => policy.RequireUserName("slidenergy@gmail.com"));
 			});
 		}
