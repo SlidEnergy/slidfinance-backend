@@ -69,10 +69,10 @@ namespace SlidFinance.WebApi
 			};
 		}
 
-		public async Task<string> GenerateImportToken(ApplicationUser user)
+		public async Task<string> GenerateToken(ApplicationUser user, AuthTokenType type)
 		{
 			var importToken = _tokenGenerator.GenerateRefreshToken();
-			await _authTokenService.AddToken(user.Id, importToken, AuthTokenType.ImportToken);
+			await _authTokenService.AddToken(user.Id, importToken, type);
 
 			return importToken;
 		}

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SlidFinance.App;
+using SlidFinance.Domain;
 using SlidFinance.WebApi.Dto;
 using System;
 using System.Security.Authentication;
@@ -51,7 +52,7 @@ namespace SlidFinance.WebApi
 			if (user == null)
 				throw new AuthenticationException();
 
-			return await _tokenService.GenerateImportToken(user);
+			return await _tokenService.GenerateToken(user, AuthTokenType.ImportToken);
 		}
 
 		[HttpPost("token")]
@@ -63,7 +64,7 @@ namespace SlidFinance.WebApi
 
 				return new TokenInfo() { Token = newTokens.Token, RefreshToken = newTokens.RefreshToken };
 			}
-			catch (SecurityTokenException exc)
+			catch (SecurityTokenException)
 			{
 				return BadRequest();
 			}

@@ -18,7 +18,7 @@ namespace SlidFinance.App
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            return user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }

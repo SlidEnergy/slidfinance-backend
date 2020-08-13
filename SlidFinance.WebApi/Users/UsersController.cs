@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-    [Route("api/v1/[controller]")]
-    [ApiController]
-    public class UsersController : ControllerBase
-    {
-        private readonly IMapper _mapper;
-        private readonly IUsersService _usersService;
+	[Route("api/v1/[controller]")]
+	[ApiController]
+	public class UsersController : ControllerBase
+	{
+		private readonly IMapper _mapper;
+		private readonly IUsersService _usersService;
 		private readonly ITokenService _tokenService;
 
-        public UsersController(IMapper mapper, IUsersService usersService, ITokenService tokenService)
-        {
-            _mapper = mapper;
-            _usersService = usersService;
+		public UsersController(IMapper mapper, IUsersService usersService, ITokenService tokenService)
+		{
+			_mapper = mapper;
+			_usersService = usersService;
 			_tokenService = tokenService;
 		}
 
@@ -36,62 +36,62 @@ namespace SlidFinance.WebApi
 		}
 
 		[HttpGet("current")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
 		[Authorize]
 		public async Task<ActionResult<Dto.User>> GetCurrentUser()
-        {
-            var userId = User.GetUserId();
+		{
+			var userId = User.GetUserId();
 
-            var user = await _usersService.GetById(userId);
+			var user = await _usersService.GetById(userId);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+			if (user == null)
+			{
+				return NotFound();
+			}
 
-            return _mapper.Map<Dto.User>(user);
-        }
+			return _mapper.Map<Dto.User>(user);
+		}
 
-        [HttpPost("register")]
-        public async Task<ActionResult<Dto.User>> Register(RegisterBindingModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+		[HttpPost("register")]
+		public async Task<ActionResult<Dto.User>> Register(RegisterBindingModel model)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
 
-            var user = _mapper.Map<ApplicationUser>(model);
+			var user = _mapper.Map<ApplicationUser>(model);
 
-            var result = await _usersService.CreateAccount(user, model.Password);
+			var result = await _usersService.CreateAccount(user, model.Password);
 
-            if (!result.Succeeded) {
-                foreach (var e in result.Errors)
-                {
-                    ModelState.TryAddModelError(e.Code, e.Description);
-                }
+			if (!result.Succeeded) {
+				foreach (var e in result.Errors)
+				{
+					ModelState.TryAddModelError(e.Code, e.Description);
+				}
 
-                return BadRequest(ModelState);
-            }
+				return BadRequest(ModelState);
+			}
 
-            return Created("", _mapper.Map<Dto.User>(user));
-        }
+			return Created("", _mapper.Map<Dto.User>(user));
+		}
 
-        [HttpPost("token")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<TokenInfo>> GetToken(LoginBindingModel userData)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest();
+		[HttpPost("token")]
+		[ProducesResponseType(200)]
+		public async Task<ActionResult<TokenInfo>> GetToken(LoginBindingModel userData)
+		{
+			if (!ModelState.IsValid)
+				return BadRequest();
 
-            try
-            {
-                var tokens = await _tokenService.CheckCredentialsAndGetToken(userData.Email, userData.Password);
+			try
+			{
+				var tokens = await _tokenService.CheckCredentialsAndGetToken(userData.Email, userData.Password);
 
-                return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
-            }
-            catch(AuthenticationException)
-            {
-                return BadRequest();
-            }
-        }
-    }
+				return new TokenInfo() { Token = tokens.Token, RefreshToken = tokens.RefreshToken, Email = userData.Email };
+			}
+			catch(AuthenticationException)
+			{
+				return BadRequest();
+			}
+		}
+	}
 }

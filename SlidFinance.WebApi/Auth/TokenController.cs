@@ -26,7 +26,7 @@ namespace SlidFinance.WebApi
 
 				return new TokenInfo() { Token = newTokens.Token, RefreshToken = newTokens.RefreshToken };
             }
-            catch (SecurityTokenException exc)
+            catch (SecurityTokenException)
             {
                 return BadRequest();
             }
