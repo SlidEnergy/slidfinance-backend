@@ -20,6 +20,9 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Swashbuckle.AspNetCore.Newtonsoft;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using AspNetCore.Authentication.ApiKey;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace SlidFinance.WebApi
 {
@@ -48,7 +51,7 @@ namespace SlidFinance.WebApi
 					opts.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
 					opts.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
 				});
-				
+
 
 			ConfigureInfrastructure(services);
 
@@ -87,7 +90,7 @@ namespace SlidFinance.WebApi
 			app.UseAuthorization();
 
 			if (env.IsProduction())
-			{ 
+			{
 				app.UseHttpsRedirection();
 			}
 
@@ -104,7 +107,8 @@ namespace SlidFinance.WebApi
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
 			});
 
-			app.UseEndpoints(endpoints => {
+			app.UseEndpoints(endpoints =>
+			{
 				endpoints.MapControllers();
 			});
 		}
@@ -131,8 +135,45 @@ namespace SlidFinance.WebApi
 				};
 			}
 
+			services.AddSingleton<AuthSettings>(x => authSettings);
+
+			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
+			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
+			services.AddIdentityCore<ApplicationUser>(options =>
+			{
+				options.User.RequireUniqueEmail = true;
+
+				// Задаем ClaimType которые будут записываться в токен, при восстановлении токена, эти параметры не учитываются
+				options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
+				options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.Email;
+				options.ClaimsIdentity.RoleClaimType = "role";
+			})
+				.AddRoles<IdentityRole>()
+				.AddRoleManager<RoleManager<IdentityRole>>()
+				.AddEntityFrameworkStores<ApplicationDbContext>();
+
+			services.AddSlidFinanceCore();
+
 			services
-				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddAuthentication(sharedOptions =>
+				{
+					sharedOptions.DefaultScheme = "smart";
+					sharedOptions.DefaultChallengeScheme = "smart";
+				})
+				.AddPolicyScheme("smart", "Authorization Bearer or api key", options =>
+				{
+					options.ForwardDefaultSelector = context =>
+					{
+						var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+						if (authHeader?.StartsWith("Bearer ") == true)
+						{
+							return JwtBearerDefaults.AuthenticationScheme;
+						}
+						return ApiKeyDefaults.AuthenticationScheme;
+					};
+				})
 				.AddJwtBearer(options =>
 				{
 					options.RequireHttpsMetadata = false;
@@ -156,18 +197,12 @@ namespace SlidFinance.WebApi
 						ValidateIssuerSigningKey = true,
 					};
 					// options.SaveToken = true;
+				})
+				.AddApiKeyInQueryParams<Auth.ApiKeyProvider>(options =>
+				{
+					options.Realm = "SlidFinance";
+					options.KeyName = "api_key";
 				});
-
-			services.AddSingleton<AuthSettings>(x => authSettings);
-
-			// AddIdentity и AddDefaultIdentity добавляют много чего лишнего. Ссылки для сранения.
-			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Core/IdentityServiceCollectionExtensions.cs
-			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/Identity/IdentityServiceCollectionExtensions.cs
-			// https://github.com/aspnet/Identity/blob/c7276ce2f76312ddd7fccad6e399da96b9f6fae1/src/UI/IdentityServiceCollectionUIExtensions.cs#L49
-			services.AddIdentityCore<ApplicationUser>()
-				.AddRoles<IdentityRole>()
-				.AddRoleManager<RoleManager<IdentityRole>>()
-				.AddEntityFrameworkStores<ApplicationDbContext>();
 		}
 
 		private void ConfigureAutoMapper(IServiceCollection services)
@@ -244,6 +279,7 @@ namespace SlidFinance.WebApi
 
 		private void ConfigureApplicationServices(IServiceCollection services)
 		{
+			services.AddScoped<IClaimsGenerator, ClaimsGenerator>();
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<ITelegramService, TelegramService>();
@@ -259,6 +295,7 @@ namespace SlidFinance.WebApi
 				// Добавляем политики на наличие нужной роли у учётной записи.
 				options.AddPolicy(Policy.MustBeAllAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString()));
 				options.AddPolicy(Policy.MustBeAllOrImportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Import.ToString()));
+				options.AddPolicy(Policy.MustBeAllOrExportAccessMode, policy => policy.RequireClaim(nameof(AccessMode), AccessMode.All.ToString(), AccessMode.Export.ToString()));
 				options.AddPolicy(Policy.MustBeAdmin, policy => policy.RequireUserName("slidenergy@gmail.com"));
 			});
 		}

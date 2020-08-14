@@ -8,6 +8,7 @@ namespace SlidFinance.Domain
 	{
 		RefreshToken = 1,
 		TelegramChatId = 2,
-		ImportToken = 3
+		ImportToken = 3,
+		ApiKey = 4
 	}
 }

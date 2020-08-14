@@ -12,5 +12,7 @@ namespace SlidFinance.App
 		Task<List<ApplicationUser>> GetListAsync();
 
 		Task<ApplicationUser> GetByTelegramChatIdAsync(long chatId);
+
+		Task<ApplicationUser> GetByApiKeyAsync(string apiKey);
 	}
 }
