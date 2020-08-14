@@ -12,11 +12,13 @@ namespace SlidFinance.WebApi.Auth
 	{
 		private readonly ILogger<ApiKeyProvider> _logger;
 		private readonly IUsersService _usersService;
+		private readonly IClaimsGenerator _claimsGenerator;
 
-		public ApiKeyProvider(ILogger<ApiKeyProvider> logger, IUsersService usersService)
+		public ApiKeyProvider(ILogger<ApiKeyProvider> logger, IUsersService usersService, IClaimsGenerator claimsGenerator)
 		{
 			_logger = logger;
 			_usersService = usersService;
+			_claimsGenerator = claimsGenerator;
 		}
 
 		public async Task<IApiKey> ProvideAsync(string key)
@@ -31,11 +33,9 @@ namespace SlidFinance.WebApi.Auth
 				if (user == null)
 					return null;
 
-				var apiKey = new ApiKey("TESTAPIKEY=", user.Id, new List<Claim>
-				{
-					new Claim(nameof(AccessMode), AccessMode.Export.ToString())
-				});
+				var claims = _claimsGenerator.CreateClaims(user, AccessMode.Export);
 
+				var apiKey = new ApiKey("TESTAPIKEY=", user.Id, claims);
 
 				return await Task.FromResult(apiKey);
 			}

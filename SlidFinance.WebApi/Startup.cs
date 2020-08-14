@@ -144,6 +144,9 @@ namespace SlidFinance.WebApi
 			services.AddIdentityCore<ApplicationUser>(options =>
 			{
 				options.User.RequireUniqueEmail = true;
+
+				// Задаем ClaimType которые будут записываться в токен, при восстановлении токена, эти параметры не учитываются
+				options.ClaimsIdentity.UserIdClaimType = JwtRegisteredClaimNames.Sub;
 				options.ClaimsIdentity.UserNameClaimType = JwtRegisteredClaimNames.Email;
 				options.ClaimsIdentity.RoleClaimType = "role";
 			})
@@ -176,9 +179,6 @@ namespace SlidFinance.WebApi
 					options.RequireHttpsMetadata = false;
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
-						NameClaimType = ClaimTypes.Email,
-						RoleClaimType = ClaimTypes.Role,
-
 						// Укзывает, будет ли проверяться издатель при проверке токена
 						ValidateIssuer = false,
 						// Строка, представляющая издателя
@@ -279,6 +279,7 @@ namespace SlidFinance.WebApi
 
 		private void ConfigureApplicationServices(IServiceCollection services)
 		{
+			services.AddScoped<IClaimsGenerator, ClaimsGenerator>();
 			services.AddScoped<ITokenGenerator, TokenGenerator>();
 			services.AddScoped<ITokenService, TokenService>();
 			services.AddScoped<ITelegramService, TelegramService>();

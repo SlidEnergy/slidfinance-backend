@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SlidFinance.App;
+using SlidFinance.App.Utils;
 using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
@@ -16,10 +18,12 @@ namespace SlidFinance.WebApi
 	public class TokenGenerator : ITokenGenerator
 	{
 		private readonly AuthSettings _authSettings;
+		private readonly IClaimsGenerator _claimsGenerator;
 
-		public TokenGenerator(AuthSettings appSettings)
+		public TokenGenerator(AuthSettings appSettings, IClaimsGenerator claimsGenerator)
 		{
 			_authSettings = appSettings;
+			_claimsGenerator = claimsGenerator;
 		}
 
 		/// <summary>
@@ -31,14 +35,14 @@ namespace SlidFinance.WebApi
 			using (var rng = RandomNumberGenerator.Create())
 			{
 				rng.GetBytes(randomNumber);
-				return Convert.ToBase64String(randomNumber);
+				return StringUtils.ToBase64StringWithUrlAndFilenameSafe(randomNumber);
 			}
 		}
 
 		/// <summary>
 		/// Формирует AccessToken для указанного пользователя.
 		/// </summary>
-		public string GenerateAccessToken(ApplicationUser user, AccessMode accessMode) => GenerateAccessToken(CreateClaims(user, accessMode));
+		public string GenerateAccessToken(ApplicationUser user, AccessMode accessMode) => GenerateAccessToken(_claimsGenerator.CreateClaims(user, accessMode));
 
 		/// <summary>
 		/// Формирует AccessToken с указанными Claims.
@@ -56,32 +60,5 @@ namespace SlidFinance.WebApi
 
 			return encodedToken;
 		}
-
-		private IEnumerable<Claim> CreateClaims(ApplicationUser user, AccessMode accessMode)
-		{
-			return new Claim[]
-				{
-					// Asp.net core Identity восстанавливает это значение в поле User.Identity.Name
-					// Допустипо ClaimTypes.Name или ClaimsIdentity.DefaultNameClaimType
-					// В startup.cs мы меняем UserNameClaimsType на "email"
-					new Claim(JwtRegisteredClaimNames.Email, user.Email),
-
-					// JWT specification
-
-					// Asp.net core Identity использует claims "sub", как альтернативу ClaimTypes.NameIdentifier
-					new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-					// IssuedAt
-					new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.Now).ToString(), ClaimValueTypes.Integer64),
-
-					// Application
-					new Claim(nameof(AccessMode), accessMode.ToString())
-				};
-		}
-
-		/// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>
-		private long ToUnixEpochDate(DateTime date)
-			=> (long)Math.Round((date.ToUniversalTime() -
-								 new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
-				.TotalSeconds);
 	}
 }

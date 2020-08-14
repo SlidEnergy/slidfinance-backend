@@ -9,11 +9,11 @@ namespace SlidFinance.WebApi.Auth
 {
 	class ApiKey : IApiKey
 	{
-		public ApiKey(string key, string owner, List<Claim> claims = null)
+		public ApiKey(string key, string owner, IEnumerable<Claim> claims = null)
 		{
 			Key = key;
 			OwnerName = owner;
-			Claims = claims ?? new List<Claim>();
+			Claims = claims.ToList() ?? new List<Claim>();
 		}
 
 		public string Key { get; }
