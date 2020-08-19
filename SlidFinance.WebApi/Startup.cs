@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using AspNetCore.Authentication.ApiKey;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using SlidFinance.WebApi.Saltedge;
 
 namespace SlidFinance.WebApi
 {
@@ -321,6 +322,30 @@ namespace SlidFinance.WebApi
 			}
 
 			services.AddSingleton<TelegramBotSettings>(x => botSettings);
+		}
+
+		private void ConfigureSaltedge(IServiceCollection services)
+		{
+			SaltedgeSettings saltedgeSettings;
+
+			if (CurrentEnvironment.IsDevelopment())
+			{
+				saltedgeSettings = Configuration
+					.GetSection("Security")
+					.GetSection("Saltedge")
+					.Get<SaltedgeSettings>();
+			}
+			else
+			{
+				saltedgeSettings = new SaltedgeSettings
+				{
+					AppId = Environment.GetEnvironmentVariable("SALTEDGE_APP_ID"),
+					Secret = Environment.GetEnvironmentVariable("SALTEDGE_SECRET"),
+				};
+			}
+			
+
+			services.AddSingleton<SaltedgeSettings>(x => saltedgeSettings);
 		}
 	}
 }
