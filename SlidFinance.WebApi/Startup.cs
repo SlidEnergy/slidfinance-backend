@@ -64,6 +64,8 @@ namespace SlidFinance.WebApi
 			ConfigureApplicationServices(services);
 
 			ConfigurePolicies(services);
+
+			ConfigureSaltedge(services);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
