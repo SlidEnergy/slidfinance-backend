@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.Controllers
 {
-	[Route("saltedge")]
+	[Route("api/v1/[controller]")]
 	[ApiController]
 	public class SaltedgeController : ControllerBase
 	{
