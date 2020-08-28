@@ -25,6 +25,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using SlidFinance.WebApi.Saltedge;
 using SlidFinance.App.Saltedge;
+using SaltEdgeNetCore;
 
 namespace SlidFinance.WebApi
 {
@@ -344,7 +345,13 @@ namespace SlidFinance.WebApi
 					Secret = Environment.GetEnvironmentVariable("SALTEDGE_SECRET"),
 				};
 			}
-			
+
+			services.AddSaltEdge(options =>
+			{
+				options.AppId = saltedgeSettings.AppId;
+				options.Secret = saltedgeSettings.Secret;
+				options.LiveMode = false;
+			});
 
 			services.AddSingleton<SaltedgeSettings>(x => saltedgeSettings);
 			services.AddScoped<ISaltedgeService, SaltedgeService>();

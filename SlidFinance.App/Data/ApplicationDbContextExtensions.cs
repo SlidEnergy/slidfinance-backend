@@ -264,5 +264,15 @@ namespace SlidFinance.App
 
 			return await context.Merchants.FindAsync(id);
 		}
+
+		public static async Task<SaltedgeAccount> GetSaltedgeAccountByIdWithAccessCheck(this IApplicationDbContext context, string userId)
+		{
+			var user = await context.Users.FindAsync(userId);
+
+			return await context.TrusteeSaltedgeAccounts
+				.Where(t => t.TrusteeId == user.TrusteeId)
+				.Join(context.SaltedgeAccounts, t => t.SaltedgeAccountId, a => a.Id, (t, a) => a)
+				.FirstOrDefaultAsync();
+		}
 	}
 }
