@@ -24,6 +24,7 @@ using AspNetCore.Authentication.ApiKey;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using SlidFinance.WebApi.Saltedge;
+using SlidFinance.App.Saltedge;
 
 namespace SlidFinance.WebApi
 {
@@ -346,6 +347,7 @@ namespace SlidFinance.WebApi
 			
 
 			services.AddSingleton<SaltedgeSettings>(x => saltedgeSettings);
+			services.AddScoped<ISaltedgeService, SaltedgeService>();
 		}
 	}
 }

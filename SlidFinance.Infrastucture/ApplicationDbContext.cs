@@ -70,6 +70,7 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Trustee> Trustee { get; set; }
 		public DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
+		public DbSet<TrusteeSaltedgeAccount> TrusteeSaltedgeAccounts { get; set; }
 		public DbSet<TrusteeCategory> TrusteeCategories { get; set; }
 		public DbSet<TrusteeProduct> TrusteeProducts { get; set; }
 

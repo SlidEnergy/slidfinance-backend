@@ -16,6 +16,7 @@ namespace SlidFinance.App
 		DbSet<Rule> Rules { get; set; }
 		DbSet<Transaction> Transactions { get; set; }
 		DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
+		DbSet<TrusteeSaltedgeAccount> TrusteeSaltedgeAccounts { get; set; }
 		DbSet<TrusteeCategory> TrusteeCategories { get; set; }
 		DbSet<TrusteeProduct> TrusteeProducts { get; set; }
 		DbSet<ApplicationUser> Users { get; set; }
@@ -24,6 +25,7 @@ namespace SlidFinance.App
 		DbSet<CashbackCategory> CashbackCategories { get; set; }
 		DbSet<CashbackCategoryMcc> CashbackCategoryMcc { get; set; }
 		DbSet<Cashback> Cashback { get; set; }
+		DbSet<SaltedgeAccount> SaltedgeAccounts { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}
