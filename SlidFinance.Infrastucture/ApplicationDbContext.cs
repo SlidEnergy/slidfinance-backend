@@ -19,6 +19,9 @@ namespace SlidFinance.Infrastructure
 			modelBuilder.Entity<TrusteeAccount>()
 				.HasKey(key => new { key.AccountId, key.TrusteeId});
 
+			modelBuilder.Entity<TrusteeSaltedgeAccount>()
+				.HasKey(key => new { key.SaltedgeAccountId, key.TrusteeId});
+
 			modelBuilder.Entity<TrusteeCategory>()
 				.HasKey(key => new { key.CategoryId, key.TrusteeId });
 
