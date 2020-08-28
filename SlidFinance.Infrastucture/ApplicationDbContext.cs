@@ -19,6 +19,9 @@ namespace SlidFinance.Infrastructure
 			modelBuilder.Entity<TrusteeAccount>()
 				.HasKey(key => new { key.AccountId, key.TrusteeId});
 
+			modelBuilder.Entity<TrusteeSaltedgeAccount>()
+				.HasKey(key => new { key.SaltedgeAccountId, key.TrusteeId});
+
 			modelBuilder.Entity<TrusteeCategory>()
 				.HasKey(key => new { key.CategoryId, key.TrusteeId });
 
@@ -70,6 +73,7 @@ namespace SlidFinance.Infrastructure
 
         public DbSet<Trustee> Trustee { get; set; }
 		public DbSet<TrusteeAccount> TrusteeAccounts { get; set; }
+		public DbSet<TrusteeSaltedgeAccount> TrusteeSaltedgeAccounts { get; set; }
 		public DbSet<TrusteeCategory> TrusteeCategories { get; set; }
 		public DbSet<TrusteeProduct> TrusteeProducts { get; set; }
 
@@ -84,5 +88,7 @@ namespace SlidFinance.Infrastructure
         public DbSet<Cashback> Cashback { get; set; }
 
         public DbSet<CashbackCategoryMcc> CashbackCategoryMcc { get; set; }
+
+        public DbSet<SaltedgeAccount> SaltedgeAccounts { get; set; }
     }
 }

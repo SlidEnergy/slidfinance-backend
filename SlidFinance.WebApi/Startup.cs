@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using AspNetCore.Authentication.ApiKey;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using SlidFinance.WebApi.Saltedge;
+using SlidFinance.App.Saltedge;
+using SaltEdgeNetCore;
 
 namespace SlidFinance.WebApi
 {
@@ -61,6 +64,8 @@ namespace SlidFinance.WebApi
 			ConfigureApplicationServices(services);
 
 			ConfigurePolicies(services);
+
+			ConfigureSaltedge(services);
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -321,6 +326,37 @@ namespace SlidFinance.WebApi
 			}
 
 			services.AddSingleton<TelegramBotSettings>(x => botSettings);
+		}
+
+		private void ConfigureSaltedge(IServiceCollection services)
+		{
+			SaltedgeSettings saltedgeSettings;
+
+			if (CurrentEnvironment.IsDevelopment())
+			{
+				saltedgeSettings = Configuration
+					.GetSection("Security")
+					.GetSection("Saltedge")
+					.Get<SaltedgeSettings>();
+			}
+			else
+			{
+				saltedgeSettings = new SaltedgeSettings
+				{
+					AppId = Environment.GetEnvironmentVariable("SALTEDGE_APP_ID"),
+					Secret = Environment.GetEnvironmentVariable("SALTEDGE_SECRET"),
+				};
+			}
+
+			services.AddSaltEdge(options =>
+			{
+				options.AppId = saltedgeSettings.AppId;
+				options.Secret = saltedgeSettings.Secret;
+				options.LiveMode = false;
+			});
+
+			services.AddSingleton<SaltedgeSettings>(x => saltedgeSettings);
+			services.AddScoped<ISaltedgeService, SaltedgeService>();
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.WebApi", "SlidFinance.WebApi\SlidFinance.WebApi.csproj", "{D3421DBC-363B-447D-8958-4DF137B7D732}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.Domain", "SlidF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.App", "SlidFinance.App\SlidFinance.App.csproj", "{12681719-8259-4819-A6EE-7FD1F936F6D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlidFinance.TelegramBot", "SlidFinance.TelegramBot\SlidFinance.TelegramBot.csproj", "{12593288-E7F5-469D-A798-49E9B976B1DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlidFinance.TelegramBot", "SlidFinance.TelegramBot\SlidFinance.TelegramBot.csproj", "{12593288-E7F5-469D-A798-49E9B976B1DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SlidFinance.App;
@@ -18,8 +19,8 @@ namespace SlidFinance.WebApi.UnitTests
 		private Mock<IAuthTokenService> _authTokenService;
 
 		[SetUp]
-        public void Setup()
-        {
+		public void Setup()
+		{
 			var authSettings = SettingsFactory.CreateAuth();
 			_tokenGenerator = new Mock<ITokenGenerator>();
 			var store = new Mock<IUserStore<ApplicationUser>>();
@@ -27,7 +28,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_manager = new Mock<UserManager<ApplicationUser>>(store.Object, null, null, null, null, null, null, null, null);
 			_authTokenService = new Mock<IAuthTokenService>();
 			_service = new TokenService(_tokenGenerator.Object, authSettings, _authTokenService.Object, _manager.Object);
-        }
+		}
 
 		[Test]
 		[TestCase(AccessMode.All)]
@@ -53,7 +54,8 @@ namespace SlidFinance.WebApi.UnitTests
 		public async Task RefreshToken_ShouldCalledMethods()
 		{
 			var authSettings = SettingsFactory.CreateAuth();
-			var tokenGenerator = new TokenGenerator(authSettings);
+			var claimsGenerator = new ClaimsGenerator(Options.Create(new IdentityOptions()));
+			var tokenGenerator = new TokenGenerator(authSettings, claimsGenerator);
 
 			var token = tokenGenerator.GenerateAccessToken(_user, AccessMode.All);
 			var refreshToken = tokenGenerator.GenerateRefreshToken();
@@ -76,7 +78,8 @@ namespace SlidFinance.WebApi.UnitTests
 		public async Task RefreshImportToken_ShouldCalledMethods()
 		{
 			var authSettings = SettingsFactory.CreateAuth();
-			var tokenGenerator = new TokenGenerator(authSettings);
+			var claimsGenerator = new ClaimsGenerator(Options.Create(new IdentityOptions()));
+			var tokenGenerator = new TokenGenerator(authSettings, claimsGenerator);
 
 			var token = tokenGenerator.GenerateAccessToken(_user, AccessMode.Import);
 			var refreshToken = tokenGenerator.GenerateRefreshToken();
