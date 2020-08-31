@@ -29,5 +29,25 @@ namespace SlidFinance.WebApi.Controllers
 
 			return Created("", created);
 		}
+
+		[HttpPost("import/run")]
+		public async Task<ActionResult> RunImport()
+		{
+			var userId = User.GetUserId();
+
+			await _saltedgeService.Import(userId);
+
+			return Ok();
+		}
+
+		[HttpGet("accounts")]
+		public async Task<ActionResult<IEnumerable<SaltedgeBankAccounts>>> GetList()
+		{
+			var userId = User.GetUserId();
+
+			var list = await _saltedgeService.GetSaltedgeBankAccounts(userId);
+
+			return Ok(list);
+		}
 	}
 }

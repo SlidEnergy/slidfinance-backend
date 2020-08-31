@@ -6,34 +6,34 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.App
 {
-    public class AccountsService : IAccountsService
+	public class AccountsService : IAccountsService
 	{
-        private DataAccessLayer _dal;
+		private DataAccessLayer _dal;
 		private IApplicationDbContext _context;
 
 		public AccountsService(DataAccessLayer dal, IApplicationDbContext context)
-        {
-            _dal = dal;
+		{
+			_dal = dal;
 			_context = context;
 		}
 
-		public Task<BankAccount> GetByIdWithAccessCheck(string userId, int id) => GetByIdWithChecks(userId, id);
+		public Task<BankAccount> GetByIdWithAccessCheckAsync(string userId, int id) => GetByIdWithChecksAsync(userId, id);
 
-        public async Task<List<BankAccount>> GetListWithAccessCheckAsync(string userId, int? bankId = null)
-        {
+		public async Task<List<BankAccount>> GetListWithAccessCheckAsync(string userId, int? bankId = null)
+		{
 			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
 
 			if (bankId.HasValue)
 				accounts = accounts.Where(x => x.Bank.Id == bankId).ToList();
 
-            return accounts;
-        }
+			return accounts;
+		}
 
-        public async Task<BankAccount> AddAccount(string userId, BankAccount account)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+		public async Task<BankAccount> AddAccount(string userId, BankAccount account)
+		{
+			var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-            var bank = await _context.Banks.FindAsync(account.BankId);
+			var bank = await _context.Banks.FindAsync(account.BankId);
 
 			if (bank == null)
 				throw new EntityNotFoundException();
@@ -44,12 +44,12 @@ namespace SlidFinance.App
 			_context.TrusteeAccounts.Add(new TrusteeAccount(user, account));
 			await _context.SaveChangesAsync();
 
-            return account;
-        }
+			return account;
+		}
 
-        public async Task<BankAccount> Update(string userId, BankAccount account)
-        {
-            var model = await GetByIdWithChecks(userId, account.Id);
+		public async Task<BankAccount> Update(string userId, BankAccount account)
+		{
+			var model = await GetByIdWithChecksAsync(userId, account.Id);
 
 			model.Title = account.Title;
 			model.Code = account.Code;
@@ -62,37 +62,37 @@ namespace SlidFinance.App
 			_context.Accounts.Update(model);
 			await _context.SaveChangesAsync();
 
-            return model;
-        }
+			return model;
+		}
 
-        public async Task<BankAccount> PatchAccount(string userId, BankAccount account)
-        {
-            var user = await _dal.Users.GetById(userId);
+		public async Task<BankAccount> PatchAccount(string userId, BankAccount account)
+		{
+			var user = await _dal.Users.GetById(userId);
 
-            Bank bank = null;
+			Bank bank = null;
 
-            if (account.Bank!= null)
-            {
-                bank = await _dal.Banks.GetById(account.Bank.Id);
+			if (account.Bank!= null)
+			{
+				bank = await _dal.Banks.GetById(account.Bank.Id);
 
-                if (bank == null)
-                    throw new EntityNotFoundException();
-            }
+				if (bank == null)
+					throw new EntityNotFoundException();
+			}
 
-            var newAccount = await _dal.Accounts.Update(account);
+			var newAccount = await _dal.Accounts.Update(account);
 
-            return newAccount;
-        }
+			return newAccount;
+		}
 
-        public async Task DeleteAccount(string userId, int accountId)
-        {
-			var account = await GetByIdWithChecks(userId, accountId);
+		public async Task DeleteAccount(string userId, int accountId)
+		{
+			var account = await GetByIdWithChecksAsync(userId, accountId);
 
 			_context.Accounts.Remove(account);
 			await _context.SaveChangesAsync();
-        }
+		}
 
-		private async Task<BankAccount> GetByIdWithChecks(string userId, int id)
+		private async Task<BankAccount> GetByIdWithChecksAsync(string userId, int id)
 		{
 			var account = await _context.Accounts.FindAsync(id);
 

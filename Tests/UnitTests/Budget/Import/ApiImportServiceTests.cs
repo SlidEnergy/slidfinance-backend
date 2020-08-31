@@ -15,6 +15,7 @@ namespace SlidFinance.WebApi.UnitTests
 		Mock<IMccService> _mccService;
 		Mock<IImportService> _importService;
 		Mock<IMerchantService> _merchantService;
+		Mock<IAccountsService> _accountService;
 
 		[SetUp]
         public void Setup()
@@ -22,8 +23,9 @@ namespace SlidFinance.WebApi.UnitTests
 			_importService = new Mock<IImportService>();
 			_mccService = new Mock<IMccService>();
 			_merchantService = new Mock<IMerchantService>();
+			_accountService = new Mock<IAccountsService>();
 
-			_service = new ApiImportService(_autoMapper.Create(_db), _importService.Object, _mccService.Object, _merchantService.Object);
+			_service = new ApiImportService(_autoMapper.Create(_db), _importService.Object, _mccService.Object, _merchantService.Object, _accountService.Object);
 		}
 
 		[Test]
@@ -45,7 +47,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Mcc = 111
 			};
 
-			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
+			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
 			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());
@@ -53,7 +55,7 @@ namespace SlidFinance.WebApi.UnitTests
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
-			_importService.Verify(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), 
+			_importService.Verify(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), 
 				It.Is<Transaction[]>(t => t[0].BankCategory == transaction1.Category)));
 		}
 
@@ -76,7 +78,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Mcc = 111
 			};
 
-			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
+			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			var queue = new Queue<List<Mcc>>();
 			queue.Enqueue(new List<Mcc>());
 			queue.Enqueue(new List<Mcc>() { mcc });
@@ -109,7 +111,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Mcc = 111
 			};
 			
-			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
+			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync((Mcc x) => x);
 			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());

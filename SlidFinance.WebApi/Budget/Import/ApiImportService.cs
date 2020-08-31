@@ -14,13 +14,15 @@ namespace SlidFinance.WebApi
 		private readonly IImportService _service;
 		private readonly IMccService _mccService;
 		private readonly IMerchantService _merchantService;
+		private readonly IAccountsService _accountsService;
 
-		public ApiImportService(IMapper mapper, IImportService importService, IMccService mccService, IMerchantService merchantService)
+		public ApiImportService(IMapper mapper, IImportService importService, IMccService mccService, IMerchantService merchantService, IAccountsService accountsService)
 		{
 			_mapper = mapper;
 			_service = importService;
 			_mccService = mccService;
 			_merchantService = merchantService;
+			_accountsService = accountsService;
 		}
 
 		public async Task<int> Import(string userId, PatchAccountDataBindingModel data)
@@ -40,9 +42,28 @@ namespace SlidFinance.WebApi
 
 			var transactions = data.Transactions == null ? null : _mapper.Map<Transaction[]>(data.Transactions);
 
-			var count = await _service.Import(userId, data.Code, data.Balance, transactions);
+			BankAccount account = null;
+
+			if (data.AccountId.HasValue)
+				account = await _accountsService.GetByIdWithAccessCheckAsync(userId, data.AccountId.Value);
+			else
+				account = await GetAccountByCode(userId, data.Code);
+
+			var count = await _service.Import(userId, account.Id, data.Balance, transactions);
 
 			return count;
+		}
+
+		private async Task<BankAccount> GetAccountByCode(string userId, string accountCode)
+		{
+			var accounts = await _accountsService.GetListWithAccessCheckAsync(userId);
+
+			var account = accounts.FirstOrDefault(x => x.Code == accountCode);
+
+			if (account == null)
+				throw new EntityNotFoundException();
+
+			return account;
 		}
 
 		private async Task AddMerchantsIfNotExist(string userId, ICollection<Dto.ImportTransaction> transactions)

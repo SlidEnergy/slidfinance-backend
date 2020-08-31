@@ -13,32 +13,32 @@ namespace SlidFinance.WebApi
 {
 
 	[Route("api/v1/[controller]")]
-    [ApiController]
-    public class ImportController : ControllerBase
-    {
-        private readonly IMapper _mapper;
-        private readonly IApiImportService _service;
+	[ApiController]
+	public class ImportController : ControllerBase
+	{
+		private readonly IMapper _mapper;
+		private readonly IApiImportService _service;
 		private readonly ITokenService _tokenService;
 		private readonly IUsersService _usersService;
 
 		public ImportController(IMapper mapper, IApiImportService importService, ITokenService tokenService, IUsersService usersService)
-        {
-            _mapper = mapper;
-            _service = importService;
+		{
+			_mapper = mapper;
+			_service = importService;
 			_tokenService = tokenService;
 			_usersService = usersService;
 		}
 
 		[Authorize(Policy = Policy.MustBeAllOrImportAccessMode)]
 		[HttpPost]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(404)]
-        public async Task<ActionResult<int>> Import(PatchAccountDataBindingModel data)
-        {
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
+		public async Task<ActionResult<int>> Import(PatchAccountDataBindingModel data)
+		{
 			var userId = User.GetUserId();
 
 			return await _service.Import(userId, data);
-        }
+		}
 
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]
 		[HttpPost("refreshToken")]

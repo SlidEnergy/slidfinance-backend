@@ -9,6 +9,8 @@ namespace SlidFinance.App.Saltedge
 	{
 		Task<SaltedgeAccount> AddSaltedgeAccount(string userId, SaltedgeAccount saltedgeAccount);
 
-		Task<IEnumerable<SeConnection>> GetConnections(string userId);
+		Task<IEnumerable<SaltedgeBankAccounts>> GetSaltedgeBankAccounts(string userId);
+
+		Task Import(string userId);
 	}
 }

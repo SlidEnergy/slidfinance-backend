@@ -15,9 +15,13 @@ namespace SlidFinance.App
 			_context = context;
 		}
 
-		public async Task<int> Import(string userId, string accountCode, float? balance, Transaction[] transactions)
+		public async Task<int> Import(string userId, int accountId, float? balance, Transaction[] transactions)
 		{
-			var account = await GetAccount(userId, accountCode);
+			var account = await _context.GetAccountByIdWithAccessCheck(userId, accountId);
+
+			if (account == null)
+				throw new EntityNotFoundException();
+
 
 			await UpdateBalance(account, balance);
 

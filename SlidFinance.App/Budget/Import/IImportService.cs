@@ -5,6 +5,6 @@ namespace SlidFinance.App
 {
 	public interface IImportService
 	{
-		Task<int> Import(string userId, string accountCode, float? balance, Transaction[] transactions);
+		Task<int> Import(string userId, int accountId, float? balance, Transaction[] transactions);
 	}
 }

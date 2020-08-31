@@ -2,8 +2,11 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SaltEdgeNetCore.Client;
+using SaltEdgeNetCore.Models.Account;
 using SaltEdgeNetCore.Models.Connections;
+using SaltEdgeNetCore.Models.Transaction;
 using SlidFinance.Domain;
+using System.Linq;
 
 namespace SlidFinance.App.Saltedge
 {
@@ -11,11 +14,13 @@ namespace SlidFinance.App.Saltedge
 	{
 		private IApplicationDbContext _context;
 		private readonly ISaltEdgeClientV5 _saltedge;
+		private readonly IImportService _importService;
 
-		public SaltedgeService(IApplicationDbContext context, ISaltEdgeClientV5 saltedge)
+		public SaltedgeService(IApplicationDbContext context, ISaltEdgeClientV5 saltedge, IImportService importService)
 		{
 			_context = context;
 			_saltedge = saltedge;
+			_importService = importService;
 		}
 
 		public async Task<SaltedgeAccount> AddSaltedgeAccount(string userId, SaltedgeAccount saltedgeAccount)
@@ -31,13 +36,67 @@ namespace SlidFinance.App.Saltedge
 			return saltedgeAccount;
 		}
 
-		public async Task<IEnumerable<SeConnection>> GetConnections(string userId)
+		public async Task<IEnumerable<SaltedgeBankAccounts>> GetSaltedgeBankAccounts(string userId)
 		{
 			var saltedgeAccount = await _context.GetSaltedgeAccountByIdWithAccessCheck(userId);
 
-			var response = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
+			var connectionsResponse = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
 
-			return response.Data;
+			var list = new List<SaltedgeBankAccounts>();
+
+			foreach(var connection in connectionsResponse.Data)
+			{
+				var accountsResponse = _saltedge.AccountList(connection.Id);
+
+				list.Add(new SaltedgeBankAccounts() { Connection = connection, Accounts = accountsResponse.Data });
+			}
+
+			return list;
+		}
+
+		public async Task Import(string userId)
+		{
+			var saltedgeAccount = await _context.GetSaltedgeAccountByIdWithAccessCheck(userId);
+
+			var connectionsResponse = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
+
+			foreach (var connection in connectionsResponse.Data)
+			{
+				var accountsResponse = _saltedge.AccountList(connection.Id);
+
+				foreach (var account in accountsResponse.Data)
+				{
+					await ImportByAccount(userId, connection, account);
+				}
+			}
+		}
+
+		private async Task<int> ImportByAccount(string userId, SeConnection connection, SeAccount account)
+		{
+			var transactionsResponse = _saltedge.TransactionsList(connection.Id, account.Id);
+
+			return await ImportTransactions(userId, transactionsResponse.Data);
+		}
+
+		private async Task<int> ImportTransactions(string userId, IEnumerable<SaltEdgeTransaction> saltedgeTransactions)
+		{
+			if (string.IsNullOrEmpty(userId))
+				return 0;
+
+			if (saltedgeTransactions != null && saltedgeTransactions.Count() > 0)
+			{
+				//await AddMccIfNotExist(data.Transactions);
+
+				//await AddMerchantsIfNotExist(userId, data.Transactions);
+			}
+
+			//var transactions = saltedgeTransactions == null ? null : _mapper.Map<Transaction[]>(saltedgeTransactions);
+
+			//var count = await _importService.Import(userId, data.Code, null, transactions);
+
+			//return count;
+
+			return 0;
 		}
 	}
 }
