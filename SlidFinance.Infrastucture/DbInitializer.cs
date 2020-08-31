@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
@@ -17,35 +18,43 @@ namespace SlidFinance.Infrastucture
 		{
 			context.Database.EnsureCreated();
 
-			// Look for any users.
-			if (context.Users.Any())
-			{
-				return; // DB has been seeded
-			}
-
-			await CreateDefaultUserAndRoleForApplication(userManager, roleManager, logger);
+			await CreateDefaultUserAndRoleForApplication(context, userManager, roleManager, logger);
 		}
 
-		private static async Task CreateDefaultUserAndRoleForApplication(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger)
+		private static async Task CreateDefaultUserAndRoleForApplication(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger)
 		{
-			const string administratorRole = "Administrator";
 			const string email = "admin";
 			const string password = "admin";
 
-			await CreateDefaultAdministratorRole(roleManager, logger, administratorRole);
-			var user = await CreateDefaultUser(userManager, logger, email);
+			// Берем первого созданного пользователя
+			var user = await context.Users.FirstOrDefaultAsync();
 
-			// Временно отключаем проверку пароля для администратора
-			var passwordValidators = userManager.PasswordValidators;
-			userManager.PasswordValidators.Clear();
+			// Для пустой базы создаем нового пользователя
+			if (user == null)
+			{
+				user = await CreateDefaultUser(userManager, logger, email);
 
-			await SetPasswordForDefaultUser(userManager, logger, email, user, password);
+				// Временно отключаем проверку пароля для администратора
+				var passwordValidators = userManager.PasswordValidators;
+				userManager.PasswordValidators.Clear();
 
-			// Возвращаем проверку пароля обратно
-			foreach (var validator in passwordValidators)
-				userManager.PasswordValidators.Add(validator);
+				await SetPasswordForUser(userManager, logger, email, user, password);
 
-			await AddDefaultRoleToDefaultUser(userManager, logger, email, administratorRole, user);
+				// Возвращаем проверку пароля обратно
+				foreach (var validator in passwordValidators)
+					userManager.PasswordValidators.Add(validator);
+			}
+
+			var role = await context.Roles.FirstOrDefaultAsync(x => x.Name == Role.Admin);
+
+			// Создаем группу администратора, если в системе еще не было групп и устанавливаем её для пользователя
+			// Если ранее был пользователь но не было группы, то для первого созданного пользователя будет установалена группа администратора
+			if (role == null)
+			{
+				await CreateDefaultAdministratorRole(roleManager, logger, Role.Admin);
+
+				await AddRoleToUser(userManager, logger, email, Role.Admin, user);
+			}
 		}
 
 		private static async Task CreateDefaultAdministratorRole(RoleManager<IdentityRole> roleManager, ILogger<DbInitializer> logger, string administratorRole)
@@ -90,7 +99,7 @@ namespace SlidFinance.Infrastucture
 			return createdUser;
 		}
 
-		private static async Task SetPasswordForDefaultUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email, ApplicationUser user, string password)
+		private static async Task SetPasswordForUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email, ApplicationUser user, string password)
 		{
 			logger.LogInformation($"Set password for default user `{email}`");
 			var result = await userManager.AddPasswordAsync(user, password);
@@ -106,7 +115,7 @@ namespace SlidFinance.Infrastucture
 			}
 		}
 
-		private static async Task AddDefaultRoleToDefaultUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email, string administratorRole, ApplicationUser user)
+		private static async Task AddRoleToUser(UserManager<ApplicationUser> userManager, ILogger<DbInitializer> logger, string email, string administratorRole, ApplicationUser user)
 		{
 			logger.LogInformation($"Add default user `{email}` to role '{administratorRole}'");
 			var result = await userManager.AddToRoleAsync(user, administratorRole);
