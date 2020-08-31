@@ -1,14 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using SlidFinance.App;
-using SlidFinance.App.Utils;
-using SlidFinance.Domain;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using SlidFinance.Domain;
 
 namespace SlidFinance.WebApi
 {
@@ -21,9 +17,9 @@ namespace SlidFinance.WebApi
 			_identityOptions = identityOptions?.Value ?? new IdentityOptions();
 		}
 
-		public IEnumerable<Claim> CreateClaims(ApplicationUser user, AccessMode accessMode)
+		public IEnumerable<Claim> CreateClaims(ApplicationUser user, IEnumerable<string> roles, AccessMode accessMode)
 		{
-			return new Claim[]
+			var claims = new List<Claim>
 				{
 					// sub, имя ClaimType берется из настроек в startup
 					new Claim(_identityOptions.ClaimsIdentity.UserIdClaimType, user.Id.ToString()),
@@ -39,6 +35,11 @@ namespace SlidFinance.WebApi
 
 					new Claim(nameof(AccessMode), accessMode.ToString())
 				};
+
+			foreach(var role in roles)
+				claims.Add(new Claim(_identityOptions.ClaimsIdentity.RoleClaimType, role));
+
+			return claims.ToArray();
 		}
 
 		/// <returns>Date converted to seconds since Unix epoch (Jan 1, 1970, midnight UTC).</returns>

@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi
 		public async Task<ActionResult<Dto.User>> GetCurrentUser()
 		{
 			var userId = User.GetUserId();
-
+			
 			var user = await _usersService.GetById(userId);
 
 			if (user == null)
@@ -50,7 +50,9 @@ namespace SlidFinance.WebApi
 				return NotFound();
 			}
 
-			return _mapper.Map<Dto.User>(user);
+			bool isAdmin = await _usersService.IsAdmin(user);
+
+			return _mapper.Map<Dto.User>(user, opt => opt.AfterMap((src, dest) => ((Dto.User)dest).IsAdmin = isAdmin));
 		}
 
 		[HttpPost("register")]

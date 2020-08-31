@@ -7,52 +7,52 @@ using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi
 {
-	[Route("api/v1/[controller]")]
-	[ApiController]
-	public class BanksController : ControllerBase
-	{
-		private readonly IMapper _mapper;
-		private readonly IBanksService _banksService;
+    [Route("api/v1/[controller]")]
+    [ApiController]
+    public class BanksController : ControllerBase
+    {
+        private readonly IMapper _mapper;
+        private readonly IBanksService _banksService;
 
-		public BanksController(IMapper mapper, IBanksService banksService)
-		{
-			_mapper = mapper;
-			_banksService = banksService;
-		}
+        public BanksController(IMapper mapper, IBanksService banksService)
+        {
+            _mapper = mapper;
+            _banksService = banksService;
+        }
 
-		[HttpGet]
-		[ProducesResponseType(200)]
+        [HttpGet]
+        [ProducesResponseType(200)]
 		[Authorize(Policy = Policy.MustBeAllAccessMode)]
 		public async Task<ActionResult<Bank[]>> GetList()
-		{
-			var banks = await _banksService.GetLis();
-			return _mapper.Map<Bank[]>(banks);
-		}
+        {
+            var banks = await _banksService.GetLis();
+            return _mapper.Map<Bank[]>(banks);
+        }
 
-		[HttpPost]
+        [HttpPost]
 		[Authorize(Policy = Policy.MustBeAdmin)]
 		public async Task<ActionResult<Bank>> Add(Bank bank)
-		{
-			var newBank = await _banksService.AddBank(bank.Title);
+        {
+            var newBank = await _banksService.AddBank(bank.Title);
 
-			return CreatedAtAction("GetList", _mapper.Map<Bank>(newBank));
-		}
+            return CreatedAtAction("GetList", _mapper.Map<Bank>(newBank));
+        }
 
-		[HttpPut("{id}")]
+        [HttpPut("{id}")]
 		[Authorize(Policy = Policy.MustBeAdmin)]
 		public async Task<ActionResult<Bank>> Update(int id, Bank bank)
-		{
-			var editedBank = await _banksService.EditBank(id, bank.Title);
-			return _mapper.Map<Bank>(editedBank);
-		}
+        {
+            var editedBank = await _banksService.EditBank(id, bank.Title);
+            return _mapper.Map<Bank>(editedBank);
+        }
 
-		[HttpDelete("{id}")]
+        [HttpDelete("{id}")]
 		[Authorize(Policy = Policy.MustBeAdmin)]
 		public async Task<ActionResult> Delete(int id)
-		{
-			await _banksService.DeleteBank(id);
+        {
+            await _banksService.DeleteBank(id);
 
-			return NoContent();
-		}
-	}
+            return NoContent();
+        }
+    }
 }

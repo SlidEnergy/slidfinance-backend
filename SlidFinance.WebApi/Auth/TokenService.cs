@@ -12,14 +12,14 @@ namespace SlidFinance.WebApi
 {
 	public class TokenService : ITokenService
 	{
-        private readonly ITokenGenerator _tokenGenerator;
+		private readonly ITokenGenerator _tokenGenerator;
 		private readonly AuthSettings _authSettings;
 		private IAuthTokenService _authTokenService;
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public TokenService(ITokenGenerator tokenGenerator, AuthSettings authSettings, IAuthTokenService authTokenService, UserManager<ApplicationUser> userManager)
-        {
-            _tokenGenerator = tokenGenerator;
+		{
+			_tokenGenerator = tokenGenerator;
 			_authSettings = authSettings;
 			_authTokenService = authTokenService;
 			_userManager = userManager;
@@ -32,7 +32,9 @@ namespace SlidFinance.WebApi
 			if (savedToken == null || savedToken.Type != AuthTokenType.ImportToken)
 				throw new SecurityTokenException("Invalid refresh token");
 
-			var newToken = _tokenGenerator.GenerateAccessToken(savedToken.User, AccessMode.Import);
+			var roles = await _userManager.GetRolesAsync(savedToken.User);
+
+			var newToken = _tokenGenerator.GenerateAccessToken(savedToken.User, roles, AccessMode.Import);
 			var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
 
 			await _authTokenService.UpdateToken(savedToken, newRefreshToken);
@@ -41,30 +43,32 @@ namespace SlidFinance.WebApi
 		}
 
 		public async Task<TokensCortage> RefreshToken(string token, string refreshToken)
-        {
-            var principal = GetPrincipalFromExpiredToken(token);
-            var userId = principal.GetUserId();
+		{
+			var principal = GetPrincipalFromExpiredToken(token);
+			var userId = principal.GetUserId();
 			var savedToken = await _authTokenService.FindAnyToken(refreshToken);
 
-            if (savedToken == null || savedToken.User.Id != userId || savedToken.Type != AuthTokenType.RefreshToken)
-                throw new SecurityTokenException("Invalid refresh token");
+			if (savedToken == null || savedToken.User.Id != userId || savedToken.Type != AuthTokenType.RefreshToken)
+				throw new SecurityTokenException("Invalid refresh token");
 
-            var newToken = _tokenGenerator.GenerateAccessToken(principal.Claims);
-            var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
+			var newToken = _tokenGenerator.GenerateAccessToken(principal.Claims);
+			var newRefreshToken = _tokenGenerator.GenerateRefreshToken();
 
 			await _authTokenService.UpdateToken(savedToken, newRefreshToken);
 
 			return new TokensCortage() { Token = newToken, RefreshToken = newRefreshToken };
-        }
+		}
 
 		public async Task<TokensCortage> GenerateAccessAndRefreshTokens(ApplicationUser user, AccessMode accessMode)
 		{
 			var refreshToken = _tokenGenerator.GenerateRefreshToken();
 			await _authTokenService.AddToken(user.Id, refreshToken, AuthTokenType.RefreshToken);
 
+			var roles = await _userManager.GetRolesAsync(user);
+
 			return new TokensCortage()
 			{
-				Token = _tokenGenerator.GenerateAccessToken(user, accessMode),
+				Token = _tokenGenerator.GenerateAccessToken(user, roles, accessMode),
 				RefreshToken = refreshToken
 			};
 		}
@@ -78,25 +82,25 @@ namespace SlidFinance.WebApi
 		}
 
 		private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
+		{
 			var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = _authSettings.GetSymmetricSecurityKey(),
-                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
-            };
+			{
+				ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+				ValidateIssuer = false,
+				ValidateIssuerSigningKey = true,
+				IssuerSigningKey = _authSettings.GetSymmetricSecurityKey(),
+				ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+			};
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
-            var jwtSecurityToken = securityToken as JwtSecurityToken;
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
+			var tokenHandler = new JwtSecurityTokenHandler();
+			SecurityToken securityToken;
+			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+			var jwtSecurityToken = securityToken as JwtSecurityToken;
+			if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+				throw new SecurityTokenException("Invalid token");
 
-            return principal;
-        }
+			return principal;
+		}
 
 		public async Task<TokensCortage> CheckCredentialsAndGetToken(string email, string password)
 		{

@@ -29,6 +29,11 @@ namespace SlidFinance.App
 			return await _userManager.FindByIdAsync(userId);
 		}
 
+		public async Task<bool> IsAdmin(ApplicationUser user)
+		{
+			return await _userManager.IsInRoleAsync(user, Role.Admin);
+		}
+
 		public async Task<ApplicationUser> GetByTelegramChatIdAsync(long chatId)
 		{
 			var token = await _dal.AuthTokens.FindAnyToken(chatId.ToString());

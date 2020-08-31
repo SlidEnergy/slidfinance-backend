@@ -42,7 +42,7 @@ namespace SlidFinance.WebApi
 		/// <summary>
 		/// Формирует AccessToken для указанного пользователя.
 		/// </summary>
-		public string GenerateAccessToken(ApplicationUser user, AccessMode accessMode) => GenerateAccessToken(_claimsGenerator.CreateClaims(user, accessMode));
+		public string GenerateAccessToken(ApplicationUser user, IEnumerable<string> roles, AccessMode accessMode) => GenerateAccessToken(_claimsGenerator.CreateClaims(user, roles, accessMode));
 
 		/// <summary>
 		/// Формирует AccessToken с указанными Claims.

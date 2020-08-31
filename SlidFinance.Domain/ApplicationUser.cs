@@ -11,13 +11,5 @@ namespace SlidFinance.Domain
 		public int TrusteeId { get; set; }
 		[Required]
 		public virtual Trustee Trustee { get; set; }
-
-		public bool isAdmin()
-		{
-			if (!string.IsNullOrEmpty(UserName) && UserName.ToLower() == "slidenergy@gmail.com")
-				return true;
-
-			return false;
-		}
     }
 }

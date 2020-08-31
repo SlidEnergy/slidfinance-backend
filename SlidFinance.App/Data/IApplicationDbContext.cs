@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SlidFinance.Domain;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,10 @@ namespace SlidFinance.App
 		DbSet<CashbackCategoryMcc> CashbackCategoryMcc { get; set; }
 		DbSet<Cashback> Cashback { get; set; }
 		DbSet<SaltedgeAccount> SaltedgeAccounts { get; set; }
+
+		DbSet<IdentityRole> Roles { get; set; }
+
+		DbSet<IdentityUserRole<string>> UserRoles { get; set; }
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
 	}

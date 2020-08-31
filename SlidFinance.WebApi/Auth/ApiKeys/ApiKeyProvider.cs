@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Authentication.ApiKey;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using SlidFinance.App;
 using SlidFinance.Domain;
@@ -12,12 +13,14 @@ namespace SlidFinance.WebApi.Auth
 	{
 		private readonly ILogger<ApiKeyProvider> _logger;
 		private readonly IUsersService _usersService;
+		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly IClaimsGenerator _claimsGenerator;
 
-		public ApiKeyProvider(ILogger<ApiKeyProvider> logger, IUsersService usersService, IClaimsGenerator claimsGenerator)
+		public ApiKeyProvider(ILogger<ApiKeyProvider> logger, IUsersService usersService, UserManager<ApplicationUser> userManager, IClaimsGenerator claimsGenerator)
 		{
 			_logger = logger;
 			_usersService = usersService;
+			_userManager = userManager;
 			_claimsGenerator = claimsGenerator;
 		}
 
@@ -33,7 +36,9 @@ namespace SlidFinance.WebApi.Auth
 				if (user == null)
 					return null;
 
-				var claims = _claimsGenerator.CreateClaims(user, AccessMode.Export);
+				var roles = await _userManager.GetRolesAsync(user);
+
+				var claims = _claimsGenerator.CreateClaims(user, roles, AccessMode.Export);
 
 				var apiKey = new ApiKey("TESTAPIKEY=", user.Id, claims);
 

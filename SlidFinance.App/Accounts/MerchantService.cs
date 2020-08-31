@@ -49,9 +49,9 @@ namespace SlidFinance.App
 			if (editMerchant == null)
 				throw new EntityNotFoundException();
 
-			var user = await _context.Users.FindAsync(userId);
+			var isAdmin = await _context.IsAdmin(userId);
 
-			if (user != null && user.isAdmin())
+			if (isAdmin)
 				editMerchant.IsPublic = merchant.IsPublic;
 
 			editMerchant.Name = merchant.Name;

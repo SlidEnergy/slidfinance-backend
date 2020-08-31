@@ -9,6 +9,9 @@ namespace SlidFinance.App
 	{
 		Task<IdentityResult> CreateAccount(ApplicationUser user, string password);
 		Task<ApplicationUser> GetById(string userId);
+
+		Task<bool> IsAdmin(ApplicationUser user);
+
 		Task<List<ApplicationUser>> GetListAsync();
 
 		Task<ApplicationUser> GetByTelegramChatIdAsync(long chatId);

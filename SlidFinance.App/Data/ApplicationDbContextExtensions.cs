@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Math.EC.Rfc7748;
 using SlidFinance.Domain;
 using System;
 using System.Collections.Generic;
@@ -243,24 +244,30 @@ namespace SlidFinance.App
 
 		public static async Task<List<Merchant>> GetMerchantListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
 		{
-			var user = await context.Users.FindAsync(userId);
-
-			if (user != null && user.isAdmin())
-			{
+			var isAdmin = await context.IsAdmin(userId);
+			if (isAdmin)
 				return await context.Merchants.ToListAsync();
-			}
 
 			return await context.Merchants.Where(x => x.IsPublic == true).ToListAsync();
 		}
 
+		public static async Task<bool> IsAdmin(this IApplicationDbContext context, string userId)
+		{
+			var role = await context.Roles.FirstOrDefaultAsync(x => x.Name == Role.Admin);
+
+			if (role == null)
+				throw new Exception("Роль администратора не найдена.");
+
+			var userRole = await context.UserRoles.FirstOrDefaultAsync(x => x.RoleId == role.Id && x.UserId == userId);
+
+			return userRole == null ? false : true;
+		}
+
 		public static async Task<Merchant> GetMerchantByIdWithAccessCheckAsync(this IApplicationDbContext context, string userId, int id)
 		{
-			var user = await context.Users.FindAsync(userId);
-
-			if (user != null && user.isAdmin())
-			{
+			var isAdmin = await context.IsAdmin(userId);
+			if (isAdmin)
 				return await context.Merchants.FindAsync(id);
-			}
 
 			return await context.Merchants.FindAsync(id);
 		}
