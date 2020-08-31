@@ -10,60 +10,60 @@ using System.Threading.Tasks;
 namespace SlidFinance.WebApi
 {
 	[Route("api/v1")]
-    [Authorize(Policy = Policy.MustBeAllAccessMode)]
-    [ApiController]
-    public sealed class CashbackCategoryMccController : ControllerBase
-    {
-        private readonly IMapper _mapper;
-        private readonly ICashbackCategoryMccService _service;
+	[Authorize(Policy = Policy.MustBeAllAccessMode)]
+	[ApiController]
+	public sealed class CashbackCategoryMccController : ControllerBase
+	{
+		private readonly IMapper _mapper;
+		private readonly ICashbackCategoryMccService _service;
 
-        public CashbackCategoryMccController(IMapper mapper, ICashbackCategoryMccService service)
-        {
-            _mapper = mapper;
-            _service = service;
-        }
+		public CashbackCategoryMccController(IMapper mapper, ICashbackCategoryMccService service)
+		{
+			_mapper = mapper;
+			_service = service;
+		}
 
-        [HttpGet("cashback/categories/{categoryId}/mcc")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<CashbackCategoryMcc>>> GetList(int categoryId)
-        {
-            var userId = User.GetUserId();
+		[HttpGet("cashback/categories/{categoryId}/mcc")]
+		[ProducesResponseType(200)]
+		public async Task<ActionResult<IEnumerable<CashbackCategoryMcc>>> GetList(int categoryId)
+		{
+			var userId = User.GetUserId();
 
-            var models = await _service.GetListWithAccessCheckAsync(userId, categoryId);
+			var models = await _service.GetListWithAccessCheckAsync(userId, categoryId);
 
-            return _mapper.Map<CashbackCategoryMcc[]>(models);
-        }
+			return _mapper.Map<CashbackCategoryMcc[]>(models);
+		}
 
-        [HttpPost("cashback/categories/{categoryId}/mcc")]
-        public async Task<ActionResult<CashbackCategoryMcc>> Add(CashbackCategoryMcc cashbackCategoryMcc)
-        {
-            var userId = User.GetUserId();
+		[HttpPost("cashback/categories/{categoryId}/mcc")]
+		public async Task<ActionResult<CashbackCategoryMcc>> Add(CashbackCategoryMcc cashbackCategoryMcc)
+		{
+			var userId = User.GetUserId();
 
-            var newModel = await _service.Add(userId, cashbackCategoryMcc);
+			var newModel = await _service.Add(userId, cashbackCategoryMcc);
 
-            return CreatedAtAction("GetList", new { newModel.CategoryId }, newModel);
-        }
+			return CreatedAtAction("GetList", new { newModel.CategoryId }, newModel);
+		}
 
-        //     [HttpPut("cashback/categories/{categoryId}/mcc/{id}")]
-        //     public async Task<ActionResult<Dto.CashbackCategoryMcc>> Update(int id, Dto.CashbackCategoryMcc product)
-        //     {
-        //         var userId = User.GetUserId();
+		//     [HttpPut("cashback/categories/{categoryId}/mcc/{id}")]
+		//     public async Task<ActionResult<Dto.CashbackCategoryMcc>> Update(int id, Dto.CashbackCategoryMcc product)
+		//     {
+		//         var userId = User.GetUserId();
 
-        //var model = _mapper.Map<CashbackCategoryMcc>(product);
+		//var model = _mapper.Map<CashbackCategoryMcc>(product);
 
-        //         var newModel = await _service.Edit(userId, model);
+		//         var newModel = await _service.Edit(userId, model);
 
-        //         return _mapper.Map<Dto.CashbackCategoryMcc>(newModel);
-        //     }
+		//         return _mapper.Map<Dto.CashbackCategoryMcc>(newModel);
+		//     }
 
-        //     [HttpDelete("cashback/categories/{categoryId}/mcc/{id}")]
-        //     public async Task<ActionResult> Delete(int id)
-        //     {
-        //         var userId = User.GetUserId();
+		//     [HttpDelete("cashback/categories/{categoryId}/mcc/{id}")]
+		//     public async Task<ActionResult> Delete(int id)
+		//     {
+		//         var userId = User.GetUserId();
 
-        //         await _service.Delete(userId, id);
+		//         await _service.Delete(userId, id);
 
-        //         return NoContent();
-        //     }
-    }
+		//         return NoContent();
+		//     }
+	}
 }

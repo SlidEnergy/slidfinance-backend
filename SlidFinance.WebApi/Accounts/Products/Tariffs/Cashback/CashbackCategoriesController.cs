@@ -10,58 +10,58 @@ using System.Threading.Tasks;
 namespace SlidFinance.WebApi
 {
 	[Route("api/v1/[controller]")]
-    [Authorize(Policy = Policy.MustBeAllAccessMode)]
-    [ApiController]
-    public sealed class CashbackCategoriesController : ControllerBase
-    {
-        private readonly IMapper _mapper;
-        private readonly ICashbackCategoriesService _service;
+	[Authorize(Policy = Policy.MustBeAllAccessMode)]
+	[ApiController]
+	public sealed class CashbackCategoriesController : ControllerBase
+	{
+		private readonly IMapper _mapper;
+		private readonly ICashbackCategoriesService _service;
 
-        public CashbackCategoriesController(IMapper mapper, ICashbackCategoriesService service)
-        {
-            _mapper = mapper;
-            _service = service;
-        }
+		public CashbackCategoriesController(IMapper mapper, ICashbackCategoriesService service)
+		{
+			_mapper = mapper;
+			_service = service;
+		}
 
-        [HttpGet]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<IEnumerable<CashbackCategory>>> GetList(int tariffId)
-        {
-            var userId = User.GetUserId();
+		[HttpGet]
+		[ProducesResponseType(200)]
+		public async Task<ActionResult<IEnumerable<CashbackCategory>>> GetList(int tariffId)
+		{
+			var userId = User.GetUserId();
 
-            var products = await _service.GetListWithAccessCheckAsync(userId, tariffId);
+			var products = await _service.GetListWithAccessCheckAsync(userId, tariffId);
 
-            return products;
-        }
+			return products;
+		}
 
-        [HttpPost]
-        public async Task<ActionResult<CashbackCategory>> Add(CashbackCategory category)
-        {
-            var userId = User.GetUserId();
+		[HttpPost]
+		public async Task<ActionResult<CashbackCategory>> Add(CashbackCategory category)
+		{
+			var userId = User.GetUserId();
 
-            var newModel = await _service.Add(userId, category);
+			var newModel = await _service.Add(userId, category);
 
-            return CreatedAtAction("GetList", new { newModel.TariffId }, newModel);
-        }
+			return CreatedAtAction("GetList", new { newModel.TariffId }, newModel);
+		}
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<CashbackCategory>> Update(int id, CashbackCategory category)
-        {
-            var userId = User.GetUserId();
+		[HttpPut("{id}")]
+		public async Task<ActionResult<CashbackCategory>> Update(int id, CashbackCategory category)
+		{
+			var userId = User.GetUserId();
 
-            var editModel = await _service.Edit(userId, category);
+			var editModel = await _service.Edit(userId, category);
 
-            return editModel;
-        }
+			return editModel;
+		}
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            var userId = User.GetUserId();
+		[HttpDelete("{id}")]
+		public async Task<ActionResult> Delete(int id)
+		{
+			var userId = User.GetUserId();
 
-            await _service.Delete(userId, id);
+			await _service.Delete(userId, id);
 
-            return NoContent();
-        }
-    }
+			return NoContent();
+		}
+	}
 }
