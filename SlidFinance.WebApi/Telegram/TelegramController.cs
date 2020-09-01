@@ -10,8 +10,8 @@ namespace SlidFinance.WebApi.Controllers
 	[Authorize(Policy = Policy.MustBeAllAccessMode)]
 	[Route("api/v1/[controller]")]
 	[ApiController]
-    public class TelegramController : ControllerBase
-    {
+	public class TelegramController : ControllerBase
+	{
 		private readonly ITelegramService _service;
 
 		public TelegramController(ITelegramService service)

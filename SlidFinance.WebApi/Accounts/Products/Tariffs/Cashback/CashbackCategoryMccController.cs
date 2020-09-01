@@ -35,7 +35,7 @@ namespace SlidFinance.WebApi
 		}
 
 		[HttpPost("cashback/categories/{categoryId}/mcc")]
-		public async Task<ActionResult<CashbackCategoryMcc>> Add(CashbackCategoryMcc cashbackCategoryMcc)
+		public async Task<ActionResult<CashbackCategoryMcc>> Add(int categoryId, CashbackCategoryMcc cashbackCategoryMcc)
 		{
 			var userId = User.GetUserId();
 
