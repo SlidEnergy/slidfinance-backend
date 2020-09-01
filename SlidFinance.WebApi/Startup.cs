@@ -52,7 +52,6 @@ namespace SlidFinance.WebApi
 				.AddNewtonsoftJson(opts =>
 				{
 					opts.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-					opts.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
 				});
 
 

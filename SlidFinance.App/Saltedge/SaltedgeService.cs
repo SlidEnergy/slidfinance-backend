@@ -60,25 +60,36 @@ namespace SlidFinance.App.Saltedge
 
 			var connectionsResponse = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
 
+			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
+			accounts = accounts.Where(x => x.SaltedgeBankAccountId != null).ToList();
+
+			if (accounts.Count() == 0)
+				return;
+
 			foreach (var connection in connectionsResponse.Data)
 			{
 				var accountsResponse = _saltedge.AccountList(connection.Id);
 
-				foreach (var account in accountsResponse.Data)
+				foreach (var responseAccount in accountsResponse.Data)
 				{
-					await ImportByAccount(userId, connection, account);
+					var account = accounts.Where(x => x.SaltedgeBankAccountId == responseAccount.Id).FirstOrDefault();
+
+					if (account == null)
+						continue;
+
+					await ImportByAccount(userId, connection, responseAccount, account);
 				}
 			}
 		}
 
-		private async Task<int> ImportByAccount(string userId, SeConnection connection, SeAccount account)
+		private async Task<int> ImportByAccount(string userId, SeConnection connection, SeAccount saltedgeAccount, BankAccount account)
 		{
-			var transactionsResponse = _saltedge.TransactionsList(connection.Id, account.Id);
+			var transactionsResponse = _saltedge.TransactionsList(connection.Id, saltedgeAccount.Id);
 
-			return await ImportTransactions(userId, transactionsResponse.Data);
+			return await ImportTransactions(userId, account, transactionsResponse.Data);
 		}
 
-		private async Task<int> ImportTransactions(string userId, IEnumerable<SaltEdgeTransaction> saltedgeTransactions)
+		private async Task<int> ImportTransactions(string userId, BankAccount account, IEnumerable<SaltEdgeTransaction> saltedgeTransactions)
 		{
 			if (string.IsNullOrEmpty(userId))
 				return 0;
@@ -92,7 +103,7 @@ namespace SlidFinance.App.Saltedge
 
 			//var transactions = saltedgeTransactions == null ? null : _mapper.Map<Transaction[]>(saltedgeTransactions);
 
-			//var count = await _importService.Import(userId, data.Code, null, transactions);
+			//var count = await _importService.Import(userId, account, null, transactions);
 
 			//return count;
 

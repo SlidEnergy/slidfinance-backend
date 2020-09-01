@@ -8,8 +8,8 @@ using System.Linq;
 
 namespace SlidFinance.WebApi
 {
-    public class MappingProfile : Profile
-    {
+	public class MappingProfile : Profile
+	{
 		public MappingProfile(ApplicationDbContext context)
 		{
 			CreateMap<RegisterBindingModel, ApplicationUser>()
@@ -65,9 +65,7 @@ namespace SlidFinance.WebApi
 				.ForMember(dest => dest.AccountId,
 					opt => opt.Ignore());
 
-			CreateMap<BankAccount, Dto.BankAccount>()
-				.ForMember(dest => dest.BankId,
-					opt => opt.MapFrom(src => src.BankId));
+			CreateMap<BankAccount, Dto.BankAccount>();
 
 			CreateMap<Dto.BankAccount, BankAccount>()
 			   .ForMember(dest => dest.Bank,
@@ -92,5 +90,5 @@ namespace SlidFinance.WebApi
 					opt => opt.MapFrom(src => src.Category == MccCategory.None ? null :
 						new Dto.MccCategory() { Id = (int)src.Category, Title = EnumUtils.GetDescription(src.Category) }));
 		}
-    }
+	}
 }

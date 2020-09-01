@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using SaltEdgeNetCore.Models.Account;
+using SaltEdgeNetCore.Models.Connections;
 using SlidFinance.App;
 using SlidFinance.App.Saltedge;
 using SlidFinance.Domain;
@@ -15,10 +18,12 @@ namespace SlidFinance.WebApi.Controllers
 	public class SaltedgeController : ControllerBase
 	{
 		private readonly ISaltedgeService _saltedgeService;
+		private readonly IHostingEnvironment _hostingEnv;
 
-		public SaltedgeController(ISaltedgeService saltedgeService)
+		public SaltedgeController(ISaltedgeService saltedgeService, IHostingEnvironment hostingEnv)
 		{
 			_saltedgeService = saltedgeService;
+			_hostingEnv = hostingEnv;
 		}
 
 		[HttpPost()]
@@ -46,9 +51,70 @@ namespace SlidFinance.WebApi.Controllers
 		{
 			var userId = User.GetUserId();
 
+			if (_hostingEnv.IsDevelopment())
+			{
+				return Ok(GenerateTestSaltedgeBankAccounts());
+			}
+
 			var list = await _saltedgeService.GetSaltedgeBankAccounts(userId);
 
 			return Ok(list);
+		}
+
+
+		private IEnumerable<SaltedgeBankAccounts> GenerateTestSaltedgeBankAccounts()
+		{
+			return new List<SaltedgeBankAccounts>()
+				{
+					new SaltedgeBankAccounts()
+					{
+						Connection = new SeConnection()
+						{
+							Id = "1",
+							ProviderName = "Provider #1"
+						},
+						Accounts = new List<SeAccount>()
+						{
+							new SeAccount()
+							{
+								Id = "1",
+								Name = "Account #1",
+								Balance = 100
+							},
+							new SeAccount()
+							{
+								Id = "2",
+								Name = "Account #2",
+								Balance = 200
+							},
+
+						}
+					},
+					new SaltedgeBankAccounts()
+					{
+						Connection = new SeConnection()
+						{
+							Id = "2",
+							ProviderName = "Provider #2"
+						},
+						Accounts = new List<SeAccount>()
+						{
+							new SeAccount()
+							{
+								Id = "3",
+								Name = "Account #3",
+								Balance = 300
+							},
+							new SeAccount()
+							{
+								Id = "4",
+								Name = "Account #4",
+								Balance = 400
+							},
+
+						}
+					}
+				};
 		}
 	}
 }

@@ -58,6 +58,7 @@ namespace SlidFinance.App
 			model.SelectedTariffId = account.SelectedTariffId;
 			model.ProductId = account.ProductId;
 			model.Opened = account.Opened;
+			model.SaltedgeBankAccountId = account.SaltedgeBankAccountId;
 
 			_context.Accounts.Update(model);
 			await _context.SaveChangesAsync();
