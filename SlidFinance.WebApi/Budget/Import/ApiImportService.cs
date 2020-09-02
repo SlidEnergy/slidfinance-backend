@@ -35,7 +35,7 @@ namespace SlidFinance.WebApi
 
 			if (data.Transactions != null && data.Transactions.Count > 0)
 			{
-				await AddMccIfNotExist(data.Transactions);
+				await _mccService.AddMccIfNotExistAsync(GetMccList(data.Transactions));	
 
 				await AddMerchantsIfNotExist(userId, data.Transactions);
 			}
@@ -66,9 +66,13 @@ namespace SlidFinance.WebApi
 			return account;
 		}
 
+		public List<Mcc> GetMccList(ICollection<Dto.ImportTransaction> transactions)
+		{
+			return transactions.Where(t => t.Mcc != null).Select(t => new Mcc(t.Mcc.Value.ToString("D4"))).ToList();
+		}
+
 		private async Task AddMerchantsIfNotExist(string userId, ICollection<Dto.ImportTransaction> transactions)
 		{
-			var merchantList = await _merchantService.GetListAsync();
 			var mccList = await _mccService.GetListAsync();
 
 			foreach (var t in transactions)
@@ -82,27 +86,6 @@ namespace SlidFinance.WebApi
 
 					var merchant = new Merchant() { MccId = mcc.Id, Name = t.Description, CreatedById = userId, Created = DateTime.Now };
 					await _merchantService.AddAsync(merchant);
-				}
-			}
-		}
-
-		private async Task AddMccIfNotExist(ICollection<Dto.ImportTransaction> transactions)
-		{
-			if (transactions == null || transactions.Count == 0)
-				return;
-
-			var mccList = await _mccService.GetListAsync();
-
-			foreach (var t in transactions)
-			{
-				if (t.Mcc.HasValue)
-				{
-					var mcc = mccList.FirstOrDefault(x => x.Code == t.Mcc.Value.ToString("D4"));
-					if (mcc == null)
-					{
-						mcc = new Mcc() { Code = t.Mcc.Value.ToString("D4"), IsSystem = false, Title = "", Category = MccCategory.None };
-						await _mccService.AddAsync(mcc);
-					}
 				}
 			}
 		}

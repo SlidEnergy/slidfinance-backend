@@ -9,5 +9,7 @@ namespace SlidFinance.App
 		Task<List<Mcc>> GetListAsync();
 		Task<Mcc> GetByIdAsync(int id);
 		Task<Mcc> AddAsync(Mcc mcc);
+
+		Task AddMccIfNotExistAsync(ICollection<Mcc> mccList);
 	}
 }

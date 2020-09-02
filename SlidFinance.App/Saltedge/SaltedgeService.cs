@@ -7,6 +7,8 @@ using SaltEdgeNetCore.Models.Connections;
 using SaltEdgeNetCore.Models.Transaction;
 using SlidFinance.Domain;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System;
 
 namespace SlidFinance.App.Saltedge
 {
@@ -15,12 +17,16 @@ namespace SlidFinance.App.Saltedge
 		private IApplicationDbContext _context;
 		private readonly ISaltEdgeClientV5 _saltedge;
 		private readonly IImportService _importService;
+		private readonly IMccService _mccService;
+		private readonly IMerchantService _merchantService;
 
-		public SaltedgeService(IApplicationDbContext context, ISaltEdgeClientV5 saltedge, IImportService importService)
+		public SaltedgeService(IApplicationDbContext context, ISaltEdgeClientV5 saltedge, IImportService importService, IMccService mccService, IMerchantService merchantService)
 		{
 			_context = context;
 			_saltedge = saltedge;
 			_importService = importService;
+			_mccService = mccService;
+			_merchantService = merchantService;
 		}
 
 		public async Task<SaltedgeAccount> AddSaltedgeAccount(string userId, SaltedgeAccount saltedgeAccount)
@@ -44,7 +50,7 @@ namespace SlidFinance.App.Saltedge
 
 			var list = new List<SaltedgeBankAccounts>();
 
-			foreach(var connection in connectionsResponse.Data)
+			foreach (var connection in connectionsResponse.Data)
 			{
 				var accountsResponse = _saltedge.AccountList(connection.Id);
 
@@ -54,7 +60,7 @@ namespace SlidFinance.App.Saltedge
 			return list;
 		}
 
-		public async Task Import(string userId)
+		public async Task<int> Import(string userId)
 		{
 			var saltedgeAccount = await _context.GetSaltedgeAccountByIdWithAccessCheck(userId);
 
@@ -64,7 +70,9 @@ namespace SlidFinance.App.Saltedge
 			accounts = accounts.Where(x => x.SaltedgeBankAccountId != null).ToList();
 
 			if (accounts.Count() == 0)
-				return;
+				return 0;
+
+			int count = 0;
 
 			foreach (var connection in connectionsResponse.Data)
 			{
@@ -77,9 +85,11 @@ namespace SlidFinance.App.Saltedge
 					if (account == null)
 						continue;
 
-					await ImportByAccount(userId, connection, responseAccount, account);
+					count += await ImportByAccount(userId, connection, responseAccount, account);
 				}
 			}
+
+			return count;
 		}
 
 		private async Task<int> ImportByAccount(string userId, SeConnection connection, SeAccount saltedgeAccount, BankAccount account)
@@ -96,18 +106,116 @@ namespace SlidFinance.App.Saltedge
 
 			if (saltedgeTransactions != null && saltedgeTransactions.Count() > 0)
 			{
-				//await AddMccIfNotExist(data.Transactions);
+				await _mccService.AddMccIfNotExistAsync(GetMccList(saltedgeTransactions));
 
-				//await AddMerchantsIfNotExist(userId, data.Transactions);
+				await AddMerchantsIfNotExist(userId, saltedgeTransactions);
 			}
 
-			//var transactions = saltedgeTransactions == null ? null : _mapper.Map<Transaction[]>(saltedgeTransactions);
+			var transactions = await ConvertToTransactions(saltedgeTransactions);
 
-			//var count = await _importService.Import(userId, account, null, transactions);
+			var balance = saltedgeTransactions.Last().Extra.AccountBalanceSnapshot;
 
-			//return count;
+			var count = await _importService.Import(userId, account.Id, (float?)balance, transactions.ToArray());
 
-			return 0;
+			return count;
+		}
+
+		private async Task<ICollection<Transaction>> ConvertToTransactions(IEnumerable<SaltEdgeTransaction> saltEdgeTransactions)
+		{
+			List<Transaction> list = new List<Transaction>(saltEdgeTransactions.Count());
+
+			var mccList = await _mccService.GetListAsync();
+
+			foreach (var t in saltEdgeTransactions)
+			{
+				var mcc = GetMcc(t);
+				var existingMcc = mcc == null ? null : mccList.FirstOrDefault(x => x.Code == mcc.Code);
+
+				if (t.MadeOn.HasValue && t.Amount.HasValue)
+				{
+					var transaction = new Transaction()
+					{
+						BankCategory = t.Category ?? "",
+						MccId = existingMcc?.Id,
+						Mcc = existingMcc,
+						DateTime = t.MadeOn.Value,
+						Description = t.Description,
+						Amount = (float)t.Amount.Value
+					};
+					list.Add(transaction);
+				}
+			}
+
+			return list;
+		}
+
+		private ICollection<Mcc> GetMccList(IEnumerable<SaltEdgeTransaction> saltEdgeTransactions)
+		{
+			List<Mcc> list = new List<Mcc>();
+
+			foreach (var t in saltEdgeTransactions)
+			{
+				var mcc = GetMcc(t);
+				if (mcc != null)
+					list.Add(mcc);
+			}
+
+			return list;
+		}
+
+		private Mcc GetMcc(SaltEdgeTransaction saltEdgeTransaction)
+		{
+			if (string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
+			{
+				Regex regex = new Regex(@".*MCC: (\d{4})");
+				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
+
+				if (match.Success)
+				{
+					return new Mcc(match.Groups[0].Value);
+				}
+			}
+
+			return null;
+		}
+
+		private string GetMerchantDescription(SaltEdgeTransaction saltEdgeTransaction)
+		{
+			if (string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
+			{
+				Regex regex = new Regex(@"(.*)MCC: \d{4}");
+				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
+
+				if (match.Success)
+					return match.Groups[0].Value;
+			}
+
+			return null;
+		}
+
+		private async Task AddMerchantsIfNotExist(string userId, IEnumerable<SaltEdgeTransaction> saltEdgeTransactions)
+		{
+			var mccList = await _mccService.GetListAsync();
+
+			foreach (var t in saltEdgeTransactions)
+			{
+				var mcc = GetMcc(t);
+				if (mcc != null)
+				{
+					var existingMcc = mccList.FirstOrDefault(x => x.Code == mcc.Code);
+
+					if (existingMcc == null)
+						throw new Exception("МСС код не найден");
+
+					var merchantDescription = GetMerchantDescription(t);
+
+					if (String.IsNullOrEmpty(merchantDescription))
+					{
+						var merchant = new Merchant() { MccId = existingMcc.Id, Name = merchantDescription, CreatedById = userId, Created = DateTime.Now };
+						await _merchantService.AddAsync(merchant);
+					}
+				}
+			}
 		}
 	}
 }

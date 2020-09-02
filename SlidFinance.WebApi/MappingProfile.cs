@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SaltEdgeNetCore.Models.Transaction;
 using SlidFinance.App;
 using SlidFinance.App.Utils;
 using SlidFinance.Domain;

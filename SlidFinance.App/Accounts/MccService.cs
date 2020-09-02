@@ -34,5 +34,20 @@ namespace SlidFinance.App
 
 			return mcc;
 		}
+
+		public async Task AddMccIfNotExistAsync(ICollection<Mcc> mccList)
+		{
+			if (mccList == null || mccList.Count == 0)
+				return;
+
+			var existingMccList = await GetListAsync();
+
+			foreach (var mcc in mccList)
+			{
+				var existingMcc = existingMccList.FirstOrDefault(x => x.Code == mcc.Code);
+				if (existingMcc == null)
+					await AddAsync(mcc);
+			}
+		}
 	}
 }

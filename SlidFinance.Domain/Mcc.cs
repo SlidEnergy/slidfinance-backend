@@ -11,7 +11,7 @@ namespace SlidFinance.Domain
         public string Code { get; set; }
 
         [Required]
-        public string Title { get; set; }
+        public string Title { get; set; } = "";
 
 		public string RuTitle { get; set; }
 
@@ -20,8 +20,15 @@ namespace SlidFinance.Domain
 		public string RuDescription { get; set; }
 
         [Required]
-        public MccCategory Category { get; set; }
+        public MccCategory Category { get; set; } = MccCategory.None;
 
-        public bool IsSystem { get; set; }
+        public bool IsSystem { get; set; } = false;
+
+        public Mcc() { }
+
+        public Mcc(string code)
+		{
+            this.Code = code;
+		}
     }
 }

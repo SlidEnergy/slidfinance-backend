@@ -37,13 +37,13 @@ namespace SlidFinance.WebApi.Controllers
 		}
 
 		[HttpPost("import/run")]
-		public async Task<ActionResult> RunImport()
+		public async Task<ActionResult<int>> RunImport()
 		{
 			var userId = User.GetUserId();
 
-			await _saltedgeService.Import(userId);
+			var count = await _saltedgeService.Import(userId);
 
-			return Ok();
+			return Ok(count);
 		}
 
 		[HttpGet("accounts")]
