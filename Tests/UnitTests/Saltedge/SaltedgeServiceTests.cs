@@ -59,7 +59,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Category = "Bank category #1",
 				Extra = new SeTransactionExtra()
 				{
-					Additional = "SAMBERY 323MCC: 0111",
+					Additional = "AMBAМСС: 0111",
 					AccountBalanceSnapshot = 100
 				}
 			};
@@ -89,7 +89,7 @@ namespace SlidFinance.WebApi.UnitTests
 					t[0].BankCategory == transaction1.Category &&
 					t[0].DateTime == transaction1.MadeOn &&
 					t[0].Amount == (float)transaction1.Amount &&
-					t[0].Description == "SAMBERY 323" &&
+					t[0].Description == "AMBA" &&
 					t[0].MccId == mcc.Id
 					)));
 		}

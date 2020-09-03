@@ -168,7 +168,7 @@ namespace SlidFinance.App.Saltedge
 		{
 			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
-				Regex regex = new Regex(@".*MCC: (\d{4})");
+				Regex regex = new Regex(@".*МСС: (\d{4})");
 				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
 
 				if (match.Success)
@@ -184,7 +184,7 @@ namespace SlidFinance.App.Saltedge
 		{
 			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
-				Regex regex = new Regex(@"MCC: \d{4}");
+				Regex regex = new Regex(@"МСС: \d{4}");
 				return regex.Replace(saltEdgeTransaction.Extra.Additional, "");
 			}
 
