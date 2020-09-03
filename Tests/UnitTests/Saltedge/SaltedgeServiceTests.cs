@@ -44,7 +44,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_db.Banks.Add(bank);
 			var account = await _db.CreateAccount(_user);
 			account.SaltedgeBankAccountId = "SaltedgeBankAccountId";
-			var category = await _db.CreateCategory(_user);
+			var category = await _db.CreateCategory(_user);	
 			var mcc = new Mcc() { Code = "0111" };
 			_db.Mcc.Add(mcc);
 			var saltedgeAccount = new SaltedgeAccount() { Id = 1, CustomerId = "CustomerId" };

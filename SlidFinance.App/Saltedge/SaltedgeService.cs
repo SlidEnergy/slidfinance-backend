@@ -129,18 +129,18 @@ namespace SlidFinance.App.Saltedge
 			foreach (var t in saltEdgeTransactions)
 			{
 				var mcc = GetMcc(t);
-				var merchantDescription = GetMerchantDescription(t);
+				
 				var existingMcc = mcc == null ? null : mccList.FirstOrDefault(x => x.Code == mcc.Code);
 
 				if (t.MadeOn.HasValue && t.Amount.HasValue)
 				{
 					var transaction = new Transaction()
 					{
-						BankCategory = t.Category ?? "",
+						BankCategory = GetBankCategory(t),
 						MccId = existingMcc?.Id,
 						Mcc = existingMcc,
 						DateTime = t.MadeOn.Value,
-						Description = merchantDescription ?? t.Description,
+						Description = GetDescription(t), 
 						Amount = (float)t.Amount.Value
 					};
 					list.Add(transaction);
@@ -148,6 +148,24 @@ namespace SlidFinance.App.Saltedge
 			}
 
 			return list;
+		}
+
+		private string GetDescription(SaltEdgeTransaction transaction)
+		{
+			if (string.IsNullOrEmpty(transaction.Extra.Additional))
+			{
+				var merchantDescription = GetMerchant(transaction);
+
+				if (!string.IsNullOrEmpty(merchantDescription))
+					return merchantDescription;
+			}
+
+			return transaction.Description;
+		}
+
+		private string GetBankCategory(SaltEdgeTransaction transaction)
+		{
+			return transaction.Extra.Type ?? transaction.Category ?? "";
 		}
 
 		private ICollection<Mcc> GetMccList(IEnumerable<SaltEdgeTransaction> saltEdgeTransactions)
@@ -180,8 +198,14 @@ namespace SlidFinance.App.Saltedge
 			return null;
 		}
 
-		private string GetMerchantDescription(SaltEdgeTransaction saltEdgeTransaction)
+		private string GetMerchant(SaltEdgeTransaction saltEdgeTransaction)
 		{
+			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.MerchantId))
+			{
+				var merchant = _saltedge.MerchantShow(saltEdgeTransaction.Extra.MerchantId);
+				return merchant.Names.Where(x => x.Mode == "name").Select(x => x.Value).FirstOrDefault();
+			}
+
 			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
 				Regex regex = new Regex(@"МСС: \d{4}");
@@ -205,7 +229,7 @@ namespace SlidFinance.App.Saltedge
 					if (existingMcc == null)
 						throw new Exception("МСС код не найден");
 
-					var merchantDescription = GetMerchantDescription(t);
+					var merchantDescription = GetMerchant(t);
 
 					if (!String.IsNullOrEmpty(merchantDescription))
 					{
