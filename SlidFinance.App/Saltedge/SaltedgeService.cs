@@ -129,6 +129,7 @@ namespace SlidFinance.App.Saltedge
 			foreach (var t in saltEdgeTransactions)
 			{
 				var mcc = GetMcc(t);
+				var merchantDescription = GetMerchantDescription(t);
 				var existingMcc = mcc == null ? null : mccList.FirstOrDefault(x => x.Code == mcc.Code);
 
 				if (t.MadeOn.HasValue && t.Amount.HasValue)
@@ -139,7 +140,7 @@ namespace SlidFinance.App.Saltedge
 						MccId = existingMcc?.Id,
 						Mcc = existingMcc,
 						DateTime = t.MadeOn.Value,
-						Description = t.Description,
+						Description = merchantDescription,
 						Amount = (float)t.Amount.Value
 					};
 					list.Add(transaction);
@@ -165,14 +166,14 @@ namespace SlidFinance.App.Saltedge
 
 		private Mcc GetMcc(SaltEdgeTransaction saltEdgeTransaction)
 		{
-			if (string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
+			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
 				Regex regex = new Regex(@".*MCC: (\d{4})");
 				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
 
 				if (match.Success)
 				{
-					return new Mcc(match.Groups[0].Value);
+					return new Mcc(match.Groups[1].Value);
 				}
 			}
 
@@ -181,13 +182,13 @@ namespace SlidFinance.App.Saltedge
 
 		private string GetMerchantDescription(SaltEdgeTransaction saltEdgeTransaction)
 		{
-			if (string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
+			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
 				Regex regex = new Regex(@"(.*)MCC: \d{4}");
 				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
 
 				if (match.Success)
-					return match.Groups[0].Value;
+					return match.Groups[1].Value;
 			}
 
 			return null;

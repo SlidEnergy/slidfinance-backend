@@ -85,11 +85,12 @@ namespace SlidFinance.WebApi.UnitTests
 			var result = await _service.Import(_user.Id);
 
 			_importService.Verify(x => x.Import(It.Is<string>(u => u == _user.Id), It.Is<int>(a => a == account.Id), It.Is<float?>(b => b == (float?)transaction1.Extra.AccountBalanceSnapshot),
-				It.Is<Transaction[]>(t => 
-					t[0].BankCategory == transaction1.Category && 
-					t[0].DateTime == transaction1.MadeOn && 
+				It.Is<Transaction[]>(t =>
+					t[0].BankCategory == transaction1.Category &&
+					t[0].DateTime == transaction1.MadeOn &&
 					t[0].Amount == (float)transaction1.Amount &&
-					t[0].Description == transaction1.Description
+					t[0].Description == "SAMBERY 323" &&
+					t[0].MccId == mcc.Id
 					)));
 		}
 	}
