@@ -140,7 +140,7 @@ namespace SlidFinance.App.Saltedge
 						MccId = existingMcc?.Id,
 						Mcc = existingMcc,
 						DateTime = t.MadeOn.Value,
-						Description = merchantDescription,
+						Description = merchantDescription ?? t.Description,
 						Amount = (float)t.Amount.Value
 					};
 					list.Add(transaction);
@@ -184,11 +184,8 @@ namespace SlidFinance.App.Saltedge
 		{
 			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
 			{
-				Regex regex = new Regex(@"(.*)MCC: \d{4}");
-				var match = regex.Match(saltEdgeTransaction.Extra.Additional);
-
-				if (match.Success)
-					return match.Groups[1].Value;
+				Regex regex = new Regex(@"MCC: \d{4}");
+				return regex.Replace(saltEdgeTransaction.Extra.Additional, "");
 			}
 
 			return null;
@@ -210,7 +207,7 @@ namespace SlidFinance.App.Saltedge
 
 					var merchantDescription = GetMerchantDescription(t);
 
-					if (String.IsNullOrEmpty(merchantDescription))
+					if (!String.IsNullOrEmpty(merchantDescription))
 					{
 						var merchant = new Merchant() { MccId = existingMcc.Id, Name = merchantDescription, CreatedById = userId, Created = DateTime.Now };
 						await _merchantService.AddAsync(merchant);
