@@ -81,14 +81,14 @@ namespace SlidFinance.WebApi.UnitTests
 
 			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			var queue = new Queue<List<Mcc>>();
-			queue.Enqueue(new List<Mcc>());
 			queue.Enqueue(new List<Mcc>() { mcc });
+			_mccService.Setup(x => x.AddMccIfNotExistAsync(It.IsAny<ICollection<Mcc>>())).Returns(Task.CompletedTask);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(queue.Dequeue);
-			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
+			_accountService.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync(new List<BankAccount>() { account });
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
-			_mccService.Verify(x => x.AddAsync(It.Is<Mcc>(m => m.Code == transaction1.Mcc.Value.ToString("D4") && m.IsSystem == false)));
+			_mccService.Verify(x => x.AddMccIfNotExistAsync(It.Is<ICollection<Mcc>>(a => a.Any(m => m.Code == mcc.Code && m.IsSystem == false))));
 		}
 
 	}
