@@ -76,7 +76,9 @@ namespace SlidFinance.WebApi
 			   .ForMember(dest => dest.SelectedTariff,
 					opt => opt.Ignore());
 
-			CreateMap<ApplicationUser, Dto.User>();
+			CreateMap<ApplicationUser, Dto.User>()
+				.ForMember(dest => dest.IsAdmin,
+					opt => opt.Ignore());
 
 			CreateMap<Rule, Dto.Rule>()
 				.ForMember(dest => dest.CategoryId,

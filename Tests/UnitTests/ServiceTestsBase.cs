@@ -5,6 +5,7 @@ using SlidFinance.Infrastructure;
 using NUnit.Framework;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
+using Microsoft.AspNetCore.Identity;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -53,7 +54,11 @@ namespace SlidFinance.WebApi.UnitTests
 			_mockedDal = new DataAccessLayer(_banks.Object, _categories.Object, _users.Object, _accounts.Object, _rules.Object, _transactions.Object, 
 				_authTokens.Object, _mcc.Object);
 
-			_user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", TrusteeId = 1, Trustee = new Trustee { Id = 1 } });
+			var role = new IdentityRole() { Name = Role.Admin };
+			_db.Roles.Add(role);
+			await _db.SaveChangesAsync();
+			_user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com", TrusteeId = 1, Trustee = new Trustee { Id = 1 } });
+			await _db.UserRoles.AddAsync(new IdentityUserRole<string>() { RoleId = role.Id, UserId = _user.Id });
 		}
 	}
 }

@@ -52,6 +52,7 @@ namespace SlidFinance.WebApi.UnitTests
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
 			_merchantService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Merchant>());
 			_merchantService.Setup(x => x.AddAsync(It.IsAny<Merchant>())).ReturnsAsync((Merchant x) => x);
+			_accountService.Setup(x => x.GetListWithAccessCheckAsync(It.IsAny<string>(), It.IsAny<int?>())).ReturnsAsync(new List<BankAccount>() { account });
 
 			var result = await _service.Import(_user.Id, new PatchAccountDataBindingModel() { Code = account.Code, Balance = 100, Transactions = new Dto.ImportTransaction[] { transaction1 } });
 
