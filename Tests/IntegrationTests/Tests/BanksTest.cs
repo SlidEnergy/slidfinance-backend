@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SlidFinance.Domain;
+using System;
 using System.Threading.Tasks;
 
 namespace SlidFinance.WebApi.IntegrationTests
@@ -34,8 +35,12 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task AddBank_ShouldReturnContent()
 		{
-			var user = CreateUser("slidenergy@gmail.com", "Password123#");
-			await Login("slidenergy@gmail.com", "Password123#");
+			var userName = Guid.NewGuid() + "@mail.com";
+			var password = Guid.NewGuid().ToString().ToUpper() + Guid.NewGuid().ToString().ToLower();
+			var user = await CreateUser(userName, password);
+			await _manager.AddToRoleAsync(user, Role.Admin);
+
+			await Login(userName, password);
 
 			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/banks/", _accessToken, new Bank () {  Title = "Bank #1" });
 			var response = await SendRequest(request);
@@ -49,8 +54,12 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task UpdateBank_ShouldReturnContent()
 		{
-			var user = CreateUser("slidenergy@gmail.com", "Password123#");
-			await Login("slidenergy@gmail.com", "Password123#");
+			var userName = Guid.NewGuid() + "@mail.com";
+			var password = Guid.NewGuid().ToString().ToUpper() + Guid.NewGuid().ToString().ToLower();
+			var user = await CreateUser(userName, password);
+			await _manager.AddToRoleAsync(user, Role.Admin);
+
+			await Login(userName, password);
 
 			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);
@@ -72,8 +81,12 @@ namespace SlidFinance.WebApi.IntegrationTests
 		[Test]
 		public async Task DeleteBank_ShouldNoContent()
 		{
-			var user = CreateUser("slidenergy@gmail.com", "Password123#");
-			await Login("slidenergy@gmail.com", "Password123#");
+			var userName = Guid.NewGuid() + "@mail.com";
+			var password = Guid.NewGuid().ToString().ToUpper() + Guid.NewGuid().ToString().ToLower();
+			var user = await CreateUser(userName, password);
+			await _manager.AddToRoleAsync(user, Role.Admin);
+
+			await Login(userName, password);
 
 			var bank = new Bank("Bank #1");
 			await _dal.Banks.Add(bank);

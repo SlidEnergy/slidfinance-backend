@@ -13,6 +13,7 @@ using SaltEdgeNetCore.Models.Responses;
 using SaltEdgeNetCore.Models.Extra;
 using SaltEdgeNetCore.Models.Connections;
 using SaltEdgeNetCore.Models.Account;
+using SlidFinance.UnitTests;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -40,13 +41,12 @@ namespace SlidFinance.WebApi.UnitTests
 		[Test]
 		public async Task Import_ShouldCallMethodWithRightParameters()
 		{
-			var bank = new Bank() { Title = "Bank #1" };
-			_db.Banks.Add(bank);
+			var bank = await _db.CreateBank();
 			var account = await _db.CreateAccount(_user);
 			account.SaltedgeBankAccountId = "SaltedgeBankAccountId";
-			var category = await _db.CreateCategory(_user);	
-			var mcc = new Mcc() { Code = "0111" };
-			_db.Mcc.Add(mcc);
+			var category = await _db.CreateCategory(_user);
+			var mccCode = RandomGenerator.GenerateMcc();
+			var mcc = await _db.CreateMcc(mccCode.ToString());
 			var saltedgeAccount = new SaltedgeAccount() { Id = 1, CustomerId = "CustomerId" };
 			_db.SaltedgeAccounts.Add(saltedgeAccount);
 			_db.TrusteeSaltedgeAccounts.Add(new TrusteeSaltedgeAccount(_user, saltedgeAccount.Id));
@@ -59,7 +59,7 @@ namespace SlidFinance.WebApi.UnitTests
 				Category = "Bank category #1",
 				Extra = new SeTransactionExtra()
 				{
-					Additional = "AMBAМСС: 0111",
+					Additional = "AMBAМСС: " + mccCode.ToString(),
 					AccountBalanceSnapshot = 100
 				}
 			};

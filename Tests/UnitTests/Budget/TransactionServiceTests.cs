@@ -29,9 +29,9 @@ namespace SlidFinance.WebApi.UnitTests
 			_db.Accounts.Add(account);
 			_db.TrusteeAccounts.Add(new TrusteeAccount(_user, account ));
 			var t1 = new Transaction() { Account = account, BankCategory = "Bank category #1", Description = "Description #1", DateTime = DateTime.Today };
-			await _dal.Transactions.Add(t1);
+			_db.Transactions.Add(t1);
 			var t2 = new Transaction() { Account = account, BankCategory = "Bank category #2", Description = "Description #2", DateTime = DateTime.Today };
-			await _dal.Transactions.Add(t2);
+			_db.Transactions.Add(t2);
 
 			await _db.SaveChangesAsync();
 

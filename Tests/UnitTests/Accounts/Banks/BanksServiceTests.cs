@@ -33,10 +33,7 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task DeleteBank_ShouldCallAddMethodWithRightArguments()
         {
-            var bank = await _dal.Banks.Add(new Bank()
-            {
-                Title = "Bank #1",
-            });
+            var bank = await _db.CreateBank();
 
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
             _banks.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(bank);

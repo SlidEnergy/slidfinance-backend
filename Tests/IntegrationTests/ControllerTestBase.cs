@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using SlidFinance.App;
 using SlidFinance.Domain;
 using SlidFinance.Infrastructure;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +21,7 @@ namespace SlidFinance.WebApi.IntegrationTests
 		protected string _refreshToken;
 		protected ApplicationDbContext _db;
 		protected UserManager<ApplicationUser> _manager;
+		protected RoleManager<IdentityRole> _roleManager;
 		protected ApplicationUser _user;
 		protected DataAccessLayer _dal;
 
@@ -42,10 +45,15 @@ namespace SlidFinance.WebApi.IntegrationTests
 
 			if (_manager == null)
 				throw new Exception("Сервис для работы с пользователями не получен");
-			
+
+			_roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+			if (_roleManager == null)
+				throw new Exception("Сервис для работы с группой пользователей не получен");
+
 			_dal = new DataAccessLayer(
 				new EfRepository<Bank, int>(_db),
-				new EfRepository<UserCategory,int>(_db),
+				new EfRepository<UserCategory, int>(_db),
 				new EfRepository<ApplicationUser, string>(_db),
 				new EfRepository<BankAccount, int>(_db),
 				new EfRepository<Rule, int>(_db),
@@ -54,6 +62,8 @@ namespace SlidFinance.WebApi.IntegrationTests
 				new EfRepository<Mcc, int>(_db));
 
 			_user = await CreateUser("test1@email.com", "Password123#");
+			await CreateRole();
+			await _manager.AddToRoleAsync(_user, Role.Admin);
 
 			await Login("test1@email.com", "Password123#");
 		}
@@ -62,15 +72,24 @@ namespace SlidFinance.WebApi.IntegrationTests
 		{
 			var user = new ApplicationUser() { Email = email, UserName = email, Trustee = new Trustee() };
 			var result = await _manager.CreateAsync(user, password);
+
 			if (!result.Succeeded)
-				throw new Exception("Новый пользователь не создан");
+				throw new Exception("Новый пользователь не создан. " + result.Errors.Select(x => x.Description).Join(". "));
 
 			return user;
 		}
 
+		protected virtual async Task CreateRole()
+		{
+			var result = await _roleManager.CreateAsync(new IdentityRole(Role.Admin));
+
+			if (!result.Succeeded)
+				throw new Exception("Новая группа не создана");
+		}
+
 		protected virtual async Task Login(string email, string password)
 		{
-			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/users/token", null, 
+			var request = HttpRequestBuilder.CreateJsonRequest("POST", "/api/v1/users/token", null,
 				new { Email = email, Password = password, ConfirmPassword = password });
 			var response = await SendRequest(request);
 

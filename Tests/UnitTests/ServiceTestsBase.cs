@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.Threading.Tasks;
 using SlidFinance.Domain;
 using Microsoft.AspNetCore.Identity;
+using System;
 
 namespace SlidFinance.WebApi.UnitTests
 {
@@ -13,7 +14,6 @@ namespace SlidFinance.WebApi.UnitTests
 	{
 		protected readonly AutoMapperFactory _autoMapper = new AutoMapperFactory();
 		protected ApplicationDbContext _db;
-		protected DataAccessLayer _dal;
 		protected DataAccessLayer _mockedDal;
 		protected ApplicationUser _user;
 
@@ -32,15 +32,6 @@ namespace SlidFinance.WebApi.UnitTests
 			var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 			optionsBuilder.UseInMemoryDatabase(TestContext.CurrentContext.Test.Name);
 			_db = new ApplicationDbContext(optionsBuilder.Options);
-			_dal = new DataAccessLayer(
-				new EfRepository<Bank, int>(_db),
-				new EfRepository<UserCategory, int>(_db),
-				new EfRepository<ApplicationUser, string>(_db),
-				new EfRepository<BankAccount, int>(_db),
-				new EfRepository<Rule, int>(_db),
-				new EfRepository<Transaction, int>(_db),
-				new EfAuthTokensRepository(_db),
-				new EfRepository<Mcc, int>(_db));
 
 			_banks = new Mock<IRepository<Bank, int>>();
 			_categories = new Mock<IRepository<UserCategory, int>>();
@@ -56,9 +47,17 @@ namespace SlidFinance.WebApi.UnitTests
 
 			var role = new IdentityRole() { Name = Role.Admin };
 			_db.Roles.Add(role);
+
+			var trustee = new Trustee();
+			_db.Trustee.Add(trustee);
+
+			var userName = Guid.NewGuid() + "@mail.com";
+			_user = new ApplicationUser() { Email = userName, UserName = userName, TrusteeId = trustee.Id, Trustee = trustee };
+			_db.Users.Add(_user);
+			
+			_db.UserRoles.Add(new IdentityUserRole<string>() { RoleId = role.Id, UserId = _user.Id });
+
 			await _db.SaveChangesAsync();
-			_user = await _dal.Users.Add(new ApplicationUser() { Email = "test1@email.com", UserName = "test1@email.com", TrusteeId = 1, Trustee = new Trustee { Id = 1 } });
-			await _db.UserRoles.AddAsync(new IdentityUserRole<string>() { RoleId = role.Id, UserId = _user.Id });
 		}
 	}
 }

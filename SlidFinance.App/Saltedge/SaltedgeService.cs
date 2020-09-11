@@ -152,7 +152,7 @@ namespace SlidFinance.App.Saltedge
 
 		private string GetDescription(SaltEdgeTransaction transaction)
 		{
-			if (string.IsNullOrEmpty(transaction.Extra.Additional))
+			if (!string.IsNullOrEmpty(transaction.Extra.Additional))
 			{
 				var merchantDescription = GetMerchant(transaction);
 

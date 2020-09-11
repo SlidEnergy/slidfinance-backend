@@ -38,8 +38,8 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task PatchAccount_ShouldSetBalance()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
-            var account = await _dal.Accounts.Add(new BankAccount() { Code ="code_1", Bank = bank });
+            var bank = await _db.CreateBank();
+            var account = await _db.CreateAccount(_user);
 
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
@@ -55,26 +55,25 @@ namespace SlidFinance.WebApi.UnitTests
         [Test]
         public async Task PatchAccount_ShouldSetBank()
         {
-            var bank1 = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
-            var bank2 = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
-            var account = await _dal.Accounts.Add(new BankAccount() { Bank = bank1 });
+            var bank = await _db.CreateBank();
+            var account = await _db.CreateAccount(_user);
             
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _banks.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(bank2);
+            _banks.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(bank);
 
-            account.Bank = bank2;
+            account.Bank = bank;
 
             var patchedAccount = await _service.PatchAccount(_user.Id, account);
 
-            Assert.AreEqual(bank2.Id, patchedAccount.Bank.Id);
+            Assert.AreEqual(bank.Id, patchedAccount.Bank.Id);
         }
 
         [Test]
         public async Task PatchAccount_ShouldCallUpdateMethod()
         {
-            var bank = await _dal.Banks.Add(new Bank() { Title = "Bank #1" });
-            var account = await _dal.Accounts.Add(new BankAccount() { Title = "Account #1", Bank = bank, Code = "Code #1"});
+            var bank = await _db.CreateBank();
+            var account = await _db.CreateAccount(_user);
 
             _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
             _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
