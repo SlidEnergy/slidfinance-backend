@@ -8,45 +8,47 @@ namespace SlidFinance.App
 {
 	public class BanksService : IBanksService
 	{
-        private DataAccessLayer _dal;
 		private IApplicationDbContext _context;
 
-		public BanksService(DataAccessLayer dal, IApplicationDbContext context)
-        {
-            _dal = dal;
+		public BanksService(IApplicationDbContext context)
+		{
 			_context = context;
 		}
 
 		public async Task<List<Bank>> GetLis()
-        {
+		{
 			var banks = await _context.Banks.ToListAsync();
 
 			return banks.OrderBy(x => x.Title).ToList();
-        }
+		}
 
-        public async Task<Bank> AddBank(string title)
-        {
-            var bank = await _dal.Banks.Add(new Bank(title));
+		public async Task<Bank> AddBank(string title)
+		{
+			var bank = new Bank(title);
+			_context.Banks.Add(bank);
+			await _context.SaveChangesAsync();
 
-            return bank;
-        }
+			return bank;
+		}
 
-        public async Task<Bank> EditBank(int bankId, string title)
-        {
-            var editBank = await _dal.Banks.GetById(bankId);
+		public async Task<Bank> EditBank(int bankId, string title)
+		{
+			var editBank = await _context.Banks.FindAsync(bankId);
 
-            editBank.Rename(title);
+			editBank.Rename(title);
 
-            await _dal.Banks.Update(editBank);
+			_context.Banks.Update(editBank);
+			await _context.SaveChangesAsync();
 
-            return editBank;
-        }
+			return editBank;
+		}
 
-        public async Task DeleteBank(int bankId)
-        {
-            var bank = await _dal.Banks.GetById(bankId);
+		public async Task DeleteBank(int bankId)
+		{
+			var bank = await _context.Banks.FindAsync(bankId);
 
-            await _dal.Banks.Delete(bank);
-        }
-    }
+			_context.Banks.Remove(bank);
+			await _context.SaveChangesAsync();
+		}
+	}
 }

@@ -8,12 +8,10 @@ namespace SlidFinance.App
 {
 	public class AccountsService : IAccountsService
 	{
-		private DataAccessLayer _dal;
 		private IApplicationDbContext _context;
 
-		public AccountsService(DataAccessLayer dal, IApplicationDbContext context)
+		public AccountsService(IApplicationDbContext context)
 		{
-			_dal = dal;
 			_context = context;
 		}
 
@@ -68,21 +66,22 @@ namespace SlidFinance.App
 
 		public async Task<BankAccount> PatchAccount(string userId, BankAccount account)
 		{
-			var user = await _dal.Users.GetById(userId);
+			var user = await _context.Users.FindAsync(userId);
 
 			Bank bank = null;
 
 			if (account.Bank!= null)
 			{
-				bank = await _dal.Banks.GetById(account.Bank.Id);
+				bank = await _context.Banks.FindAsync(account.Bank.Id);
 
 				if (bank == null)
 					throw new EntityNotFoundException();
 			}
 
-			var newAccount = await _dal.Accounts.Update(account);
+			_context.Accounts.Update(account);
+			await _context.SaveChangesAsync();
 
-			return newAccount;
+			return account;
 		}
 
 		public async Task DeleteAccount(string userId, int accountId)

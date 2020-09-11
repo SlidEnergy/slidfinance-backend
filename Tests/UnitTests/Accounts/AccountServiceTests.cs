@@ -15,7 +15,7 @@ namespace SlidFinance.WebApi.UnitTests
         [SetUp]
         public void Setup()
         {
-            _service = new AccountsService(_mockedDal, _db);
+            _service = new AccountsService(_db);
         }
 
 
@@ -75,16 +75,10 @@ namespace SlidFinance.WebApi.UnitTests
             var bank = await _db.CreateBank();
             var account = await _db.CreateAccount(_user);
 
-            _accounts.Setup(x => x.Update(It.IsAny<BankAccount>())).ReturnsAsync(account);
-            _users.Setup(x => x.GetById(It.IsAny<string>())).ReturnsAsync(_user);
-            _banks.Setup(x => x.GetById(It.IsAny<int>())).ReturnsAsync(bank);
-
+            account.Balance = 100;
             var patchedAccount = await _service.PatchAccount(_user.Id, account);
 
-            _accounts.Verify(x => x.Update(It.Is<BankAccount>(a =>
-                a.Title == account.Title &&
-                a.Balance == account.Balance
-            )), Times.Once);
+            Assert.IsTrue(_db.Accounts.Any(x => x.Id == account.Id && x.Balance == account.Balance));
         }
     }
 }
