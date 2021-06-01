@@ -200,13 +200,13 @@ namespace SlidFinance.App.Saltedge
 
 		private string GetMerchant(SaltEdgeTransaction saltEdgeTransaction)
 		{
-			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.MerchantId))
+			if (!string.IsNullOrEmpty(saltEdgeTransaction?.Extra?.MerchantId))
 			{
 				var merchant = _saltedge.MerchantShow(saltEdgeTransaction.Extra.MerchantId);
 				return merchant.Names.Where(x => x.Mode == "name").Select(x => x.Value).FirstOrDefault();
 			}
 
-			if (!string.IsNullOrEmpty(saltEdgeTransaction.Extra.Additional))
+			if (!string.IsNullOrEmpty(saltEdgeTransaction?.Extra?.Additional))
 			{
 				Regex regex = new Regex(@"МСС: \d{4}");
 				return regex.Replace(saltEdgeTransaction.Extra.Additional, "");
