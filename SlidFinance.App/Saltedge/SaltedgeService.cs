@@ -129,7 +129,7 @@ namespace SlidFinance.App.Saltedge
 			foreach (var t in saltEdgeTransactions)
 			{
 				var mcc = GetMcc(t);
-				
+
 				var existingMcc = mcc == null ? null : mccList.FirstOrDefault(x => x.Code == mcc.Code);
 
 				if (t.MadeOn.HasValue && t.Amount.HasValue)
@@ -140,7 +140,7 @@ namespace SlidFinance.App.Saltedge
 						MccId = existingMcc?.Id,
 						Mcc = existingMcc,
 						DateTime = t.MadeOn.Value,
-						Description = GetDescription(t), 
+						Description = GetDescription(t),
 						Amount = (float)t.Amount.Value
 					};
 					list.Add(transaction);
@@ -203,7 +203,8 @@ namespace SlidFinance.App.Saltedge
 			if (!string.IsNullOrEmpty(saltEdgeTransaction?.Extra?.MerchantId))
 			{
 				var merchant = _saltedge.MerchantShow(saltEdgeTransaction.Extra.MerchantId);
-				return merchant.Names.Where(x => x.Mode == "name").Select(x => x.Value).FirstOrDefault();
+
+				return merchant?.Names?.Where(x => x.Mode == "name").Select(x => x.Value).FirstOrDefault();
 			}
 
 			if (!string.IsNullOrEmpty(saltEdgeTransaction?.Extra?.Additional))
