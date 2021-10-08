@@ -40,7 +40,7 @@ namespace SlidFinance.App.Analysis
 			var parts = findSearchPartInStringWithoutMcc(searchString, codes);
 
 			// Все счета пользователя
-			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
+			var accounts = await _context.GetBankAccountListWithAccessCheckAsync(userId);
 
 			// Все категории кэшбэков по тарифам
 			var allUserCategories = await _context.GetCashbackCategoriesWithAccessCheckAsync(userId);

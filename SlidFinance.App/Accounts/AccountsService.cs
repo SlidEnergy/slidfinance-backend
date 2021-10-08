@@ -19,7 +19,7 @@ namespace SlidFinance.App
 
 		public async Task<List<BankAccount>> GetListWithAccessCheckAsync(string userId, int? bankId = null)
 		{
-			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
+			var accounts = await _context.GetBankAccountListWithAccessCheckAsync(userId);
 
 			if (bankId.HasValue)
 				accounts = accounts.Where(x => x.Bank.Id == bankId).ToList();

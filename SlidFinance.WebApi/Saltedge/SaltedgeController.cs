@@ -46,12 +46,14 @@ namespace SlidFinance.WebApi.Controllers
 			return Ok(count);
 		}
 
-		[HttpPost("refresh/all")]
-		public async Task<ActionResult<int>> RefreshAll()
+		[HttpPost("refresh/{{saltedgeBankAccountId}}")]
+		public async Task<ActionResult<int>> Refresh(string saltedgeBankAccountId)
 		{
 			var userId = User.GetUserId();
 
-			return Ok(0);
+			var url = await _saltedgeService.Refresh(userId, saltedgeBankAccountId);
+
+			return Ok(url);
 		}
 
 		[HttpGet("accounts")]

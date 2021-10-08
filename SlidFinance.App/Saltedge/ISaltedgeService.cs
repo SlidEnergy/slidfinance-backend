@@ -12,5 +12,6 @@ namespace SlidFinance.App.Saltedge
 		Task<IEnumerable<SaltedgeBankAccounts>> GetSaltedgeBankAccounts(string userId);
 
 		Task<int> Import(string userId);
+		Task<string> Refresh(string userId, string saltedgeBankAccountId);
 	}
 }

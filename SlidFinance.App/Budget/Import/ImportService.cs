@@ -69,7 +69,7 @@ namespace SlidFinance.App
 
 		private async Task<BankAccount> GetAccount(string userId, string accountCode)
 		{
-			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
+			var accounts = await _context.GetBankAccountListWithAccessCheckAsync(userId);
 
 			var account = accounts.FirstOrDefault(x => x.Code == accountCode);
 

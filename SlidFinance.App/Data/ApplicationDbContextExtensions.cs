@@ -72,7 +72,7 @@ namespace SlidFinance.App
 			return allProducts.Union(products).ToList();
 		}
 
-		public static async Task<List<BankAccount>> GetAccountListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
+		public static async Task<List<BankAccount>> GetBankAccountListWithAccessCheckAsync(this IApplicationDbContext context, string userId)
 		{
 			var user = await context.Users.FindAsync(userId);
 

@@ -46,13 +46,13 @@ namespace SlidFinance.App.Saltedge
 		{
 			var saltedgeAccount = await _context.GetSaltedgeAccountByIdWithAccessCheck(userId);
 
-			var connectionsResponse = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
+			var connectionsResponse = await _saltedge.ConnectionsListAsync(saltedgeAccount.CustomerId);
 
 			var list = new List<SaltedgeBankAccounts>();
 
 			foreach (var connection in connectionsResponse.Data)
 			{
-				var accountsResponse = _saltedge.AccountList(connection.Id);
+				var accountsResponse = await _saltedge.AccountListAsync(connection.Id);
 
 				list.Add(new SaltedgeBankAccounts() { Connection = connection, Accounts = accountsResponse.Data });
 			}
@@ -60,13 +60,51 @@ namespace SlidFinance.App.Saltedge
 			return list;
 		}
 
-		public async Task<int> Import(string userId)
+		private async Task<IEnumerable<SeConnection>> GetUserConnections(string userId)
 		{
 			var saltedgeAccount = await _context.GetSaltedgeAccountByIdWithAccessCheck(userId);
 
-			var connectionsResponse = _saltedge.ConnectionsList(saltedgeAccount.CustomerId);
+			var connectionsResponse = await _saltedge.ConnectionsListAsync(saltedgeAccount.CustomerId);
 
-			var accounts = await _context.GetAccountListWithAccessCheckAsync(userId);
+			return connectionsResponse.Data;
+		}
+
+		private async Task<SeConnection> GetSeConnectionBySaltedgeBankAccountId(string userId, string saltedgeBankAccountId)
+		{
+			var connections = await GetUserConnections(userId);
+
+			foreach (var connection in connections)
+			{
+				var accountsResponse = await _saltedge.AccountListAsync(connection.Id);
+
+				foreach (var responseAccount in accountsResponse.Data)
+				{
+					if (responseAccount.Id == saltedgeBankAccountId)
+						return connection;
+				}
+			}
+
+			return null;
+		}
+
+		public async Task<string> Refresh(string userId, string saltedgeBankAccountId)
+		{
+			var connection = await GetSeConnectionBySaltedgeBankAccountId(userId, saltedgeBankAccountId);
+
+
+			var session = new SaltEdgeNetCore.Models.ConnectSession.RefreshSession()
+			{
+				ConnectionId = connection.Id
+			};
+
+			var response = await _saltedge.SessionRefreshAsync(session);
+
+			return response.ConnectUrl;
+		}
+
+		public async Task<int> Import(string userId)
+		{
+			var accounts = await _context.GetBankAccountListWithAccessCheckAsync(userId);
 			accounts = accounts.Where(x => x.SaltedgeBankAccountId != null).ToList();
 
 			if (accounts.Count() == 0)
@@ -74,9 +112,11 @@ namespace SlidFinance.App.Saltedge
 
 			int count = 0;
 
-			foreach (var connection in connectionsResponse.Data)
+			var connections = await GetUserConnections(userId);
+
+			foreach (var connection in connections)
 			{
-				var accountsResponse = _saltedge.AccountList(connection.Id);
+				var accountsResponse = await _saltedge.AccountListAsync(connection.Id);
 
 				foreach (var responseAccount in accountsResponse.Data)
 				{
@@ -94,7 +134,7 @@ namespace SlidFinance.App.Saltedge
 
 		private async Task<int> ImportByAccount(string userId, SeConnection connection, SeAccount saltedgeAccount, BankAccount account)
 		{
-			var transactionsResponse = _saltedge.TransactionsList(connection.Id, saltedgeAccount.Id);
+			var transactionsResponse = await _saltedge.TransactionsListAsync(connection.Id, saltedgeAccount.Id);
 
 			return await ImportTransactions(userId, account, transactionsResponse.Data);
 		}
@@ -140,7 +180,7 @@ namespace SlidFinance.App.Saltedge
 						MccId = existingMcc?.Id,
 						Mcc = existingMcc,
 						DateTime = t.MadeOn.Value,
-						Description = GetDescription(t),
+						Description = await GetDescription(t),
 						Amount = (float)t.Amount.Value
 					};
 					list.Add(transaction);
@@ -150,11 +190,11 @@ namespace SlidFinance.App.Saltedge
 			return list;
 		}
 
-		private string GetDescription(SaltEdgeTransaction transaction)
+		private async Task<string> GetDescription(SaltEdgeTransaction transaction)
 		{
 			if (!string.IsNullOrEmpty(transaction.Extra.Additional))
 			{
-				var merchantDescription = GetMerchant(transaction);
+				var merchantDescription = await GetMerchant(transaction);
 
 				if (!string.IsNullOrEmpty(merchantDescription))
 					return merchantDescription;
@@ -198,11 +238,11 @@ namespace SlidFinance.App.Saltedge
 			return null;
 		}
 
-		private string GetMerchant(SaltEdgeTransaction saltEdgeTransaction)
+		private async Task<string> GetMerchant(SaltEdgeTransaction saltEdgeTransaction)
 		{
 			if (!string.IsNullOrEmpty(saltEdgeTransaction?.Extra?.MerchantId))
 			{
-				var merchant = _saltedge.MerchantShow(saltEdgeTransaction.Extra.MerchantId);
+				var merchant = await _saltedge.MerchantShowAsync(saltEdgeTransaction.Extra.MerchantId);
 
 				return merchant?.Names?.Where(x => x.Mode == "name").Select(x => x.Value).FirstOrDefault();
 			}
@@ -230,7 +270,7 @@ namespace SlidFinance.App.Saltedge
 					if (existingMcc == null)
 						throw new Exception("МСС код не найден");
 
-					var merchantDescription = GetMerchant(t);
+					var merchantDescription = await GetMerchant(t);
 
 					if (!String.IsNullOrEmpty(merchantDescription))
 					{
