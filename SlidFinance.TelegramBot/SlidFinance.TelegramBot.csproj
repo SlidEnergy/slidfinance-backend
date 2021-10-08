@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Bot.Builder" Version="4.7.2" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.7.2" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.7.2" />
-    <PackageReference Include="Microsoft.Bot.Connector" Version="4.7.2" />
+    <PackageReference Include="Microsoft.Bot.Connector" Version="4.7.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.1" />
     <PackageReference Include="Telegram.Bot" Version="15.3.0" />
   </ItemGroup>
