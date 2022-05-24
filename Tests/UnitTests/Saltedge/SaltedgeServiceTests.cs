@@ -72,9 +72,9 @@ namespace SlidFinance.WebApi.UnitTests
 			var accountsResponse = new SaltEdgeNetCore.Models.Responses.Response<IEnumerable<SeAccount>, SePaging>();
 			accountsResponse.Data = new List<SeAccount>() { new SeAccount() { Id = "SaltedgeBankAccountId" } };
 
-			_saltedgeClient.Setup(x => x.TransactionsList(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(transactionsResponse);
-			_saltedgeClient.Setup(x => x.ConnectionsList(It.IsAny<string>(), It.IsAny<string>())).Returns(connectionsResponse);
-			_saltedgeClient.Setup(x => x.AccountList(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(accountsResponse);
+			_saltedgeClient.Setup(x => x.TransactionsListAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(transactionsResponse);
+			_saltedgeClient.Setup(x => x.ConnectionsListAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(connectionsResponse);
+			_saltedgeClient.Setup(x => x.AccountListAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(accountsResponse);
 			_importService.Setup(x => x.Import(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<float?>(), It.IsAny<Transaction[]>())).ReturnsAsync(1);
 			_mccService.Setup(x => x.GetListAsync()).ReturnsAsync(new List<Mcc>() { mcc });
 			_mccService.Setup(x => x.AddAsync(It.IsAny<Mcc>())).ReturnsAsync(mcc);
